@@ -40,7 +40,7 @@ const groups = {
 };
 
 // Load data.
-const stages = d3.tsv("data/trans_zz_pivoted.tsv", d3.autoType);
+const stages = d3.tsv("data/ftf_zz_pivoted.tsv", d3.autoType);
 
 // Once data is loaded...
 stages.then(function (data) {
@@ -156,7 +156,7 @@ stages.then(function (data) {
       return
     };
 
-    nodes.forEach(function (o, i) {
+    nodes.forEach(function (o, i) { // o here is an individual node
       o.timeleft -= 1;
       if (o.timeleft == 0 && o.istage < o.stages.length - 1) {
         // Decrease counter for previous group.

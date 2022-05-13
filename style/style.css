@@ -1,5 +1,5 @@
 body {
-    font-family: "Cambria", Georgia;
+    font-family: "Century Gothic";
     background: #FBEEE6;
 }
 #main-wrapper {
@@ -7,6 +7,16 @@ body {
 }
 #chart {
     margin: 0px auto;
+}
+#play-pause {
+    background-color: #4a6b96;
+    border: none;
+    color: white;
+    padding: 8px 40px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
 }
 
 h1 {

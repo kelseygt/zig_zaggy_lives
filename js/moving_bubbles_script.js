@@ -28,7 +28,7 @@ d3.select("#chart").style("width", (width + margin.left + margin.right) + "px");
 
 // Group coordinates and meta info. 
 const groups = {
-  "Starting Cohort": { x: 580, y: 120, color: "#800080", cnt: 0, fullname: "Starting Cohort" },
+  "Starting Cohort": { x: 580, y: 120, color: "#BB8FCE", cnt: 0, fullname: "Starting Cohort" },
   "Sabbatical": { x: 580, y: 500, color: "#e7b416", cnt: 0, fullname: "Sabbatical" },  
   "Freshman": { x: 930, y: 200, color: "#ABD5AB", cnt: 0, fullname: "Freshman" },
   "Sophomore": { x: 1030, y: 450, color: "#85C285", cnt: 0, fullname: "Sophomore" },
@@ -54,8 +54,6 @@ stages.then(function (data) {
       people[d.pid + ""] = [d];
     }
   });
-
-  console.log(people)
 
   // Create node data.
   var nodes = d3.keys(people).map(function (d) {

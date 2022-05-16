@@ -14,7 +14,7 @@ Establishing whether a student graduates, takes a sabbatical, transfer out, or d
     - Fill forward transfer status, but only where term value is NA
 3. 'Drop Out' logic:
     - Calc is based on a student's last enrolled semester (max term)
-    - Drop-outs are considered someone who left MSU without graduating, and did not enroll elsewhere
+    - Drop-outs are considered someone who left the institution without graduating, and did not enroll elsewhere
     - This was the trickiest one, and the logic was done in Excel first, to remove students with a max term that meet the below criteria. Logic to be implemented in R forthcoming.
         - If the student has a 'graduated' status AFTER their last semester, their max term was removed (because they should not be considered a drop-out)	
         - If the student has a 'graduated' status BEFORE their last semester, that's already been overwritten by 'graduated' status

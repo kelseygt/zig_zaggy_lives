@@ -1,299 +1,33 @@
 <!DOCTYPE html>
+
 <head>
-<meta charset="utf-8">
-<title>The Lives of Students</title>
-<link rel="stylesheet" href="style/style.css" type="text/css" media="screen" />
+  <meta charset="utf-8">
+  <title>The Lives of Students</title>
+  <link rel="stylesheet" href="style/style.css" type="text/css" media="screen" />
 </head>
 
 <div id="main-wrapper">
   <h1 id="term"><span class="trm">Fall 2011</span></h1>
   <h2 id="yrcount">Year <span class="cnt">1</span></h2>
-	<!-- <h2 id="timecount">Total Months Elapsed: <span class="cnt">0</span></h2> -->
   <h3>Fall 2011 First-Time Freshman</h3>
-    <div id="chart"></div>
-    <!-- <iframe width="50%" height="682" frameborder="0" src="https://observablehq.com/embed/@kelseygt/transfer_outs?cells=chart"></iframe> -->
-    
+  <br />
+  <div style="text-align:center"><button id="play-pause" width="90"></button></div>
+  <div id="chart"></div>
 </div><!-- @end #main-wrapper -->
 
-
-<script src="js/d3.v5.min.js"></script>
-
+<!-- <script src="js/d3.v5.min.js"></script> -->
+<script src="https://d3js.org/d3.v5.min.js"></script>
 
 <script>
-const people = {};
-let time_so_far = 0;
-
-// Node size and spacing.
-const radius = 4,
-	  padding = 3, // Space between nodes
-    cluster_padding = 5; // Space between nodes in different stages
-    
-// Dimensions of chart.
-const margin = { top: 20, right: 20, bottom: 20, left: 20 },
-      width = 1050 - margin.left - margin.right,
-      height = 1000 - margin.top - margin.bottom; 
-
-const svg = d3.select("#chart").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-d3.select("#chart").style("width", (width + margin.left + margin.right) + "px");
-
-
-// Group coordinates and meta info. 
-const groups = {
-    "First-Time Freshman": { x: 500, y: 575, color: "#800080", cnt: 0, fullname: "First-Time Freshman" },
-    "Freshman": { x: 700, y: 150, color: "#ABD5AB", cnt: 0, fullname: "Freshman" }, 
-    "Sophomore": { x: 900, y: 350, color: "#85C285", cnt: 0, fullname: "Sophomore" },
-    "Junior": { x: 900, y: 600, color: "#4FA64F", cnt: 0, fullname: "Junior" },
-	  "Senior": { x: 700, y: 800, color: "#249225", cnt: 0, fullname: "Senior" },
-    "Graduated": { x: 300, y: 800, color: "#4a6b96", cnt: 0, fullname: "Graduated" },
-    "Sabbatical": { x: 100, y: 600, color: "#e7b416", cnt: 0, fullname: "Sabbatical" },
-    "Transferred Out": { x: 100, y: 350, color: "#db7b2b", cnt: 0, fullname: "Transferred Out" },
-    "Dropped Out": { x: 300, y: 150, color: "#cc3232", cnt: 0, fullname: "Dropped Out" },
-};
-
-// const sexColors = {
-//    "Male": { color: "#AF7AC5" },
-//    "Female": { color: "#1ABC9C" }
-// }
-
-// Load data.
-const stages = d3.tsv("data/final_zz_pivoted.tsv", d3.autoType);
-
-// Once data is loaded...
-stages.then(function(data) {
-    
-    // Consolidate stages by pid.
-    // The data file is one row per stage change.
-    data.forEach(d => {
-        if (d3.keys(people).includes(d.pid+"")) {
-            people[d.pid+""].push(d);
-        } else {
-            people[d.pid+""] = [d];
-        }
-    });
-    
-    // Create node data.
-    var nodes = d3.keys(people).map(function(d) {
-        
-        // Initialize count for each group.
-        groups[people[d][0].grp].cnt += 1;
-        
-        return {
-            id: "node"+d,
-            x: groups[people[d][0].grp].x + Math.random(),
-            y: groups[people[d][0].grp].y + Math.random(),
-            r: radius,
-            color: groups[people[d][0].grp].color,
-            // color: sexColors[people[d][0].sex].color,
-            group: people[d][0].grp,
-            timeleft: people[d][0].duration,
-            istage: 0,
-            stages: people[d]
-        }
-    });
-    
-    
-    // Circle for each node.
-    const circle = svg.append("g")
-        .selectAll("circle")
-        .data(nodes)
-        .join("circle")
-          .attr("cx", d => d.x)
-          .attr("cy", d => d.y)
-          .attr("fill", d => d.color);
-    
-    // Ease in the circles.
-    circle.transition()
-      .delay((d, i) => i * 5)
-      .duration(800)
-      .attrTween("r", d => {
-        const i = d3.interpolate(0, d.r);
-        return t => d.r = i(t);
-      });
-
-    // Group name labels
-    svg.selectAll('.grp')
-      .data(d3.keys(groups))
-      .join("text")
-          .attr("class", "grp")
-          .attr("text-anchor", "middle")
-          .attr("x", d => groups[d].x)
-          .attr("y", d => groups[d].y + 100)
-          .text(d => groups[d].fullname);
-          
-    // Group counts
-    svg.selectAll('.grpcnt')
-      .data(d3.keys(groups))
-      .join("text")
-          .attr("class", "grpcnt")
-          .attr("text-anchor", "middle")
-          .attr("x", d => groups[d].x)
-          .attr("y", d => groups[d].y + 125)
-          .text(d => `n = ${groups[d].cnt}`);
-
-    // Group percent
-    svg.selectAll('.grpper')
-      .data(d3.keys(groups))
-      .join("text")
-          .attr("class", "grpper")
-          .attr("text-anchor", "middle")
-          .attr("x", d => groups[d].x)
-          .attr("y", d => groups[d].y + 150)
-          .text(d => `${Math.round((groups[d].cnt/d3.keys(people).length)*100*10)/10}%`);
-
-    // Forces
-    const simulation = d3.forceSimulation(nodes)
-        .force("x", d => d3.forceX(d.x))
-        .force("y", d => d3.forceY(d.y))
-        .force("cluster", forceCluster())
-        .force("collide", forceCollide())
-        .alpha(.09)
-        .alphaDecay(0);
-
-    // Adjust position of circles.
-    simulation.on("tick", () => {    
-        circle
-            .attr("cx", d => d.x)
-            .attr("cy", d => d.y)
-            .attr("fill", d => groups[d.group].color);
-        });
-    
-        
-    // Make time pass. Adjust node stage as necessary.
-    function timer() {
-
-        if (time_so_far == 124) {
-            return
-          };
-
-        nodes.forEach(function(o,i) {
-            o.timeleft -= 1;
-            if (o.timeleft == 0 && o.istage < o.stages.length-1) {
-                // Decrease counter for previous group.
-                groups[o.group].cnt -= 1;
-                
-                // Update current node to new group.
-                o.istage += 1;
-                o.group = o.stages[o.istage].grp;
-                o.timeleft = o.stages[o.istage].duration;
-                
-                // Increment counter for new group.
-                groups[o.group].cnt += 1;
-            }
-        });
-        
-        // Increment time.
-        time_so_far += 1;
-        d3.select("#term .trm").text(`${termLabels[Math.floor((time_so_far) / 4)]}`);
-        d3.select("#timecount .cnt").text(time_so_far - 4);
-        d3.select("#yrcount .cnt").text(Math.ceil((time_so_far - 4) / 12));
-        
-        // Update counters.
-        svg.selectAll('.grpcnt').text(d => `n = ${groups[d].cnt}`);
-        svg.selectAll('.grpper').text(d => `${Math.round((groups[d].cnt/d3.keys(people).length)*100*10)/10}%`);
-
-        // Do it again.
-        d3.timeout(timer, 1000);
-        
-    } // @end timer()
-
-    
-    // Start things off after a few seconds.
-    d3.timeout(timer, 10000);
-    
-});
-
-termLabels = [
-  "Fall 2011",
-  "Fall 2011", 
-  "Spring 2012", 
-  "Summer 2012", 
-  "Fall 2012", 
-  "Spring 2013", 
-  "Summer 2013", 
-  "Fall 2013", 
-  "Spring 2014", 
-  "Summer 2014", 
-  "Fall 2014", 
-  "Spring 2015", 
-  "Summer 2015", 
-  "Fall 2015", 
-  "Spring 2016", 
-  "Summer 2016", 
-  "Fall 2016",
-  "Spring 2017", 
-  "Summer 2017", 
-  "Fall 2017", 
-  "Spring 2018", 
-  "Summer 2018", 
-  "Fall 2018", 
-  "Spring 2019", 
-  "Summer 2019", 
-  "Fall 2019", 
-  "Spring 2020", 
-  "Summer 2020", 
-  "Fall 2020", 
-  "Spring 2021", 
-  "Summer 2021",
-  "Summer 2021"
-]
-
-// Force to increment nodes to groups.
-function forceCluster() {
-  const strength = .15;
-  let nodes;
-
-  function force(alpha) {
-    const l = alpha * strength;
-    for (const d of nodes) {
-      d.vx -= (d.x - groups[d.group].x) * l;
-      d.vy -= (d.y - groups[d.group].y) * l;
-    }
-  }
-  force.initialize = _ => nodes = _;
-
-  return force;
-}
-
-// Force for collision detection.
-function forceCollide() {
-  const alpha = 0.2; // fixed for greater rigidity!
-  const padding1 = padding; // separation between same-color nodes
-  const padding2 = cluster_padding; // separation between different-color nodes
-  let nodes;
-  let maxRadius;
-
-  function force() {
-    const quadtree = d3.quadtree(nodes, d => d.x, d => d.y);
-    for (const d of nodes) {
-      const r = d.r + maxRadius;
-      const nx1 = d.x - r, ny1 = d.y - r;
-      const nx2 = d.x + r, ny2 = d.y + r;
-      quadtree.visit((q, x1, y1, x2, y2) => {
-      
-        if (!q.length) do {
-          if (q.data !== d) {
-            const r = d.r + q.data.r + (d.group === q.data.group ? padding1 : padding2);
-            let x = d.x - q.data.x, y = d.y - q.data.y, l = Math.hypot(x, y);
-            if (l < r) {
-              l = (l - r) / l * alpha;
-              d.x -= x *= l, d.y -= y *= l;
-              q.data.x += x, q.data.y += y;
-            }
-          }
-        } while (q = q.next);
-        return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
-      });
-    }
-  }
-
-  force.initialize = _ => maxRadius = d3.max(nodes = _, d => d.r) + Math.max(padding1, padding2);
-
-  return force;
-}
-
+  var PAUSE = false;
+  d3.select('button#play-pause')
+    .on('click', function() {
+      let self = d3.select(this)
+      PAUSE = !PAUSE
+      console.log(`Animation ${PAUSE ? 'paused' : 'playing'}`)
+      self.text(PAUSE ? 'Play' : 'Pause')
+    })
+    .text(PAUSE ? 'Play' : 'Pause')
 </script>
+
+<script src="js/moving_bubbles_script.js" type="text/javascript"></script>

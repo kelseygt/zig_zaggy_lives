@@ -148,6 +148,10 @@ stages.then(function (data) {
     }
   }
 
+
+  // slider.oninput = mySliderUpdateFunction
+
+
   // Make time pass. Adjust node stage as necessary.
   function playSimulation() {
     if (time_so_far == 30) {

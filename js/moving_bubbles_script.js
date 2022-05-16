@@ -155,7 +155,7 @@ stages.then(function (data) {
     };
 
     nodes.forEach(function (o, i) { // o here is an individual node
-      o.timeleft -= 1;
+      o.timeleft = Math.max(o.timeleft - 1, 0);
       if (o.timeleft == 0 && o.istage < o.stages.length - 1) {
         // Decrease counter for previous group.
         groups[o.group].cnt -= 1;

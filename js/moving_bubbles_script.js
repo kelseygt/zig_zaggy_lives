@@ -1,20 +1,50 @@
-function getSliderValue(run) {
-  previousSliderValue = sliderValue
-  sliderValue = run.value
-}
-
 // Dimensions of chart.
 const margin = { top: 20, right: 20, bottom: 20, left: 20 };
 const width = 1200 - margin.left - margin.right;
 const height = 1100 - margin.top - margin.bottom;
 
-const svg = d3.select("#chart").append("svg")
-  .attr("width", width + margin.left + margin.right)
-  .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+// Initialize global constants.
+const radius = 4; // Size of the nodes
+const padding = 1.2 * radius; // Space between nodes
+const cluster_padding = 2 * padding; // Space between nodes in different stages
 
-d3.select("#chart").style("width", (width + margin.left + margin.right) + "px");
+// Initialize global variables.
+let sliderValue = 1;
+let previousSliderValue = sliderValue
+let slider = document.querySelector("input[type='range']");
+
+const termLabels = [
+  "Fall 2011",
+  "Spring 2012",
+  "Summer 2012",
+  "Fall 2012",
+  "Spring 2013",
+  "Summer 2013",
+  "Fall 2013",
+  "Spring 2014",
+  "Summer 2014",
+  "Fall 2014",
+  "Spring 2015",
+  "Summer 2015",
+  "Fall 2015",
+  "Spring 2016",
+  "Summer 2016",
+  "Fall 2016",
+  "Spring 2017",
+  "Summer 2017",
+  "Fall 2017",
+  "Spring 2018",
+  "Summer 2018",
+  "Fall 2018",
+  "Spring 2019",
+  "Summer 2019",
+  "Fall 2019",
+  "Spring 2020",
+  "Summer 2020",
+  "Fall 2020",
+  "Spring 2021",
+  "Summer 2021"
+]
 
 // Group coordinates and meta info. 
 const groups = {
@@ -29,12 +59,13 @@ const groups = {
   "Dropped Out": { x: 230, y: 200, color: "#cc3232", cnt: 0, fullname: "Dropped Out" },
 };
 
-// Initialize globals
-const radius = 4; // Size of the nodes
-const padding = 1.2 * radius; // Space between nodes
-const cluster_padding = 2 * padding; // Space between nodes in different stages
-let sliderValue = 1;
-let previousSliderValue = sliderValue
+const svg = d3.select("#chart").append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.select("#chart").style("width", (width + margin.left + margin.right) + "px");
 
 // Load data.
 const stages = d3.tsv("data/ftf_zz_pivoted.tsv", d3.autoType);
@@ -43,7 +74,7 @@ const stages = d3.tsv("data/ftf_zz_pivoted.tsv", d3.autoType);
 stages.then(function (data) {
   // Initialize local variables.
   const people = {};
-  const simulationRate = 5000  // in milliseconds
+  const simulationRate = 1000  // in milliseconds
   let currentTerm = -1;
 
   // Consolidate stages by pid.
@@ -165,6 +196,9 @@ stages.then(function (data) {
       previousSliderValue = sliderValue
       currentTerm = sliderValue - 1
     }
+    
+    // Update slider position based on loop.
+    updateSliderPosition(currentTerm + 1)
 
     // Update node positions.
     nodes.forEach(function (node) {
@@ -199,39 +233,6 @@ stages.then(function (data) {
   // Start things off after a few seconds.
   setTimeout(simulateNodes, simulationRate);
 });
-
-termLabels = [
-  "Fall 2011",
-  "Spring 2012",
-  "Summer 2012",
-  "Fall 2012",
-  "Spring 2013",
-  "Summer 2013",
-  "Fall 2013",
-  "Spring 2014",
-  "Summer 2014",
-  "Fall 2014",
-  "Spring 2015",
-  "Summer 2015",
-  "Fall 2015",
-  "Spring 2016",
-  "Summer 2016",
-  "Fall 2016",
-  "Spring 2017",
-  "Summer 2017",
-  "Fall 2017",
-  "Spring 2018",
-  "Summer 2018",
-  "Fall 2018",
-  "Spring 2019",
-  "Summer 2019",
-  "Fall 2019",
-  "Spring 2020",
-  "Summer 2020",
-  "Fall 2020",
-  "Spring 2021",
-  "Summer 2021"
-]
 
 // Force to increment nodes to groups.
 function forceCluster() {
@@ -286,4 +287,13 @@ function forceCollide() {
   force.initialize = _ => maxRadius = d3.max(nodes = _, d => d.r) + Math.max(padding, cluster_padding);
 
   return force;
+}
+
+function getSliderValue(run) {
+  previousSliderValue = sliderValue
+  sliderValue = run.value
+}
+
+function updateSliderPosition(value) {
+  slider.value = Math.min(Math.max(value, 1), 30)
 }

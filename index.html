@@ -7,21 +7,26 @@
 </head>
 
 <div id="main-wrapper">
-  <h1 id="term"><span class="trm">Fall 2011</span></h1>
-  <h2 id="yrcount">Year <span class="cnt">1</span></h2>
-  <h3>Fall 2011 First-Time Freshman</h3>
-  <br />
+  <h1>Follow the Lives of<br/>Fall 2011 First-Time Freshman</h1>
+  <div style="line-height:75%;"><br></div>
   <div style="text-align:center"><button id="play-pause" width="90"></button></div>
+  <div style="line-height:50%;"><br></div>
+  <div class="slidecontainer" style="text-align:center">
+    <span class="leftlabel">Fall 2011</span>
+    <input type="range" min="1" max="30" value="1" class="slider" step="1" id="myRange" list="tickmarks" onchange="getSliderValue(this)">
+    <span class="rightlabel">Summer 2021</span>
+  </div>
+  <h2 id="term"><span class="trm">Fall 2011</span></h1>
+  <h3 id="yrcount">Year <span class="cnt">1</span></h2>
   <div id="chart"></div>
-</div><!-- @end #main-wrapper -->
+</div>
 
-<!-- <script src="js/d3.v5.min.js"></script> -->
-<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="js/d3.v5.min.js"></script>
 
 <script>
   var PAUSE = false;
   d3.select('button#play-pause')
-    .on('click', function() {
+    .on('click', function () {
       let self = d3.select(this)
       PAUSE = !PAUSE
       console.log(`Animation ${PAUSE ? 'paused' : 'playing'}`)

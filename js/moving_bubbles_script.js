@@ -1,35 +1,55 @@
-
-const people = {};
-let time_so_far = 0;
-
-// Node size and spacing.
-// const radius = 4; // Size of the nodes
-// const padding = 4; // Space between nodes
-// const cluster_padding = 5; // Space between nodes in different stages
-
-const simulationRate = 5000  // in milliseconds
-
-const radius = 4; // Size of the nodes
-const padding = 1.2 * radius; // Space between nodes
-const cluster_padding = 2 * padding; // Space between nodes in different stages
-
 // Dimensions of chart.
 const margin = { top: 20, right: 20, bottom: 20, left: 20 };
 const width = 1200 - margin.left - margin.right;
 const height = 1100 - margin.top - margin.bottom;
 
-const svg = d3.select("#chart").append("svg")
-  .attr("width", width + margin.left + margin.right)
-  .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+// Initialize global constants.
+const radius = 4; // Size of the nodes
+const padding = 1.2 * radius; // Space between nodes
+const cluster_padding = 2 * padding; // Space between nodes in different stages
 
-d3.select("#chart").style("width", (width + margin.left + margin.right) + "px");
+// Initialize global variables.
+let sliderValue = 1;
+let previousSliderValue = sliderValue
+let slider = document.querySelector("input[type='range']");
+
+const termLabels = [
+  "Fall 2011",
+  "Spring 2012",
+  "Summer 2012",
+  "Fall 2012",
+  "Spring 2013",
+  "Summer 2013",
+  "Fall 2013",
+  "Spring 2014",
+  "Summer 2014",
+  "Fall 2014",
+  "Spring 2015",
+  "Summer 2015",
+  "Fall 2015",
+  "Spring 2016",
+  "Summer 2016",
+  "Fall 2016",
+  "Spring 2017",
+  "Summer 2017",
+  "Fall 2017",
+  "Spring 2018",
+  "Summer 2018",
+  "Fall 2018",
+  "Spring 2019",
+  "Summer 2019",
+  "Fall 2019",
+  "Spring 2020",
+  "Summer 2020",
+  "Fall 2020",
+  "Spring 2021",
+  "Summer 2021"
+]
 
 // Group coordinates and meta info. 
 const groups = {
   "Starting Cohort": { x: 580, y: 120, color: "#BB8FCE", cnt: 0, fullname: "Starting Cohort" },
-  "Sabbatical": { x: 580, y: 500, color: "#e7b416", cnt: 0, fullname: "Sabbatical" },  
+  "Sabbatical": { x: 580, y: 500, color: "#e7b416", cnt: 0, fullname: "Sabbatical" },
   "Freshman": { x: 930, y: 200, color: "#ABD5AB", cnt: 0, fullname: "Freshman" },
   "Sophomore": { x: 1030, y: 450, color: "#85C285", cnt: 0, fullname: "Sophomore" },
   "Junior": { x: 930, y: 700, color: "#4FA64F", cnt: 0, fullname: "Junior" },
@@ -39,11 +59,23 @@ const groups = {
   "Dropped Out": { x: 230, y: 200, color: "#cc3232", cnt: 0, fullname: "Dropped Out" },
 };
 
+const svg = d3.select("#chart").append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.select("#chart").style("width", (width + margin.left + margin.right) + "px");
+
 // Load data.
 const stages = d3.tsv("data/ftf_zz_pivoted.tsv", d3.autoType);
 
 // Once data is loaded...
 stages.then(function (data) {
+  // Initialize local variables.
+  const people = {};
+  const simulationRate = 1000  // in milliseconds
+  let currentTerm = -1;
 
   // Consolidate stages by pid.
   // The data file is one row per stage change.
@@ -57,7 +89,6 @@ stages.then(function (data) {
 
   // Create node data.
   var nodes = d3.keys(people).map(function (d) {
-
     // Initialize count for each group.
     groups[people[d][0].grp].cnt += 1;
 
@@ -73,7 +104,6 @@ stages.then(function (data) {
       stages: people[d]
     }
   });
-
 
   // Circle for each node.
   const circle = svg.append("g")
@@ -142,40 +172,62 @@ stages.then(function (data) {
 
   function simulateNodes() {
     if (PAUSE === true) {
-        setTimeout(simulateNodes, 100)
+      setTimeout(simulateNodes, 100)
     } else {
-        setTimeout(playSimulation, 100)
+      setTimeout(playSimulation, 100)
     }
   }
 
   // Make time pass. Adjust node stage as necessary.
   function playSimulation() {
-    if (time_so_far == 30) {
-      return
+    // Increment time.
+    currentTerm += 1;
+
+    // Loop back to beginning.
+    if (currentTerm == 30) {
+      sliderValue = 1
+      previousSliderValue = 0
     };
 
+<<<<<<< HEAD
     nodes.forEach(function (o, i) { // o here is an individual node
       o.timeleft = Math.max(o.timeleft - 1, 0);
       if (o.timeleft == 0 && o.istage < o.stages.length - 1) {
+=======
+    // If slider has changed, set nodes' istage to the slider value.
+    if (sliderValue !== previousSliderValue) {
+      console.log(`sliderValue: ${sliderValue}\nprevious: ${previousSliderValue}`)
+      nodes.forEach((o) => o.istage = Math.max(sliderValue - 1, 0))
+      previousSliderValue = sliderValue
+      currentTerm = sliderValue - 1
+    }
+    
+    // Update slider position based on loop.
+    updateSliderPosition(currentTerm + 1)
+
+    // Update node positions.
+    nodes.forEach(function (node) {
+      node.timeleft = Math.max(node.timeleft - 1, 0);
+      if (node.timeleft == 0) {
+>>>>>>> 7e98b8059ff4c81625e33facc12f7254399dc343
         // Decrease counter for previous group.
-        groups[o.group].cnt -= 1;
+        groups[node.group].cnt -= 1;
 
         // Update current node to new group.
-        o.istage += 1;
-        o.group = o.stages[o.istage].grp;
-        o.timeleft = o.stages[o.istage].duration;
+        node.istage += 1;
+        node.group = node.stages[node.istage].grp;
+        node.timeleft = node.stages[node.istage].duration;
 
         // Increment counter for new group.
-        groups[o.group].cnt += 1;
+        groups[node.group].cnt += 1;
       }
     });
 
-    // Increment time.
-    time_so_far += 1;
-    d3.select("#term .trm").text(`${termLabels[time_so_far]}`);
-    d3.select("#timecount .cnt").text(time_so_far);
-    d3.select("#yrcount .cnt").text(Math.ceil((time_so_far) / 3));
-    
+    // Update subtitles.
+    d3.select("#term .trm").text(`${termLabels[currentTerm]}`);
+    d3.select("#timecount .cnt").text(currentTerm);
+    d3.select("#yrcount .cnt").text(Math.floor((currentTerm) / 3) + 1);
+
     // Update counters.
     svg.selectAll('.grpcnt').text(d => `n = ${groups[d].cnt}`);
     svg.selectAll('.grpper').text(d => `${Math.round((groups[d].cnt / d3.keys(people).length) * 100 * 10) / 10}%`);
@@ -187,40 +239,6 @@ stages.then(function (data) {
   // Start things off after a few seconds.
   setTimeout(simulateNodes, simulationRate);
 });
-
-termLabels = [
-  "Fall 2011",
-  "Fall 2011",
-  "Spring 2012",
-  "Summer 2012",
-  "Fall 2012",
-  "Spring 2013",
-  "Summer 2013",
-  "Fall 2013",
-  "Spring 2014",
-  "Summer 2014",
-  "Fall 2014",
-  "Spring 2015",
-  "Summer 2015",
-  "Fall 2015",
-  "Spring 2016",
-  "Summer 2016",
-  "Fall 2016",
-  "Spring 2017",
-  "Summer 2017",
-  "Fall 2017",
-  "Spring 2018",
-  "Summer 2018",
-  "Fall 2018",
-  "Spring 2019",
-  "Summer 2019",
-  "Fall 2019",
-  "Spring 2020",
-  "Summer 2020",
-  "Fall 2020",
-  "Spring 2021",
-  "Summer 2021"
-]
 
 // Force to increment nodes to groups.
 function forceCluster() {
@@ -275,4 +293,13 @@ function forceCollide() {
   force.initialize = _ => maxRadius = d3.max(nodes = _, d => d.r) + Math.max(padding, cluster_padding);
 
   return force;
+}
+
+function getSliderValue(run) {
+  previousSliderValue = sliderValue
+  sliderValue = run.value
+}
+
+function updateSliderPosition(value) {
+  slider.value = Math.min(Math.max(value, 1), 30)
 }

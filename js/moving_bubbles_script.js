@@ -7,12 +7,38 @@ const height = 1100 - margin.top - margin.bottom;
 const radius = 4; // Size of the nodes
 const padding = 1.2 * radius; // Space between nodes
 const cluster_padding = 2 * padding; // Space between nodes in different stages
-const simulationRate = 5000; // in milliseconds
 
 // Initialize global variables.
+let simulationRate = 5000; // in milliseconds
 let sliderValue = 1;
 let previousSliderValue = sliderValue;
 let slider = document.querySelector("input[type='range']");
+let PAUSE = false;
+
+// Buttons.
+d3.select('button#play-pause')
+  .on('click', function () {
+    let self = d3.select(this)
+    PAUSE = !PAUSE
+    console.log(`Animation ${PAUSE ? 'paused' : 'playing'}`)
+    self.text(PAUSE ? 'Play' : 'Pause')
+  })
+  .text(PAUSE ? 'Play' : 'Pause')
+
+// Adjust play rate if needed.
+d3.select('button#slow')
+  .on('click', function () {
+    simulationRate += 500
+    console.log(simulationRate)
+  })
+  .text('Slower')
+
+d3.select('button#fast')
+  .on('click', function () {
+    simulationRate = Math.max(500, (simulationRate - 500));
+    console.log(simulationRate);
+  })
+  .text('Faster')
 
 const termLabels = [
   "Fall 2011",
@@ -229,6 +255,7 @@ stages.then(function (data) {
     d3.select("#term .trm").text(`${termLabels[currentTerm]}`);
     d3.select("#timecount .cnt").text(currentTerm);
     d3.select("#yrcount .cnt").text(Math.floor(currentTerm / 3) + 1);
+    d3.select("#transition-speed .spd").text(simulationRate / 1000);
 
     // Update counters.
     svg.selectAll(".grpcnt").text((d) => `n = ${groups[d].cnt}`);

@@ -7,6 +7,7 @@ const height = 1100 - margin.top - margin.bottom;
 const radius = 4; // Size of the nodes
 const padding = 1.2 * radius; // Space between nodes
 const cluster_padding = 2 * padding; // Space between nodes in different stages
+const simulationRate = 5000  // in milliseconds
 
 // Initialize global variables.
 let sliderValue = 1;
@@ -74,7 +75,6 @@ const stages = d3.tsv("data/ftf_zz_pivoted.tsv", d3.autoType);
 stages.then(function (data) {
   // Initialize local variables.
   const people = {};
-  const simulationRate = 1000  // in milliseconds
   let currentTerm = -1;
 
   // Consolidate stages by pid.

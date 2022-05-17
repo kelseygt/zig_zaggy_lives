@@ -2,6 +2,7 @@ body {
     font-family: "Century Gothic";
     background: #FBEEE6;
 }
+
 #main-wrapper {
     margin: 40px auto;
 }
@@ -50,7 +51,7 @@ text {
 }
 
 .slidecontainer {
-    width: 50%; /* Width of the outside container */
+    width: 55%; /* Width of the outside container */
     margin-left: auto !important;
     margin-right: auto !important;
   }
@@ -59,7 +60,7 @@ text {
   .slider {
     -webkit-appearance: none;  /* Override default CSS styles */
     appearance: none;
-    width: 50%; /* Full-width */
+    width: 55%; /* Full-width */
     height: 25px; /* Specified height */
     background: #d3d3d3; /* Grey background */
     outline: none; /* Remove outline */
@@ -90,11 +91,11 @@ text {
     cursor: pointer; /* Cursor on hover */
   }
 
-  #tickmarks {
+  /* #tickmarks {
     display: flex;
     justify-content: space-between;
     padding: 0 10px;
     width: 55%;
     margin-left: auto !important;
     margin-right: auto !important;
-}
+} */

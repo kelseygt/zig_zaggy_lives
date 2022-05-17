@@ -74,7 +74,7 @@ const stages = d3.tsv("data/ftf_zz_pivoted.tsv", d3.autoType);
 stages.then(function (data) {
   // Initialize local variables.
   const people = {};
-  const simulationRate = 1000  // in milliseconds
+  const simulationRate = 3000  // in milliseconds
   let currentTerm = -1;
 
   // Consolidate stages by pid.

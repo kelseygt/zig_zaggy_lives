@@ -7,12 +7,38 @@ const height = 1100 - margin.top - margin.bottom;
 const radius = 4; // Size of the nodes
 const padding = 1.2 * radius; // Space between nodes
 const cluster_padding = 2 * padding; // Space between nodes in different stages
-const simulationRate = 5000; // in milliseconds
 
 // Initialize global variables.
+let simulationRate = 5000; // in milliseconds
 let sliderValue = 1;
 let previousSliderValue = sliderValue;
 let slider = document.querySelector("input[type='range']");
+let PAUSE = false;
+
+// Buttons.
+d3.select('button#play-pause')
+  .on('click', function () {
+    let self = d3.select(this)
+    PAUSE = !PAUSE
+    console.log(`Animation ${PAUSE ? 'paused' : 'playing'}`)
+    self.text(PAUSE ? 'Play' : 'Pause')
+  })
+  .text(PAUSE ? 'Play' : 'Pause')
+
+// Adjust play rate if needed.
+d3.select('button#slow')
+  .on('click', function () {
+    simulationRate += 500
+    console.log(simulationRate)
+  })
+  .text('Slower')
+
+d3.select('button#fast')
+  .on('click', function () {
+    simulationRate = Math.max(500, (simulationRate - 500));
+    console.log(simulationRate);
+  })
+  .text('Faster')
 
 const termLabels = [
   "Fall 2011",
@@ -50,12 +76,12 @@ const termLabels = [
 // Group coordinates and meta info.
 const groups = {
   "Starting Cohort": { x: 580, y: 120, color: "#BB8FCE", cnt: 0, fullname: "Starting Cohort" },
-  Sabbatical: { x: 580, y: 500, color: "#e7b416", cnt: 0, fullname: "Sabbatical" },
-  Freshman: { x: 930, y: 200, color: "#ABD5AB", cnt: 0, fullname: "Freshman" },
-  Sophomore: { x: 1030, y: 450, color: "#85C285", cnt: 0, fullname: "Sophomore" },
-  Junior: { x: 930, y: 700, color: "#4FA64F", cnt: 0, fullname: "Junior" },
-  Senior: { x: 580, y: 850, color: "#249225", cnt: 0, fullname: "Senior" },
-  Graduated: { x: 230, y: 700, color: "#4a6b96", cnt: 0, fullname: "Graduated" },
+  "Sabbatical": { x: 580, y: 450, color: "#e7b416", cnt: 0, fullname: "Sabbatical" },
+  "Freshman": { x: 930, y: 200, color: "#ABD5AB", cnt: 0, fullname: "Freshman" },
+  "Sophomore": { x: 1030, y: 450, color: "#85C285", cnt: 0, fullname: "Sophomore" },
+  "Junior": { x: 930, y: 700, color: "#4FA64F", cnt: 0, fullname: "Junior" },
+  "Senior": { x: 580, y: 800, color: "#249225", cnt: 0, fullname: "Senior" },
+  "Graduated": { x: 230, y: 700, color: "#4a6b96", cnt: 0, fullname: "Graduated" },
   "Transferred Out": { x: 130, y: 450, color: "#db7b2b", cnt: 0, fullname: "Transferred Out" },
   "Dropped Out": { x: 230, y: 200, color: "#cc3232", cnt: 0, fullname: "Dropped Out" },
 };
@@ -229,6 +255,7 @@ stages.then(function (data) {
     d3.select("#term .trm").text(`${termLabels[currentTerm]}`);
     d3.select("#timecount .cnt").text(currentTerm);
     d3.select("#yrcount .cnt").text(Math.floor(currentTerm / 3) + 1);
+    d3.select("#transition-speed .spd").text(simulationRate / 1000);
 
     // Update counters.
     svg.selectAll(".grpcnt").text((d) => `n = ${groups[d].cnt}`);

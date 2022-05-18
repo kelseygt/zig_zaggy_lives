@@ -4,35 +4,64 @@
   <meta charset="utf-8">
   <title>The Lives of Students</title>
   <link rel="stylesheet" href="style/style.css" type="text/css" media="screen" />
+  <!-- font for labels -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dosis&family=Mohave&family=Truculenta:opsz,wght@12..72,300&display=swap" rel="stylesheet">
+  <!-- end of font for labels -->
 </head>
 
 <div id="main-wrapper">
-  <h1>Follow the Lives of<br/>Fall 2011 First-Time Freshman</h1>
+  <h1>Follow the Lives of Fall 2011 First-Time Freshman</h1>
   <div style="line-height:75%;"><br></div>
-  <div style="text-align:center"><button id="play-pause" width="90"></button></div>
+  <div id="button-container">
+    <button id="slow" width="90"></button>
+    <button id="play-pause" width="90"></button>
+    <button id="fast" width="90"></button>
+  </div>
   <div style="line-height:50%;"><br></div>
+  <h4 id="transition-speed">Transition Speed: <span class="spd">5</span> seconds</h4>
   <div class="slidecontainer" style="text-align:center">
     <span class="leftlabel">Fall 2011</span>
-    <input type="range" min="1" max="30" value="1" class="slider" step="1" id="myRange" list="tickmarks" onchange="getSliderValue(this)">
+    <input type="range" min="1" max="30" value="1" class="slider" step="1" id="myRange" list="sliderticks" onchange="getSliderValue(this)">
     <span class="rightlabel">Summer 2021</span>
+    <div class="sliderticks">
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+    </div>
   </div>
-  <h2 id="term"><span class="trm">Fall 2011</span></h1>
-  <h3 id="yrcount">Year <span class="cnt">1</span></h2>
+  <h2 id="term"><span class="trm">Fall 2011</span></h2>
+  <h3 id="yrcount">Year <span class="cnt">1</span></h3>
   <div id="chart"></div>
 </div>
 
 <script src="js/d3.v5.min.js"></script>
-
-<script>
-  var PAUSE = false;
-  d3.select('button#play-pause')
-    .on('click', function () {
-      let self = d3.select(this)
-      PAUSE = !PAUSE
-      console.log(`Animation ${PAUSE ? 'paused' : 'playing'}`)
-      self.text(PAUSE ? 'Play' : 'Pause')
-    })
-    .text(PAUSE ? 'Play' : 'Pause')
-</script>
-
 <script src="js/moving_bubbles_script.js" type="text/javascript"></script>

@@ -73,7 +73,7 @@ h1 {
   margin-bottom: 0px;
 }
 h2 {
-	font-size: 1.4em;
+	font-size: 1.7em;
 	padding: 3px 0px;
 	font-weight: normal;
   text-align: center;
@@ -81,7 +81,7 @@ h2 {
   margin-bottom: 0px;
 }
 h3 {
-	font-size: 1.1em;
+	font-size: 1.4em;
 	padding: 3px 0px;
 	font-weight: normal;
   text-align: center;
@@ -143,22 +143,17 @@ text {
     cursor: pointer; /* Cursor on hover */
   }
 
-/* .sliderticks {
-  width: 55%;
-  display: flex;
-  justify-content: space-between;
-  padding-left: 196px;
-  padding-right: 234px;
+/* Tooltip hover formatting */
+div.tooltip {
+  color: white;
+  position: absolute;
+  text-align: left;
+  width: 200px;
+  /* height: 28px; */
+  padding: 5px;
+  font-size: 16px; 
+  font-family: 'Mohave', sans-serif;;
+  background: #4a6b96;
+  border: 1px solid black;
+  pointer-events: none;
 }
-
-.sliderticks p {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  text-align: center;
-  width: 1px;
-  background: #D3D3D3;
-  height: 10px;
-  line-height: 40px;
-  margin: 0 0 20px 0;
-} */

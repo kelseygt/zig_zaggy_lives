@@ -39,7 +39,7 @@ vignettes/*.pdf
 .Renviron
 
 # Data files
-/data
 /working_files
 /documentation
 /transfer_institutions
+/data/*.csv

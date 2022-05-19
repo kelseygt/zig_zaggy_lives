@@ -76,14 +76,14 @@ const termLabels = [
 // Group coordinates and meta info.
 const groups = {
   "Starting Cohort": { x: 580, y: 120, color: "#BB8FCE", cnt: 0, fullname: "Starting Cohort" },
-  "Sabbatical": { x: 580, y: 450, color: "#e7b416", cnt: 0, fullname: "Sabbatical" },
+  "Sabbatical": { x: 580, y: 450, color: "#e7b416", cnt: 0, fullname: "Sabbatical", hovertext: "'Sabbatical' is defined here as when a student takes one or more semesters off between enrolled semesters, excluding the summer term." },
   "Freshman": { x: 930, y: 200, color: "#ABD5AB", cnt: 0, fullname: "Freshman" },
   "Sophomore": { x: 1030, y: 450, color: "#85C285", cnt: 0, fullname: "Sophomore" },
   "Junior": { x: 930, y: 700, color: "#4FA64F", cnt: 0, fullname: "Junior" },
   "Senior": { x: 580, y: 800, color: "#249225", cnt: 0, fullname: "Senior" },
-  "Graduated": { x: 230, y: 700, color: "#4a6b96", cnt: 0, fullname: "Graduated" },
-  "Transferred Out": { x: 130, y: 450, color: "#db7b2b", cnt: 0, fullname: "Transferred Out" },
-  "Dropped Out": { x: 230, y: 200, color: "#cc3232", cnt: 0, fullname: "Dropped Out" },
+  "Graduated": { x: 230, y: 700, color: "#4a6b96", cnt: 0, fullname: "Graduated", hovertext: "'Graduated' here is defined as bachelor's degree recipients." },
+  "Transferred Out": { x: 130, y: 450, color: "#db7b2b", cnt: 0, fullname: "Transferred Out", hovertext: "'Transferred Out' is here defined as when we have established evidence of a student enrolling at an external institution. This category is not terminal; students may have evidence of transferring out, but may subsequently return to MSU Denver." },
+  "Dropped Out": { x: 230, y: 200, color: "#cc3232", cnt: 0, fullname: "Dropped Out", hovertext: "'Dropped Out' is here defined as a student who has no subsequent enrollment at MSU Denver to date, and no enrollment at any external institution. This category is terminal." },
 };
 
 const svg = d3
@@ -97,7 +97,7 @@ const svg = d3
 d3.select("#chart").style("width", width + margin.left + margin.right + "px");
 
 // Load data.
-const stages = d3.tsv("data/ftf_zz_pivoted.tsv", d3.autoType);
+const stages = d3.tsv("data/ftf.tsv", d3.autoType);
 
 // Once data is loaded...
 stages.then(function (data) {
@@ -153,6 +153,13 @@ stages.then(function (data) {
       return (t) => (d.r = i(t));
     });
 
+  // Define the div for the tooltip
+  const div = d3
+    .select('body')
+    .append('div')
+    .attr('class', 'tooltip')
+    .style('opacity', 0);
+
   // Group name labels
   svg
     .selectAll(".grp")
@@ -162,7 +169,25 @@ stages.then(function (data) {
     .attr("text-anchor", "middle")
     .attr("x", (d) => groups[d].x)
     .attr("y", (d) => groups[d].y + 100)
-    .text((d) => groups[d].fullname);
+    .text((d) => groups[d].fullname)
+    .on('mouseover', d => {
+      if (groups[d].hovertext) {
+        div
+          .transition()
+          .duration(200)
+          .style('opacity', 0.9);
+        div
+          .html(groups[d].hovertext)
+          .style('left', (d3.event.pageX - 275) + 'px')
+          .style('top', (d3.event.pageY - 28) + 'px');
+      }
+    })
+    .on('mouseout', () => {
+      div
+        .transition()
+        .duration(500)
+        .style('opacity', 0);
+    });
 
   // Group counts
   svg
@@ -337,3 +362,4 @@ function getSliderValue(run) {
 function updateSliderPosition(value) {
   slider.value = Math.min(Math.max(value, 1), 30);
 }
+

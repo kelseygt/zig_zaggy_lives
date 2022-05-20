@@ -1,11 +1,11 @@
 // Dimensions of chart.
-const margin = { top: 20, right: 20, bottom: 20, left: 20 };
+const margin = { top: 5, right: 20, bottom: 5, left: 20 };
 const width = 3688 - margin.left - margin.right;
-const height = 1050 - margin.top - margin.bottom;
+const height = 680 - margin.top - margin.bottom;
 
 // Initialize global constants.
-const radius = 6; // Size of the nodes
-const padding = 2 * radius; // Space between nodes
+const radius = 4; // Size of the nodes
+const padding = 3 * radius; // Space between nodes
 const cluster_padding = 2 * padding; // Space between nodes in different stages
 
 // Initialize global variables.
@@ -76,15 +76,15 @@ const termLabels = [
 
 // Group coordinates and meta info.
 const groups = {
-  "Sabbatical": { x: 1022, y: 500, color: "#e7b416", cnt: 0, fullname: "Sabbatical", hovertext: "'Sabbatical' is defined here as when a student takes one or more semesters off between enrolled semesters, excluding the summer term." },
-  "Starting Cohort": { x: 200, y: 500, color: "#BB8FCE", cnt: 0, fullname: "Starting Cohort" },
-  "Freshman": { x: 611, y: 200, color: "#ABD5AB", cnt: 0, fullname: "Freshman" },
-  "Sophomore": { x: 1433, y: 200, color: "#85C285", cnt: 0, fullname: "Sophomore" },
-  "Junior": { x: 2255, y: 200, color: "#4FA64F", cnt: 0, fullname: "Junior" },
-  "Senior": { x: 3077, y: 200, color: "#249225", cnt: 0, fullname: "Senior" },
-  "Graduated": { x: 3488, y: 500, color: "#4a6b96", cnt: 0, fullname: "Graduated", hovertext: "'Graduated' here is defined as bachelor's degree recipients." },
-  "Transferred Out": { x: 1844, y: 500, color: "#db7b2b", cnt: 0, fullname: "Transferred Out", hovertext: "'Transferred Out' is here defined as when we have established evidence of a student enrolling at an external institution. This category is not terminal; students may have evidence of transferring out, but may subsequently return to MSU Denver." },
-  "Dropped Out": { x: 2666, y: 500, color: "#cc3232", cnt: 0, fullname: "Dropped Out", hovertext: "'Dropped Out' is here defined as a student who has no subsequent enrollment at MSU Denver to date, and no enrollment at any external institution. This category is terminal." },
+  "Sabbatical": { x: 1022, y: 500, color: "#EED12E", cnt: 0, fullname: "Sabbatical", hovertext: "'Sabbatical' is defined here as when a student takes one or more semesters off between enrolled semesters, excluding the summer term." },
+  "Starting Cohort": { x: 200, y: 500, color: "#8c3c9d", cnt: 0, fullname: "Starting Cohort" },
+  "Freshman": { x: 611, y: 200, color: "#7bb892", cnt: 0, fullname: "Freshman" },
+  "Sophomore": { x: 1433, y: 200, color: "#69ae82", cnt: 0, fullname: "Sophomore" },
+  "Junior": { x: 2255, y: 200, color: "#56a473", cnt: 0, fullname: "Junior" },
+  "Senior": { x: 3077, y: 200, color: "#439a63", cnt: 0, fullname: "Senior" },
+  "Graduated": { x: 3488, y: 500, color: "#25a6b9", cnt: 0, fullname: "Graduated", hovertext: "'Graduated' here is defined as bachelor's degree recipients." },
+  "Transferred Out": { x: 1844, y: 500, color: "#fa8a28", cnt: 0, fullname: "Transferred Out", hovertext: "'Transferred Out' is here defined as when we have established evidence of a student enrolling at an external institution. This category is not terminal; students may have evidence of transferring out, but may subsequently return to MSU Denver." },
+  "Dropped Out": { x: 2666, y: 500, color: "#d63839", cnt: 0, fullname: "Dropped Out", hovertext: "'Dropped Out' is here defined as a student who has no subsequent enrollment at MSU Denver to date, and no enrollment at any external institution. This category is terminal." },
 };
 
 const svg = d3
@@ -127,7 +127,7 @@ stages.then(function (data) {
       id: "node" + d,
       x: groups[people[d][0].grp].x + Math.random(),
       y: groups[people[d][0].grp].y + Math.random(),
-      r: radius,
+      r: radius * (1 + Math.random()),
       color: groups[people[d][0].grp].color,
       group: people[d][0].grp,
       timeleft: people[d][0].duration,

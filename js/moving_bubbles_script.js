@@ -86,6 +86,41 @@ const groups = {
   "Dropped Out": { x: 230, y: 200, color: "#cc3232", cnt: 0, fullname: "Dropped Out", hovertext: "'Dropped Out' is here defined as a student who has no subsequent enrollment at MSU Denver to date, and no enrollment at any external institution. This category is terminal." },
 };
 
+const sexColors = {
+  "Male": { color: "#BB8FCE" },
+  "Female": { color: "#ABD5AB" }
+}
+
+const separationScaleFactor = 0.01
+function separationDistance(centerPoint, groupSize) {
+  return centerPoint + separationScaleFactor * groupSize
+}
+
+const sexPositions = {
+  "Male": {
+    "Starting Cohort": { x: (groupSize) => separationDistance(580, groupSize), y: 120 },
+    "Sabbatical": { x: (groupSize) => separationDistance(580, groupSize), y: 450 },
+    "Freshman": { x: (groupSize) => separationDistance(930, groupSize), y: 200 },
+    "Sophomore": { x: (groupSize) => separationDistance(1030, groupSize), y: 450 },
+    "Junior": { x: (groupSize) => separationDistance(930, groupSize), y: 700 },
+    "Senior": { x: (groupSize) => separationDistance(580, groupSize), y: 800 },
+    "Graduated": { x: (groupSize) => separationDistance(230, groupSize), y: 700 },
+    "Transferred Out": { x: (groupSize) => separationDistance(130, groupSize), y: 450 },
+    "Dropped Out": { x: (groupSize) => separationDistance(230, groupSize), y: 200 },
+  },
+  "Female": {
+    "Starting Cohort": { x: (groupSize) => separationDistance(580, -groupSize), y: 120 },
+    "Sabbatical": { x: (groupSize) => separationDistance(580, -groupSize), y: 450 },
+    "Freshman": { x: (groupSize) => separationDistance(930, -groupSize), y: 200 },
+    "Sophomore": { x: (groupSize) => separationDistance(1030, -groupSize), y: 450 },
+    "Junior": { x: (groupSize) => separationDistance(930, -groupSize), y: 700 },
+    "Senior": { x: (groupSize) => separationDistance(580, -groupSize), y: 800 },
+    "Graduated": { x: (groupSize) => separationDistance(230, -groupSize), y: 700 },
+    "Transferred Out": { x: (groupSize) => separationDistance(130, -groupSize), y: 450 },
+    "Dropped Out": { x: (groupSize) => separationDistance(230, -groupSize), y: 200 },
+  }
+}
+
 const svg = d3
   .select("#chart")
   .append("svg")
@@ -116,20 +151,22 @@ stages.then(function (data) {
   });
 
   // Create node data.
+  groups["Starting Cohort"].cnt = Object.keys(people).length;
   var nodes = d3.keys(people).map(function (d) {
+    group = people[d][0].grp
     // Initialize count for each group.
-    groups[people[d][0].grp].cnt += 1;
-
     return {
       id: "node" + d,
-      x: groups[people[d][0].grp].x + Math.random(),
-      y: groups[people[d][0].grp].y + Math.random(),
+      x: sexPositions[people[d][0].sex][group].x(groups[group].cnt) + Math.random(),
+      y: sexPositions[people[d][0].sex][group].y + Math.random(),
       r: radius,
-      color: groups[people[d][0].grp].color,
-      group: people[d][0].grp,
+      sex: people[d][0].sex,
+      // color: groups[group].color,
+      // color: sexColors[people[d][0].sex].color,
+      group: group,
       timeleft: people[d][0].duration,
       istage: 0,
-      stages: people[d],
+      stages: people[d].map((s) => ({ grp: s.grp, duration: s.duration })),
     };
   });
 
@@ -141,7 +178,7 @@ stages.then(function (data) {
     .join("circle")
     .attr("cx", (d) => d.x)
     .attr("cy", (d) => d.y)
-    .attr("fill", (d) => d.color);
+  // .attr("fill", (d) => d.color);
 
   // Ease in the circles.
   circle
@@ -226,7 +263,8 @@ stages.then(function (data) {
     circle
       .attr("cx", (d) => d.x)
       .attr("cy", (d) => d.y)
-      .attr("fill", (d) => groups[d.group].color);
+      // .attr("fill", (d) => groups[d.group].color);
+      .attr("fill", (d) => sexColors[d.sex].color);
   });
 
   function simulateNodes() {
@@ -298,12 +336,12 @@ stages.then(function (data) {
 function forceCluster() {
   const strength = 0.15;
   let nodes;
-
+  
   function force(alpha) {
     const l = alpha * strength;
     for (const d of nodes) {
-      d.vx -= (d.x - groups[d.group].x) * l;
-      d.vy -= (d.y - groups[d.group].y) * l;
+      d.vx -= (d.x - sexPositions[d.sex][d.group].x(groups[d.group].cnt)) * l;
+      d.vy -= (d.y - sexPositions[d.sex][d.group].y) * l;
     }
   }
   force.initialize = (_) => (nodes = _);

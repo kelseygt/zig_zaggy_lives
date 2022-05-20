@@ -1,11 +1,11 @@
 // Dimensions of chart.
 const margin = { top: 20, right: 20, bottom: 20, left: 20 };
-const width = 1200 - margin.left - margin.right;
-const height = 1100 - margin.top - margin.bottom;
+const width = 3688 - margin.left - margin.right;
+const height = 1050 - margin.top - margin.bottom;
 
 // Initialize global constants.
-const radius = 4; // Size of the nodes
-const padding = 1.2 * radius; // Space between nodes
+const radius = 6; // Size of the nodes
+const padding = 2 * radius; // Space between nodes
 const cluster_padding = 2 * padding; // Space between nodes in different stages
 
 // Initialize global variables.
@@ -14,6 +14,7 @@ let sliderValue = 1;
 let previousSliderValue = sliderValue;
 let slider = document.querySelector("input[type='range']");
 let PAUSE = false;
+let numNodes;
 
 // Buttons.
 d3.select('button#play-pause')
@@ -75,15 +76,15 @@ const termLabels = [
 
 // Group coordinates and meta info.
 const groups = {
-  "Starting Cohort": { x: 580, y: 120, color: "#BB8FCE", cnt: 0, fullname: "Starting Cohort" },
-  "Sabbatical": { x: 580, y: 450, color: "#e7b416", cnt: 0, fullname: "Sabbatical", hovertext: "'Sabbatical' is defined here as when a student takes one or more semesters off between enrolled semesters, excluding the summer term." },
-  "Freshman": { x: 930, y: 200, color: "#ABD5AB", cnt: 0, fullname: "Freshman" },
-  "Sophomore": { x: 1030, y: 450, color: "#85C285", cnt: 0, fullname: "Sophomore" },
-  "Junior": { x: 930, y: 700, color: "#4FA64F", cnt: 0, fullname: "Junior" },
-  "Senior": { x: 580, y: 800, color: "#249225", cnt: 0, fullname: "Senior" },
-  "Graduated": { x: 230, y: 700, color: "#4a6b96", cnt: 0, fullname: "Graduated", hovertext: "'Graduated' here is defined as bachelor's degree recipients." },
-  "Transferred Out": { x: 130, y: 450, color: "#db7b2b", cnt: 0, fullname: "Transferred Out", hovertext: "'Transferred Out' is here defined as when we have established evidence of a student enrolling at an external institution. This category is not terminal; students may have evidence of transferring out, but may subsequently return to MSU Denver." },
-  "Dropped Out": { x: 230, y: 200, color: "#cc3232", cnt: 0, fullname: "Dropped Out", hovertext: "'Dropped Out' is here defined as a student who has no subsequent enrollment at MSU Denver to date, and no enrollment at any external institution. This category is terminal." },
+  "Sabbatical": { x: 1022, y: 500, color: "#e7b416", cnt: 0, fullname: "Sabbatical", hovertext: "'Sabbatical' is defined here as when a student takes one or more semesters off between enrolled semesters, excluding the summer term." },
+  "Starting Cohort": { x: 200, y: 500, color: "#BB8FCE", cnt: 0, fullname: "Starting Cohort" },
+  "Freshman": { x: 611, y: 200, color: "#ABD5AB", cnt: 0, fullname: "Freshman" },
+  "Sophomore": { x: 1433, y: 200, color: "#85C285", cnt: 0, fullname: "Sophomore" },
+  "Junior": { x: 2255, y: 200, color: "#4FA64F", cnt: 0, fullname: "Junior" },
+  "Senior": { x: 3077, y: 200, color: "#249225", cnt: 0, fullname: "Senior" },
+  "Graduated": { x: 3488, y: 500, color: "#4a6b96", cnt: 0, fullname: "Graduated", hovertext: "'Graduated' here is defined as bachelor's degree recipients." },
+  "Transferred Out": { x: 1844, y: 500, color: "#db7b2b", cnt: 0, fullname: "Transferred Out", hovertext: "'Transferred Out' is here defined as when we have established evidence of a student enrolling at an external institution. This category is not terminal; students may have evidence of transferring out, but may subsequently return to MSU Denver." },
+  "Dropped Out": { x: 2666, y: 500, color: "#cc3232", cnt: 0, fullname: "Dropped Out", hovertext: "'Dropped Out' is here defined as a student who has no subsequent enrollment at MSU Denver to date, and no enrollment at any external institution. This category is terminal." },
 };
 
 const svg = d3
@@ -114,6 +115,8 @@ stages.then(function (data) {
       people[d.pid + ""] = [d];
     }
   });
+
+  numNodes = d3.keys(people).length
 
   // Create node data.
   var nodes = d3.keys(people).map(function (d) {
@@ -197,19 +200,20 @@ stages.then(function (data) {
     .attr("class", "grpcnt")
     .attr("text-anchor", "middle")
     .attr("x", (d) => groups[d].x)
-    .attr("y", (d) => groups[d].y + 125)
-    .text((d) => `n = ${groups[d].cnt}`);
+    .attr("y", (d) => groups[d].y + 135)
+    .text((d) => `${Math.round((groups[d].cnt / numNodes) * 1000) / 10}% (n = ${groups[d].cnt})`)
+    .style('font-size', '1.4em')
 
   // Group percent
-  svg
-    .selectAll(".grpper")
-    .data(d3.keys(groups))
-    .join("text")
-    .attr("class", "grpper")
-    .attr("text-anchor", "middle")
-    .attr("x", (d) => groups[d].x)
-    .attr("y", (d) => groups[d].y + 150)
-    .text((d) => `${Math.round((groups[d].cnt / d3.keys(people).length) * 100 * 10) / 10}%`);
+  // svg
+  //   .selectAll(".grpper")
+  //   .data(d3.keys(groups))
+  //   .join("text")
+  //   .attr("class", "grpper")
+  //   .attr("text-anchor", "middle")
+  //   .attr("x", (d) => groups[d].x)
+  //   .attr("y", (d) => groups[d].y + 170)
+  //   .text((d) => `${Math.round((groups[d].cnt / d3.keys(people).length) * 100 * 10) / 10}%`);
 
   // Forces
   const simulation = d3
@@ -283,8 +287,8 @@ stages.then(function (data) {
     d3.select("#transition-speed .spd").text(simulationRate / 1000);
 
     // Update counters.
-    svg.selectAll(".grpcnt").text((d) => `n = ${groups[d].cnt}`);
-    svg.selectAll(".grpper").text((d) => `${Math.round((groups[d].cnt / d3.keys(people).length) * 100 * 10) / 10}%`);
+    svg.selectAll(".grpcnt").text((d) => `${Math.round((groups[d].cnt / numNodes) * 1000) / 10}% (n = ${groups[d].cnt})`);
+    // svg.selectAll(".grpper").text((d) => `${Math.round((groups[d].cnt / d3.keys(people).length) * 100 * 10) / 10}%`);
 
     // Do it again.
     setTimeout(simulateNodes, simulationRate);
@@ -313,7 +317,7 @@ function forceCluster() {
 
 // Force for collision detection.
 function forceCollide() {
-  const alpha = 0.15; // fixed for greater rigidity!
+  const alpha = 0.1; // fixed for greater rigidity!
   let nodes;
   let maxRadius;
 
@@ -363,3 +367,7 @@ function updateSliderPosition(value) {
   slider.value = Math.min(Math.max(value, 1), 30);
 }
 
+function labelBuilder(group) {
+  let pct = Math.round((group.cnt / numNodes) * 1000) / 10
+  return `${group.fullname}<br>n = ${group.cnt} (${pct}%)`
+}

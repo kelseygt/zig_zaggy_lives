@@ -4,8 +4,8 @@ const width = 1200 - margin.left - margin.right;
 const height = 1100 - margin.top - margin.bottom;
 
 // Initialize global constants.
-const radius = 4; // Size of the nodes
-const padding = 1.2 * radius; // Space between nodes
+const radius = 3; // Size of the nodes
+const padding = 3 * radius; // Space between nodes
 const cluster_padding = 2 * padding; // Space between nodes in different stages
 
 // Initialize global variables.
@@ -14,6 +14,7 @@ let sliderValue = 1;
 let previousSliderValue = sliderValue;
 let slider = document.querySelector("input[type='range']");
 let PAUSE = false;
+let numNodes;
 
 // Buttons.
 d3.select('button#play-pause')
@@ -115,6 +116,8 @@ stages.then(function (data) {
     }
   });
 
+  numNodes = Object.keys(people).length
+
   // Create node data.
   var nodes = d3.keys(people).map(function (d) {
     // Initialize count for each group.
@@ -124,7 +127,7 @@ stages.then(function (data) {
       id: "node" + d,
       x: groups[people[d][0].grp].x + Math.random(),
       y: groups[people[d][0].grp].y + Math.random(),
-      r: radius,
+      r: radius * (1 + Math.random()),
       color: groups[people[d][0].grp].color,
       group: people[d][0].grp,
       timeleft: people[d][0].duration,
@@ -198,18 +201,18 @@ stages.then(function (data) {
     .attr("text-anchor", "middle")
     .attr("x", (d) => groups[d].x)
     .attr("y", (d) => groups[d].y + 125)
-    .text((d) => `n = ${groups[d].cnt}`);
+    .text((d) => `n = ${groups[d].cnt} (${Math.round((groups[d].cnt / numNodes) * 1000) / 10}%)`);
 
-  // Group percent
-  svg
-    .selectAll(".grpper")
-    .data(d3.keys(groups))
-    .join("text")
-    .attr("class", "grpper")
-    .attr("text-anchor", "middle")
-    .attr("x", (d) => groups[d].x)
-    .attr("y", (d) => groups[d].y + 150)
-    .text((d) => `${Math.round((groups[d].cnt / d3.keys(people).length) * 100 * 10) / 10}%`);
+  // // Group percent
+  // svg
+  //   .selectAll(".grpper")
+  //   .data(d3.keys(groups))
+  //   .join("text")
+  //   .attr("class", "grpper")
+  //   .attr("text-anchor", "middle")
+  //   .attr("x", (d) => groups[d].x)
+  //   .attr("y", (d) => groups[d].y + 150)
+  //   .text((d) => `${Math.round((groups[d].cnt / numNodes) * 1000) / 10}%`);
 
   // Forces
   const simulation = d3
@@ -283,8 +286,8 @@ stages.then(function (data) {
     d3.select("#transition-speed .spd").text(simulationRate / 1000);
 
     // Update counters.
-    svg.selectAll(".grpcnt").text((d) => `n = ${groups[d].cnt}`);
-    svg.selectAll(".grpper").text((d) => `${Math.round((groups[d].cnt / d3.keys(people).length) * 100 * 10) / 10}%`);
+    svg.selectAll(".grpcnt").text((d) => `n = ${groups[d].cnt} (${Math.round((groups[d].cnt / numNodes) * 1000) / 10}%)`);
+    // svg.selectAll(".grpper").text((d) => `${Math.round((groups[d].cnt / d3.keys(people).length) * 100 * 10) / 10}%`);
 
     // Do it again.
     setTimeout(simulateNodes, simulationRate);
@@ -296,7 +299,7 @@ stages.then(function (data) {
 
 // Force to increment nodes to groups.
 function forceCluster() {
-  const strength = 0.15;
+  const strength = 0.3;
   let nodes;
 
   function force(alpha) {

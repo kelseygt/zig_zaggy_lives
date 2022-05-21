@@ -1,6 +1,6 @@
 body {
   font-family: 'Mohave', sans-serif;
-  background: #FBEEE6;
+  background: #222a3f;
 }
 
 #main-wrapper {
@@ -11,52 +11,52 @@ body {
 }
 #play-pause {
   font-family: 'Mohave', sans-serif;
-  background-color: #4a6b96;
+  background-color: #7a7f8c;
   border: none;
   color: white;
   padding: 8px 40px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 14px;
+  font-size: 16px;
   opacity: 1;
 }
 #play-pause:hover{
-  background-color: #9e4949;
+  background-color: #ca7878;
   opacity: 0.7;
   transition: 0.3s;
 }
 #slow {
   font-family: 'Mohave', sans-serif;
-  background-color: #4a6b96;
+  background-color: #7a7f8c;
   border: none;
   color: white;
   padding: 8px 40px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 14px;
+  font-size: 16px;
   opacity: 1;
 }
 #slow:hover{
-  background-color: #9e4949;
+  background-color: #ca7878;
   opacity: 0.7;
   transition: 0.3s;
 }
 #fast {
   font-family: 'Mohave', sans-serif;
-  background-color: #4a6b96;
+  background-color: #7a7f8c;
   border: none;
   color: white;
   padding: 8px 40px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 14px;
+  font-size: 16px;
   opacity: 1;
 }
 #fast:hover{
-  background-color: #9e4949;
+  background-color: #ca7878;
   opacity: 0.7;
   transition: 0.3s;
 }
@@ -65,40 +65,44 @@ body {
 }
 
 h1 {
-	font-size: 2em;
+	font-size: 2.5em;
 	padding: 3px 0px;
 	font-weight: normal;
   text-align: center;
   margin-top: 0x;
   margin-bottom: 0px;
+  color: #fbfbee;
 }
 h2 {
-	font-size: 1.7em;
+	font-size: 1.8em;
 	padding: 3px 0px;
 	font-weight: normal;
   text-align: center;
   margin-top: 0px;
   margin-bottom: 0px;
+  color: #fbfbee;
 }
 h3 {
-	font-size: 1.4em;
+	font-size: 1.6em;
 	padding: 3px 0px;
 	font-weight: normal;
   text-align: center;
   margin-top:0px;
   margin-bottom: 0px;
+  color: #fbfbee;
 }
 h4 {
-	font-size: 0.9em;
+	font-size: 0.8em;
 	padding: 3px 0px;
 	font-weight: normal;
   text-align: center;
   margin-top:0px;
   margin-bottom: 0px;
+  color: #fbfbee;
 }
 text {
-  font-size: 1.1em;
-  fill: #000;
+  font-size: 1.4em;
+  fill: #fbfbee;
 }
 
 .slidecontainer {
@@ -132,16 +136,17 @@ text {
     appearance: none;
     width: 25px; /* Set a specific slider handle width */
     height: 25px; /* Slider handle height */
-    background: #4a6b96; /* Blue background */
+    background: #7a7f8c; /* Blue background */
     cursor: pointer; /* Cursor on hover */
   }
   
   .slider::-moz-range-thumb {
     width: 25px; /* Set a specific slider handle width */
     height: 25px; /* Slider handle height */
-    background: #4a6b96; /* Blue background */
+    background: #7a7f8c; /* Blue background */
     cursor: pointer; /* Cursor on hover */
   }
+
 
 /* Tooltip hover formatting */
 div.tooltip {
@@ -156,4 +161,12 @@ div.tooltip {
   background: #4a6b96;
   border: 1px solid black;
   pointer-events: none;
+}
+
+.leftlabel {
+  color: white;
+}
+
+.rightlabel {
+  color: white;
 }

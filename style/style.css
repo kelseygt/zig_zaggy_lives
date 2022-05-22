@@ -14,12 +14,14 @@ body {
   background-color: #7a7f8c;
   border: none;
   color: white;
-  padding: 8px 40px;
+  /* padding: 8px 20px; */
   text-align: center;
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
   opacity: 1;
+  height: 35px;
+  width: 80px;
 }
 #play-pause:hover{
   background-color: #ca7878;
@@ -31,12 +33,14 @@ body {
   background-color: #7a7f8c;
   border: none;
   color: white;
-  padding: 8px 40px;
+  /* padding: 8px 20px; */
   text-align: center;
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
   opacity: 1;
+  height: 35px;
+  width: 80px;
 }
 #slow:hover{
   background-color: #ca7878;
@@ -48,14 +52,35 @@ body {
   background-color: #7a7f8c;
   border: none;
   color: white;
-  padding: 8px 40px;
+  /* padding: 8px 20px; */
   text-align: center;
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
   opacity: 1;
+  height: 35px;
+  width: 80px;
 }
 #fast:hover{
+  background-color: #ca7878;
+  opacity: 0.7;
+  transition: 0.3s;
+}
+#reset {
+  font-family: 'Mohave', sans-serif;
+  background-color: #7a7f8c;
+  border: none;
+  color: white;
+  /* padding: 8px 20px; */
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  opacity: 1;
+  height: 35px;
+  width: 80px;
+}
+#reset:hover{
   background-color: #ca7878;
   opacity: 0.7;
   transition: 0.3s;
@@ -79,7 +104,7 @@ h2 {
 	font-weight: normal;
   text-align: center;
   margin-top: 0px;
-  margin-bottom: 0px;
+  margin-bottom: -8px;
   color: #fbfbee;
 }
 h3 {
@@ -101,15 +126,16 @@ h4 {
   color: #fbfbee;
 }
 text {
-  font-size: 1.4em;
+  font-size: 1.3em;
   fill: #fbfbee;
 }
 
 .slidecontainer {
     font-size: 20px;
-    width: 55%; /* Width of the outside container */
+    width: 40%; /* Width of the outside container */
     margin-left: auto !important;
     margin-right: auto !important;
+    position: relative;
   }
   
   /* The slider itself */
@@ -165,8 +191,14 @@ div.tooltip {
 
 .leftlabel {
   color: white;
+  position: absolute; 
+  top: 8%;
+  right: 78%;
 }
 
 .rightlabel {
   color: white;
+  position:absolute; 
+  top: 8%;
+  left: 78%;
 }

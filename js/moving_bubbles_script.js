@@ -41,6 +41,13 @@ d3.select('button#fast')
   })
   .text('Faster')
 
+d3.select('button#reset')
+  .on('click', function () {
+    sliderValue = 1;
+    previousSliderValue = 0;
+  })
+  .text('Reset')
+
 const termLabels = [
   "Fall 2011",
   "Spring 2012",
@@ -76,15 +83,15 @@ const termLabels = [
 
 // Group coordinates and meta info.
 const groups = {
-  "Starting Cohort": { x: 580, y: 120, color: "#BB8FCE", cnt: 0, fullname: "Starting Cohort" },
-  "Sabbatical": { x: 580, y: 450, color: "#e7b416", cnt: 0, fullname: "Sabbatical", hovertext: "'Sabbatical' is defined here as when a student takes one or more semesters off between enrolled semesters, excluding the summer term." },
-  "Freshman": { x: 930, y: 200, color: "#ABD5AB", cnt: 0, fullname: "Freshman" },
-  "Sophomore": { x: 1030, y: 450, color: "#85C285", cnt: 0, fullname: "Sophomore" },
-  "Junior": { x: 930, y: 700, color: "#4FA64F", cnt: 0, fullname: "Junior" },
-  "Senior": { x: 580, y: 800, color: "#249225", cnt: 0, fullname: "Senior" },
-  "Graduated": { x: 230, y: 700, color: "#4a6b96", cnt: 0, fullname: "Graduated", hovertext: "'Graduated' here is defined as bachelor's degree recipients." },
-  "Transferred Out": { x: 130, y: 450, color: "#db7b2b", cnt: 0, fullname: "Transferred Out", hovertext: "'Transferred Out' is here defined as when we have established evidence of a student enrolling at an external institution. This category is not terminal; students may have evidence of transferring out, but may subsequently return to MSU Denver." },
-  "Dropped Out": { x: 230, y: 200, color: "#cc3232", cnt: 0, fullname: "Dropped Out", hovertext: "'Dropped Out' is here defined as a student who has no subsequent enrollment at MSU Denver to date, and no enrollment at any external institution. This category is terminal." },
+  "Starting Cohort": { x: 580, y: 150, color: "#843b97", cnt: 0, fullname: "Starting Cohort" }, // was x: 120 for a circle, doesn't fit well though
+  "Sabbatical": { x: 580, y: 450, color: "#Eae61a", cnt: 0, fullname: "Sabbatical", hovertext: "'Sabbatical' is defined here as when a student takes one or more semesters off between enrolled semesters, excluding the summer term." },
+  "Freshman": { x: 930, y: 200, color: "#7bb890", cnt: 0, fullname: "Freshman" },
+  "Sophomore": { x: 1030, y: 450, color: "#68ad80", cnt: 0, fullname: "Sophomore" },
+  "Junior": { x: 930, y: 700, color: "#55a370", cnt: 0, fullname: "Junior" },
+  "Senior": { x: 580, y: 800, color: "#429960", cnt: 0, fullname: "Senior" },
+  "Graduated": { x: 230, y: 700, color: "#26a9bb", cnt: 0, fullname: "Graduated", hovertext: "'Graduated' here is defined as bachelor's degree recipients." },
+  "Transferred Out": { x: 130, y: 450, color: "#f8882a", cnt: 0, fullname: "Transferred Out", hovertext: "'Transferred Out' is here defined as when we have established evidence of a student enrolling at an external institution. This category is not terminal; students may have evidence of transferring out, but may subsequently return to MSU Denver." },
+  "Dropped Out": { x: 230, y: 200, color: "#d53739", cnt: 0, fullname: "Dropped Out", hovertext: "'Dropped Out' is here defined as a student who has no subsequent enrollment at MSU Denver to date, and no enrollment at any external institution. This category is terminal." },
 };
 
 const svg = d3

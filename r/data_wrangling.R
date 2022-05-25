@@ -7,8 +7,8 @@ library(zoo)
 library(tibble)
 
 # loading in data
-setwd("C:/Users/Laserbeams/Desktop/zig_zag/working_files")
-raw_data <- read.csv("all_students_201150.csv", header = T, check.names = F)
+setwd("C:/Users/Laserbeams/Desktop/temp")
+raw_data <- read.csv("all_201150.csv", header = T, check.names = F)
 grad_data <- as.data.frame(read_excel("grads_from_201150.xlsx", sheet = "for_import"))
 trans_data <- as.data.frame(read_excel("transfer_outs_201150.xlsx", sheet = "for_import"))
 drop_data <- as.data.frame(read_excel("max_term_201150.xlsx", sheet = "for_import"))
@@ -17,10 +17,11 @@ drop_data <- as.data.frame(read_excel("max_term_201150.xlsx", sheet = "for_impor
 # data prep #
 #############
 
-# remember to subset by student type, remove non-degree seeking
+# remember to subset by student type, remove non-degree seeking AT THE END
 
 # converting credit hours to class levels
-mapping <- raw_data[ , 4:ncol(raw_data)]
+raw_data[2][is.na(raw_data[2])] <- 0 # replaces NA values in first semester with 0
+mapping <- raw_data[ , 2:ncol(raw_data)]
 mapping <- mapping %>% mutate(
   across(
     .cols = everything(),
@@ -33,7 +34,8 @@ mapping <- mapping %>% mutate(
     )
   )
 )
-class_levels <- cbind("PIDM" = raw_data$SHRTGPA_PIDM, mapping)
+
+class_levels <- cbind("PIDM" = raw_data$PIDM, mapping)
 class_levels <- arrange(class_levels, PIDM)
 
 ########################
@@ -177,7 +179,7 @@ zz_sabb <- as.data.frame(t(zz_sabb))
 zz_sabb <- rownames_to_column(zz_sabb, "PIDM")
 
 # adding column for start position
-zz <- add_column(zz_sabb, start = rep("First-Time Freshman", times = nrow(zz_sabb)), .after = "PIDM")
+zz <- add_column(zz_sabb, start = rep("Starting Cohort", times = nrow(zz_sabb)), .after = "PIDM")
 
 # export final data set
 write.csv(zz, "final_zz.csv", row.names = F)

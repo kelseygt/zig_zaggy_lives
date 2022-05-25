@@ -1,6 +1,8 @@
 /* 
 This selects all students enrolled in a particular semester, but unions on a specific pull for the first
-semester in question, so folks don't come in with a NULL during the pivot
+semester in question, so folks who shouldn't don't come in with a NULL during the pivot (i.e. those who 
+earned 0 credit hours in the base term were coming in with an incorrect null value for total earned
+hours up through that term).
 */
 
 SELECT * FROM (

@@ -39,7 +39,5 @@ vignettes/*.pdf
 .Renviron
 
 # Data files
-/working_files
-/documentation
-/transfer_institutions
-/data/*.csv
+/data/*/
+/tableau_files

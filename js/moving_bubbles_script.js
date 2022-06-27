@@ -105,7 +105,7 @@ const svg = d3
 d3.select("#chart").style("width", width + margin.left + margin.right + "px");
 
 // Load data.
-const stages = d3.tsv("data/ftf.tsv", d3.autoType);
+const stages = d3.tsv("data/201150_ftf_piv.tsv", d3.autoType);
 
 // Once data is loaded...
 stages.then(function (data) {

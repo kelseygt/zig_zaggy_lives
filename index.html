@@ -13,21 +13,24 @@
 
 <div id="main-wrapper">
   <h1>Follow the Lives of 2,185 Fall 2011 First-Time Freshman</h1>
+  <div style="line-height:50%;"><br></div>
+  <div class="slidecontainer" style="text-align:center">
+    <span class="leftlabel">Fall 2011</span>
+    <input type="range" min="1" max="30" value="1" class="slider" step="1" id="myRange" onchange="getSliderValue(this)">
+    <span class="rightlabel">Summer 2021</span>
+  </div>
   <div id="button-container">
     <button id="play-pause" width="90"></button>
     <button id="reset" width="90"></button>
     <button id="slow" width="90"></button>
     <button id="fast" width="90"></button>
   </div>
-  <div style="line-height:50%;"><br></div>
-  <h4 id="transition-speed">[Transition Speed: <span class="spd">5</span> seconds]</h4>
-  <div class="slidecontainer" style="text-align:center">
-    <span class="leftlabel">Fall 2011</span>
-    <input type="range" min="1" max="30" value="1" class="slider" step="1" id="myRange" onchange="getSliderValue(this)">
-    <span class="rightlabel">Summer 2021</span>
+  <div class="inline-div">
+    <h2 id="yrcount">Year <span class="cnt">1</span></h2>
+    <h2>:</h2>
+    <h2 id="term"><span class="trm">Fall 2011</span></h2>
   </div>
-  <h2 id="term"><span class="trm">Fall 2011</span></h2>
-  <h3 id="yrcount">Year <span class="cnt">1</span></h3>
+  <h4 id="transition-speed">[Transition Speed: <span class="spd">5</span> seconds]</h4>
   <div id="chart"></div>
 </div>
 

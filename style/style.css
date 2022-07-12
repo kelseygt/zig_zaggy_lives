@@ -20,7 +20,7 @@ body {
   display: inline-block;
   font-size: 16px;
   opacity: 1;
-  height: 35px;
+  height: 30px;
   width: 80px;
 }
 #play-pause:hover{
@@ -39,7 +39,7 @@ body {
   display: inline-block;
   font-size: 16px;
   opacity: 1;
-  height: 35px;
+  height: 30px;
   width: 80px;
 }
 #slow:hover{
@@ -58,7 +58,7 @@ body {
   display: inline-block;
   font-size: 16px;
   opacity: 1;
-  height: 35px;
+  height: 30px;
   width: 80px;
 }
 #fast:hover{
@@ -77,8 +77,9 @@ body {
   display: inline-block;
   font-size: 16px;
   opacity: 1;
-  height: 35px;
+  height: 30px;
   width: 80px;
+  margin-right: 30px;
 }
 #reset:hover{
   background-color: #ca7878;
@@ -86,6 +87,11 @@ body {
   transition: 0.3s;
 }
 #button-container{
+  text-align: center;
+}
+
+.inline-div {
+  display: block;
   text-align: center;
 }
 
@@ -106,6 +112,8 @@ h2 {
   margin-top: 0px;
   margin-bottom: -8px;
   color: #fbfbee;
+  display: inline-block;
+  text-align: center;
 }
 h3 {
 	font-size: 1.6em;

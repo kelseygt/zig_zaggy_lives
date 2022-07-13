@@ -4,7 +4,45 @@ body {
 }
 
 #main-wrapper {
-  margin: 40px auto;
+  margin: auto;
+  margin-top: 1%;
+  width: 100%;
+  text-align:center;
+}
+#sidebar{
+  display: inline-block;
+  width: 500px;
+  /* float: left; */
+  margin-right: 30px;
+  padding-right: 20px;
+  border-right: 1px solid #ccc;
+  height: 1200px;
+  text-align: left;
+}
+#animation-area{
+  vertical-align:top;
+  display: inline-block;
+  width: 1200px;
+}
+#note {
+  position: relative;
+  color: #fff; 
+  padding-left: 20px; 
+  font-style: italic;
+  font-weight: 400; 
+  font-size: 20px; 
+  line-height: 1.4em;
+  padding-top: 100px;
+}
+#source {
+  position: absolute;
+  border-top: 1px solid #ccc;
+  padding-top: 20px;
+  top: 1100px;
+  font-size: 15px;
+  line-height: 1.4em;
+  width: 500px;
+  color: white;
 }
 #chart {
   margin: 0px auto;
@@ -21,7 +59,7 @@ body {
   font-size: 16px;
   opacity: 1;
   height: 30px;
-  width: 80px;
+  width: 70px;
 }
 #play-pause:hover{
   background-color: #ca7878;
@@ -40,7 +78,7 @@ body {
   font-size: 16px;
   opacity: 1;
   height: 30px;
-  width: 80px;
+  width: 70px;
 }
 #slow:hover{
   background-color: #ca7878;
@@ -59,7 +97,7 @@ body {
   font-size: 16px;
   opacity: 1;
   height: 30px;
-  width: 80px;
+  width: 70px;
 }
 #fast:hover{
   background-color: #ca7878;
@@ -78,8 +116,7 @@ body {
   font-size: 16px;
   opacity: 1;
   height: 30px;
-  width: 80px;
-  margin-right: 30px;
+  width: 70px;
 }
 #reset:hover{
   background-color: #ca7878;
@@ -88,21 +125,54 @@ body {
 }
 #button-container{
   text-align: center;
+  width: 70%; /* Width of the outside container */
+  margin-left: auto !important;
+  margin-right: auto !important;
+  position: relative;
 }
+
+/* #new-buttons{
+  text-align: center;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  position: relative;
+}
+#test1:hover{
+  background-color: #ca7878;
+  opacity: 0.7;
+  transition: 0.3s;
+}
+#test2:hover{
+  background-color: #ca7878;
+  opacity: 0.7;
+  transition: 0.3s;
+}
+#test3:hover{
+  background-color: #ca7878;
+  opacity: 0.7;
+  transition: 0.3s;
+}
+#test4:hover{
+  background-color: #ca7878;
+  opacity: 0.7;
+  transition: 0.3s;
+} */
 
 .inline-div {
   display: block;
   text-align: center;
+  margin-bottom: 10px;
 }
 
 h1 {
 	font-size: 2.5em;
 	padding: 3px 0px;
 	font-weight: normal;
-  text-align: center;
+  text-align: left;
   margin-top: 0x;
   margin-bottom: 0px;
   color: #fbfbee;
+  border-bottom: 1px solid #ccc;
 }
 h2 {
 	font-size: 1.8em;
@@ -116,11 +186,11 @@ h2 {
   text-align: center;
 }
 h3 {
-	font-size: 1.6em;
+	font-size: 1.2em;
 	padding: 3px 0px;
 	font-weight: normal;
-  text-align: center;
-  margin-top:0px;
+  text-align: left;
+  margin-top: 50px;
   margin-bottom: 0px;
   color: #fbfbee;
 }
@@ -140,7 +210,7 @@ text {
 
 .slidecontainer {
     font-size: 20px;
-    width: 40%; /* Width of the outside container */
+    width: 100%; /* Width of the outside container */
     margin-left: auto !important;
     margin-right: auto !important;
     position: relative;

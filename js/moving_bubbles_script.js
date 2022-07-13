@@ -16,6 +16,15 @@ let slider = document.querySelector("input[type='range']");
 let PAUSE = false;
 let numNodes;
 
+let timeNotes = {
+  0: "Test1",
+ 12: "Test2",
+ 18: "Test3"
+}
+let currentNote;
+let previouseNote;
+
+
 // Buttons.
 d3.select('button#play-pause')
   .on('click', function () {
@@ -25,6 +34,13 @@ d3.select('button#play-pause')
     self.text(PAUSE ? 'Play' : 'Pause')
   })
   .text(PAUSE ? 'Play' : 'Pause')
+
+d3.select('button#reset')
+  .on('click', function () {
+    sliderValue = 1;
+    previousSliderValue = 0;
+  })
+  .text('Reset')
 
 // Adjust play rate if needed.
 d3.select('button#slow')
@@ -40,13 +56,6 @@ d3.select('button#fast')
     console.log(simulationRate);
   })
   .text('Faster')
-
-d3.select('button#reset')
-  .on('click', function () {
-    sliderValue = 1;
-    previousSliderValue = 0;
-  })
-  .text('Reset')
 
 const termLabels = [
   "Fall 2011",
@@ -82,16 +91,29 @@ const termLabels = [
 ];
 
 // Group coordinates and meta info.
+
+// const groups = {
+//   "Starting Cohort": { x: 580, y: 200, color: "#843b97", cnt: 0, fullname: "Starting Cohort" }, // was x: 120 for a circle, doesn't fit well though
+//   "Sabbatical": { x: 580, y: 500, color: "#Eae61a", cnt: 0, fullname: "Sabbatical", hovertext: "'Sabbatical' is defined here as when a student takes one or more semesters off between enrolled semesters, excluding the summer term." },
+//   "Freshman": { x: 930, y: 250, color: "#7bb890", cnt: 0, fullname: "Freshman" },
+//   "Sophomore": { x: 1030, y: 500, color: "#68ad80", cnt: 0, fullname: "Sophomore" },
+//   "Junior": { x: 930, y: 750, color: "#55a370", cnt: 0, fullname: "Junior" },
+//   "Senior": { x: 580, y: 850, color: "#429960", cnt: 0, fullname: "Senior" },
+//   "Graduated": { x: 230, y: 750, color: "#26a9bb", cnt: 0, fullname: "Graduated", hovertext: "'Graduated' here is defined as bachelor's degree recipients." },
+//   "Transferred Out": { x: 130, y: 500, color: "#f8882a", cnt: 0, fullname: "Transferred Out", hovertext: "'Transferred Out' is here defined as when we have established evidence of a student enrolling at an external institution. This category is not terminal; students may have evidence of transferring out, but may subsequently return to MSU Denver." },
+//   "Dropped Out": { x: 230, y: 250, color: "#d53739", cnt: 0, fullname: "Dropped Out", hovertext: "'Dropped Out' is here defined as a student who has no subsequent enrollment at MSU Denver to date, and no enrollment at any external institution. This category is terminal." },
+// };
+
 const groups = {
-  "Starting Cohort": { x: 580, y: 150, color: "#843b97", cnt: 0, fullname: "Starting Cohort" }, // was x: 120 for a circle, doesn't fit well though
-  "Sabbatical": { x: 580, y: 450, color: "#Eae61a", cnt: 0, fullname: "Sabbatical", hovertext: "'Sabbatical' is defined here as when a student takes one or more semesters off between enrolled semesters, excluding the summer term." },
-  "Freshman": { x: 930, y: 200, color: "#7bb890", cnt: 0, fullname: "Freshman" },
-  "Sophomore": { x: 1030, y: 450, color: "#68ad80", cnt: 0, fullname: "Sophomore" },
-  "Junior": { x: 930, y: 700, color: "#55a370", cnt: 0, fullname: "Junior" },
-  "Senior": { x: 580, y: 800, color: "#429960", cnt: 0, fullname: "Senior" },
-  "Graduated": { x: 230, y: 700, color: "#26a9bb", cnt: 0, fullname: "Graduated", hovertext: "'Graduated' here is defined as bachelor's degree recipients." },
-  "Transferred Out": { x: 130, y: 450, color: "#f8882a", cnt: 0, fullname: "Transferred Out", hovertext: "'Transferred Out' is here defined as when we have established evidence of a student enrolling at an external institution. This category is not terminal; students may have evidence of transferring out, but may subsequently return to MSU Denver." },
-  "Dropped Out": { x: 230, y: 200, color: "#d53739", cnt: 0, fullname: "Dropped Out", hovertext: "'Dropped Out' is here defined as a student who has no subsequent enrollment at MSU Denver to date, and no enrollment at any external institution. This category is terminal." },
+  "Starting Cohort": { x: width*0.5, y: height*.19, color: "#843b97", cnt: 0, fullname: "Starting Cohort" }, // was x: 120 for a circle, doesn't fit well though
+  "Sabbatical": { x: width*0.5, y: height*0.47, color: "#Eae61a", cnt: 0, fullname: "Sabbatical", hovertext: "'Sabbatical' is defined here as when a student takes one or more semesters off between enrolled semesters, excluding the summer term." },
+  "Freshman": { x: width*0.8, y: height*0.236, color: "#7bb890", cnt: 0, fullname: "Freshman" },
+  "Sophomore": { x: width*0.89, y: height*0.47, color: "#68ad80", cnt: 0, fullname: "Sophomore" },
+  "Junior": { x: width*0.8, y: height*0.71, color: "#55a370", cnt: 0, fullname: "Junior" },
+  "Senior": { x: width*0.5, y: height*0.80, color: "#429960", cnt: 0, fullname: "Senior" },
+  "Graduated": { x: width*0.2, y: height*0.71, color: "#26a9bb", cnt: 0, fullname: "Graduated", hovertext: "'Graduated' here is defined as bachelor's degree recipients." },
+  "Transferred Out": { x: width*0.11, y: height*0.47, color: "#f8882a", cnt: 0, fullname: "Transferred Out", hovertext: "'Transferred Out' is here defined as when we have established evidence of a student enrolling at an external institution. This category is not terminal; students may have evidence of transferring out, but may subsequently return to MSU Denver." },
+  "Dropped Out": { x: width*0.2, y: height*0.236, color: "#d53739", cnt: 0, fullname: "Dropped Out", hovertext: "'Dropped Out' is here defined as a student who has no subsequent enrollment at MSU Denver to date, and no enrollment at any external institution. This category is terminal." },
 };
 
 const svg = d3
@@ -291,6 +313,7 @@ stages.then(function (data) {
     d3.select("#timecount .cnt").text(currentTerm);
     d3.select("#yrcount .cnt").text(Math.floor(currentTerm / 3) + 1);
     d3.select("#transition-speed .spd").text(simulationRate / 1000);
+    d3.select("#current-note .note").text(timeNotes[currentTerm]);
 
     // Update counters.
     svg.selectAll(".grpcnt").text((d) => `n = ${groups[d].cnt} (${Math.round((groups[d].cnt / numNodes) * 1000) / 10}%)`);
@@ -364,6 +387,7 @@ function forceCollide() {
   return force;
 }
 
+// Slider functions.
 function getSliderValue(run) {
   previousSliderValue = sliderValue;
   sliderValue = run.value;

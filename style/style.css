@@ -24,10 +24,11 @@ body {
   display: inline-block;
   width: 1200px;
 }
-#note {
+#current-note {
   position: relative;
   color: #fff; 
   padding-left: 20px; 
+  padding-right: 20px;
   font-style: italic;
   font-weight: 400; 
   font-size: 20px; 
@@ -171,7 +172,7 @@ h1 {
   text-align: left;
   margin-top: 0x;
   margin-bottom: 0px;
-  color: #fbfbee;
+  color: #fff;
   border-bottom: 1px solid #ccc;
 }
 h2 {
@@ -181,7 +182,7 @@ h2 {
   text-align: center;
   margin-top: 0px;
   margin-bottom: -8px;
-  color: #fbfbee;
+  color: #fff;
   display: inline-block;
   text-align: center;
 }
@@ -192,7 +193,7 @@ h3 {
   text-align: left;
   margin-top: 50px;
   margin-bottom: 0px;
-  color: #fbfbee;
+  color: #fff;
 }
 h4 {
 	font-size: 0.8em;
@@ -201,11 +202,11 @@ h4 {
   text-align: center;
   margin-top:0px;
   margin-bottom: 0px;
-  color: #fbfbee;
+  color: #fff;
 }
 text {
   font-size: 1.3em;
-  fill: #fbfbee;
+  fill: #fff;
 }
 
 .slidecontainer {

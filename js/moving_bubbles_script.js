@@ -13,12 +13,12 @@ let simulationRate = 5000; // in milliseconds
 let sliderValue = 1;
 let previousSliderValue = sliderValue;
 let slider = document.querySelector("input[type='range']");
-let PAUSE = false;
+let PAUSE = true;
 let numNodes;
-
+let start = "Click 'Play' to get started."
 let timeNotes = {
   0: "We start with just over 2000 full- and part-time first-time freshman. By the end of the first semester, over 8% have dropped out. That percentage doubles by the end of the first year. By this same time, around the same number of students have opted to take at least one semester off.",
-  9: "Here we hit the fourth year of study for this cohort. By now we've seen almost a third of this cohort drop out, and only about 6% of the students graduate. However, almost a third of students are still on track in their studies. Pause at the summer semester to really digest where this cohort stands.",
+  9: "Here we hit the fourth year of study for this cohort. By the end of this year, we'll have seen almost a third of this cohort drop out, and only about 6% of the students graduate. However, almost a third of students are still on track in their studies. Pause at the summer semester to really digest where this cohort stands.",
  15: "Here marks the start of the sixth year from when this group of students began. By the end of the academic year, the number of graduates will jump to four times as many as we had two years ago at the 4-year mark. Pause at the summer semester again to absorb the overall picture.",
  19: "From here, during the seventh year, things start to slow down, as most students -- but not all -- have come to the end of their chosen path.",
  27: "And here we are at year 10. The majority of students will have settled into their final classification by now, be it dropped out, transferred out, or graduated. Even still, a small handful of students continue on their educational journey at MSU Denver. Pause here for a final snapshot of this cohort."
@@ -91,18 +91,8 @@ const termLabels = [
 
 // Group coordinates and meta info.
 
-// const groups = {
-//   "Starting Cohort": { x: 580, y: 200, color: "#843b97", cnt: 0, fullname: "Starting Cohort" }, // was x: 120 for a circle, doesn't fit well though
-//   "Sabbatical": { x: 580, y: 500, color: "#Eae61a", cnt: 0, fullname: "Sabbatical", hovertext: "'Sabbatical' is defined here as when a student takes one or more semesters off between enrolled semesters, excluding the summer term." },
-//   "Freshman": { x: 930, y: 250, color: "#7bb890", cnt: 0, fullname: "Freshman" },
-//   "Sophomore": { x: 1030, y: 500, color: "#68ad80", cnt: 0, fullname: "Sophomore" },
-//   "Junior": { x: 930, y: 750, color: "#55a370", cnt: 0, fullname: "Junior" },
-//   "Senior": { x: 580, y: 850, color: "#429960", cnt: 0, fullname: "Senior" },
-//   "Graduated": { x: 230, y: 750, color: "#26a9bb", cnt: 0, fullname: "Graduated", hovertext: "'Graduated' here is defined as bachelor's degree recipients." },
-//   "Transferred Out": { x: 130, y: 500, color: "#f8882a", cnt: 0, fullname: "Transferred Out", hovertext: "'Transferred Out' is here defined as when we have established evidence of a student enrolling at an external institution. This category is not terminal; students may have evidence of transferring out, but may subsequently return to MSU Denver." },
-//   "Dropped Out": { x: 230, y: 250, color: "#d53739", cnt: 0, fullname: "Dropped Out", hovertext: "'Dropped Out' is here defined as a student who has no subsequent enrollment at MSU Denver to date, and no enrollment at any external institution. This category is terminal." },
-// };
-
+// Coordinates have been converted to dynamic coordinates (rather than hard-coded) based on the chart dimensions. 
+// Still needs work, since this only stays valid if the dimension ratio of the chart stays the same.
 const groups = {
   "Starting Cohort": { x: width*0.5, y: height*.19, color: "#843b97", cnt: 0, fullname: "Starting Cohort" }, // was x: 120 for a circle, doesn't fit well though
   "Sabbatical": { x: width*0.5, y: height*0.47, color: "#Eae61a", cnt: 0, fullname: "Sabbatical", hovertext: "'Sabbatical' is defined here as when a student takes one or more semesters off between enrolled semesters, excluding the summer term." },
@@ -251,6 +241,11 @@ stages.then(function (data) {
       .attr("fill", (d) => groups[d.group].color);
   });
 
+  d3.select("#starting-note")
+  .style("opacity", 1)
+  .style("color", "#ffffff")
+  .text("#starting-note .start").text(start);
+
   function simulateNodes() {
     if (PAUSE === true) {
       setTimeout(simulateNodes, 100);
@@ -304,7 +299,7 @@ stages.then(function (data) {
     d3.select("#yrcount .cnt").text(Math.floor(currentTerm / 3) + 1);
     d3.select("#transition-speed .spd").text(simulationRate / 1000);
     
-    // The below ~50 lines of code are ugly (but functional), and needs reworked somehow.
+    // The below ~50 lines of code are very hacky and very ugly (but functional), and need reworked somehow.
     // currentNote = timeNotes[currentTerm] ?? currentNote
     // previousNote = timeNotes[currentTerm - 1] ?? previousNote
 
@@ -334,14 +329,11 @@ stages.then(function (data) {
       previousNote = timeNotes[27]
     }
 
-    console.log(currentNote)
-    console.log(previousNote)
-
     if (currentNote != previousNote) {
       d3.select("#current-note")
       .style("opacity", 0)
       .transition()
-      .duration(1000)
+      .duration(1500)
       .style("opacity", 1)
       .style("color", "#ffffff")
       .text("#current-note .note").text(`${currentNote}`);
@@ -355,6 +347,21 @@ stages.then(function (data) {
       .style("opacity", 0)
       .style("color", "#ffffff")
       .text("#current-note .note").text(`${currentNote}`);
+    }
+
+    // Fade out the starting instructions after the user starts the animation.
+    if (currentTerm < 0) {
+      d3.select("#starting-note")
+      .style("opacity", 1)
+      .style("color", "#ffffff")
+      .text("#starting-note .start").text(start);
+    } else {
+      d3.select("#starting-note")
+      .transition()
+      .duration(1000)
+      .style("opacity", 0)
+      .style("color", "#ffffff")
+      .text("#starting-note .start").text(start);
     }
 
     // Update counters.

@@ -32,29 +32,25 @@ d3.select('button#play-pause')
     console.log(`Animation ${PAUSE ? 'paused' : 'playing'}`)
     self.text(PAUSE ? 'Play' : 'Pause')
   })
-  .text(PAUSE ? 'Play' : 'Pause')
+  // .text(PAUSE ? 'Play' : 'Pause')
 
 d3.select('button#reset')
   .on('click', function () {
     sliderValue = 1;
     previousSliderValue = 0;
   })
-  .text('Reset')
 
 // Adjust play rate if needed.
-d3.select('button#slow')
+d3.select('button#slower')
   .on('click', function () {
     simulationRate += 500
     console.log(simulationRate)
   })
-  .text('Slower')
-
-d3.select('button#fast')
+d3.select('button#faster')
   .on('click', function () {
     simulationRate = Math.max(500, (simulationRate - 500));
     console.log(simulationRate);
   })
-  .text('Faster')
 
 const termLabels = [
   "Fall 2011",
@@ -96,11 +92,11 @@ const termLabels = [
 const groups = {
   "Starting Cohort": { x: width*0.5, y: height*.19, color: "#843b97", cnt: 0, fullname: "Starting Cohort" }, // was x: 120 for a circle, doesn't fit well though
   "Sabbatical": { x: width*0.5, y: height*0.47, color: "#Eae61a", cnt: 0, fullname: "Sabbatical", hovertext: "'Sabbatical' is defined here as when a student takes one or more semesters off between enrolled semesters, excluding the summer term." },
-  "Freshman": { x: width*0.8, y: height*0.236, color: "#7bb890", cnt: 0, fullname: "Freshman" },
-  "Sophomore": { x: width*0.89, y: height*0.47, color: "#68ad80", cnt: 0, fullname: "Sophomore" },
-  "Junior": { x: width*0.8, y: height*0.71, color: "#55a370", cnt: 0, fullname: "Junior" },
-  "Senior": { x: width*0.5, y: height*0.80, color: "#429960", cnt: 0, fullname: "Senior" },
-  "Graduated": { x: width*0.2, y: height*0.71, color: "#26a9bb", cnt: 0, fullname: "Graduated", hovertext: "'Graduated' here is defined as bachelor's degree recipients." },
+  "Freshman": { x: width*0.8, y: height*0.236, color: "#7DD9C1", cnt: 0, fullname: "Freshman" },
+  "Sophomore": { x: width*0.89, y: height*0.47, color: "#3AC6A0", cnt: 0, fullname: "Sophomore" },
+  "Junior": { x: width*0.8, y: height*0.71, color: "#35B794", cnt: 0, fullname: "Junior" },
+  "Senior": { x: width*0.5, y: height*0.80, color: "#31A888", cnt: 0, fullname: "Senior" },
+  "Graduated": { x: width*0.2, y: height*0.71, color: "#34C3D5", cnt: 0, fullname: "Graduated", hovertext: "'Graduated' here is defined as bachelor's degree recipients." },
   "Transferred Out": { x: width*0.11, y: height*0.47, color: "#f8882a", cnt: 0, fullname: "Transferred Out", hovertext: "'Transferred Out' is here defined as when we have established evidence of a student enrolling at an external institution. This category is not terminal; students may have evidence of transferring out, but may subsequently return to MSU Denver." },
   "Dropped Out": { x: width*0.2, y: height*0.236, color: "#d53739", cnt: 0, fullname: "Dropped Out", hovertext: "'Dropped Out' is here defined as a student who has no subsequent enrollment at MSU Denver to date, and no enrollment at any external institution. This category is terminal." },
 };

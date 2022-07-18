@@ -9,3 +9,5 @@ For now, only the finalized data set being fed into the D3 animation has been pr
 To see the logic used in establishing whether a student graduates, takes a sabbatical, transfer out, or drops out, see the 'data_wrangling_logic' doc file. 
 
 Note: The current format of the data wrangling process is more laborious than it should be. The eventual goal is to refactor the Javascript to function row-wise (one row per student, with each "stage" being a column), rather than its current column-wise format (multiple rows per student, with a row for every "stage" a student experiences).
+
+Many thanks to Nathan Yau with [Flowing Data](https://flowingdata.com/2015/12/15/a-day-in-the-life-of-americans/) for layout and D3 coding inspiration. As a novice javascript user creating their first animation, his tutorials were invaluable.

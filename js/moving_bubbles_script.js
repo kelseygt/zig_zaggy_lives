@@ -13,8 +13,16 @@ let simulationRate = 5000; // in milliseconds
 let sliderValue = 1;
 let previousSliderValue = sliderValue;
 let slider = document.querySelector("input[type='range']");
-let PAUSE = false;
+let PAUSE = true;
 let numNodes;
+let start = "Click 'Play' to get started."
+let timeNotes = {
+  0: "We start with just over 2000 full- and part-time first-time freshman. By the end of the first semester, over 8% have dropped out. That percentage doubles by the end of the first year. By this same time, around the same number of students have opted to take at least one semester off.",
+  9: "Here we hit the fourth year of study for this cohort. By the end of this year, we'll have seen almost a third of this cohort drop out, and only about 6% of the students graduate. However, almost a third of students are still on track in their studies. Pause at the summer semester to really digest where this cohort stands.",
+ 15: "Here marks the start of the sixth year from when this group of students began. By the end of the academic year, the number of graduates will jump to four times as many as we had two years ago at the 4-year mark. Pause at the summer semester again to absorb the overall picture.",
+ 19: "From here, during the seventh year, things start to slow down, as most students -- but not all -- have come to the end of their chosen path.",
+ 27: "And here we are at year 10. The majority of students will have settled into their final classification by now, be it dropped out, transferred out, or graduated. Even still, a small handful of students continue on their educational journey at MSU Denver. Pause here for a final snapshot of this cohort."
+}
 
 // Buttons.
 d3.select('button#play-pause')
@@ -25,6 +33,13 @@ d3.select('button#play-pause')
     self.text(PAUSE ? 'Play' : 'Pause')
   })
   .text(PAUSE ? 'Play' : 'Pause')
+
+d3.select('button#reset')
+  .on('click', function () {
+    sliderValue = 1;
+    previousSliderValue = 0;
+  })
+  .text('Reset')
 
 // Adjust play rate if needed.
 d3.select('button#slow')
@@ -40,13 +55,6 @@ d3.select('button#fast')
     console.log(simulationRate);
   })
   .text('Faster')
-
-d3.select('button#reset')
-  .on('click', function () {
-    sliderValue = 1;
-    previousSliderValue = 0;
-  })
-  .text('Reset')
 
 const termLabels = [
   "Fall 2011",
@@ -82,16 +90,19 @@ const termLabels = [
 ];
 
 // Group coordinates and meta info.
+
+// Coordinates have been converted to dynamic coordinates (rather than hard-coded) based on the chart dimensions. 
+// Still needs work, since this only stays valid if the dimension ratio of the chart stays the same.
 const groups = {
-  "Starting Cohort": { x: 580, y: 150, color: "#843b97", cnt: 0, fullname: "Starting Cohort" }, // was x: 120 for a circle, doesn't fit well though
-  "Sabbatical": { x: 580, y: 450, color: "#Eae61a", cnt: 0, fullname: "Sabbatical", hovertext: "'Sabbatical' is defined here as when a student takes one or more semesters off between enrolled semesters, excluding the summer term." },
-  "Freshman": { x: 930, y: 200, color: "#7bb890", cnt: 0, fullname: "Freshman" },
-  "Sophomore": { x: 1030, y: 450, color: "#68ad80", cnt: 0, fullname: "Sophomore" },
-  "Junior": { x: 930, y: 700, color: "#55a370", cnt: 0, fullname: "Junior" },
-  "Senior": { x: 580, y: 800, color: "#429960", cnt: 0, fullname: "Senior" },
-  "Graduated": { x: 230, y: 700, color: "#26a9bb", cnt: 0, fullname: "Graduated", hovertext: "'Graduated' here is defined as bachelor's degree recipients." },
-  "Transferred Out": { x: 130, y: 450, color: "#f8882a", cnt: 0, fullname: "Transferred Out", hovertext: "'Transferred Out' is here defined as when we have established evidence of a student enrolling at an external institution. This category is not terminal; students may have evidence of transferring out, but may subsequently return to MSU Denver." },
-  "Dropped Out": { x: 230, y: 200, color: "#d53739", cnt: 0, fullname: "Dropped Out", hovertext: "'Dropped Out' is here defined as a student who has no subsequent enrollment at MSU Denver to date, and no enrollment at any external institution. This category is terminal." },
+  "Starting Cohort": { x: width*0.5, y: height*.19, color: "#843b97", cnt: 0, fullname: "Starting Cohort" }, // was x: 120 for a circle, doesn't fit well though
+  "Sabbatical": { x: width*0.5, y: height*0.47, color: "#Eae61a", cnt: 0, fullname: "Sabbatical", hovertext: "'Sabbatical' is defined here as when a student takes one or more semesters off between enrolled semesters, excluding the summer term." },
+  "Freshman": { x: width*0.8, y: height*0.236, color: "#7bb890", cnt: 0, fullname: "Freshman" },
+  "Sophomore": { x: width*0.89, y: height*0.47, color: "#68ad80", cnt: 0, fullname: "Sophomore" },
+  "Junior": { x: width*0.8, y: height*0.71, color: "#55a370", cnt: 0, fullname: "Junior" },
+  "Senior": { x: width*0.5, y: height*0.80, color: "#429960", cnt: 0, fullname: "Senior" },
+  "Graduated": { x: width*0.2, y: height*0.71, color: "#26a9bb", cnt: 0, fullname: "Graduated", hovertext: "'Graduated' here is defined as bachelor's degree recipients." },
+  "Transferred Out": { x: width*0.11, y: height*0.47, color: "#f8882a", cnt: 0, fullname: "Transferred Out", hovertext: "'Transferred Out' is here defined as when we have established evidence of a student enrolling at an external institution. This category is not terminal; students may have evidence of transferring out, but may subsequently return to MSU Denver." },
+  "Dropped Out": { x: width*0.2, y: height*0.236, color: "#d53739", cnt: 0, fullname: "Dropped Out", hovertext: "'Dropped Out' is here defined as a student who has no subsequent enrollment at MSU Denver to date, and no enrollment at any external institution. This category is terminal." },
 };
 
 const svg = d3
@@ -112,6 +123,8 @@ stages.then(function (data) {
   // Initialize local variables.
   let people = {};
   let currentTerm = -1;
+  let currentNote = timeNotes[currentTerm];
+  let previousNote = timeNotes[currentTerm - 1];
 
   // Consolidate stages by pid.
   // The data file is one row per stage change.
@@ -210,17 +223,6 @@ stages.then(function (data) {
     .attr("y", (d) => groups[d].y + 125)
     .text((d) => `n = ${groups[d].cnt} (${Math.round((groups[d].cnt / numNodes) * 1000) / 10}%)`);
 
-  // // Group percent
-  // svg
-  //   .selectAll(".grpper")
-  //   .data(d3.keys(groups))
-  //   .join("text")
-  //   .attr("class", "grpper")
-  //   .attr("text-anchor", "middle")
-  //   .attr("x", (d) => groups[d].x)
-  //   .attr("y", (d) => groups[d].y + 150)
-  //   .text((d) => `${Math.round((groups[d].cnt / numNodes) * 1000) / 10}%`);
-
   // Forces
   const simulation = d3
     .forceSimulation(nodes)
@@ -238,6 +240,11 @@ stages.then(function (data) {
       .attr("cy", (d) => d.y)
       .attr("fill", (d) => groups[d.group].color);
   });
+
+  d3.select("#starting-note")
+  .style("opacity", 1)
+  .style("color", "#ffffff")
+  .text("#starting-note .start").text(start);
 
   function simulateNodes() {
     if (PAUSE === true) {
@@ -291,10 +298,74 @@ stages.then(function (data) {
     d3.select("#timecount .cnt").text(currentTerm);
     d3.select("#yrcount .cnt").text(Math.floor(currentTerm / 3) + 1);
     d3.select("#transition-speed .spd").text(simulationRate / 1000);
+    
+    // The below ~50 lines of code are very hacky and very ugly (but functional), and need reworked somehow.
+    // currentNote = timeNotes[currentTerm] ?? currentNote
+    // previousNote = timeNotes[currentTerm - 1] ?? previousNote
+
+    if (currentTerm < 9) {
+      currentNote = timeNotes[0]
+    } else if (currentTerm < 15) {
+      currentNote = timeNotes[9]
+    } else if (currentTerm < 19) {
+      currentNote = timeNotes[15]
+    } else if (currentTerm < 27) {
+      currentNote = timeNotes[19]
+    } else if (currentTerm >= 27) {
+      currentNote = timeNotes[27]
+    }
+
+    if (currentTerm == 0) {
+      previousNote = timeNotes[27]
+    } else if (currentTerm <= 9) {
+      previousNote = timeNotes[0]
+    } else if (currentTerm <= 15) {
+      previousNote = timeNotes[9]
+    } else if (currentTerm <= 19) {
+      previousNote = timeNotes[15]
+    }else if (currentTerm <= 27) {
+      previousNote = timeNotes[19]
+    } else if (currentTerm > 27) {
+      previousNote = timeNotes[27]
+    }
+
+    if (currentNote != previousNote) {
+      d3.select("#current-note")
+      .style("opacity", 0)
+      .transition()
+      .duration(1500)
+      .style("opacity", 1)
+      .style("color", "#ffffff")
+      .text("#current-note .note").text(`${currentNote}`);
+    }
+
+    if (currentTerm == 3 || currentTerm == 12 || currentTerm == 18 || currentTerm == 23) {
+      d3.select("#current-note")
+      .style("opacity", 1)
+      .transition()
+      .duration(1000)
+      .style("opacity", 0)
+      .style("color", "#ffffff")
+      .text("#current-note .note").text(`${currentNote}`);
+    }
+
+    // Fade out the starting instructions after the user starts the animation.
+    if (currentTerm < 0) {
+      d3.select("#starting-note")
+      .style("opacity", 1)
+      .style("color", "#ffffff")
+      .text("#starting-note .start").text(start);
+    } else {
+      d3.select("#starting-note")
+      .transition()
+      .duration(1000)
+      .style("opacity", 0)
+      .style("color", "#ffffff")
+      .text("#starting-note .start").text(start);
+    }
 
     // Update counters.
     svg.selectAll(".grpcnt").text((d) => `n = ${groups[d].cnt} (${Math.round((groups[d].cnt / numNodes) * 1000) / 10}%)`);
-    // svg.selectAll(".grpper").text((d) => `${Math.round((groups[d].cnt / d3.keys(people).length) * 100 * 10) / 10}%`);
 
     // Do it again.
     setTimeout(simulateNodes, simulationRate);
@@ -364,6 +435,7 @@ function forceCollide() {
   return force;
 }
 
+// Slider functions.
 function getSliderValue(run) {
   previousSliderValue = sliderValue;
   sliderValue = run.value;

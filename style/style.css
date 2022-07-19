@@ -63,13 +63,13 @@ body {
   margin-right: auto !important;
   position: relative;
 }
-#slower, #play-pause, #reset, #faster{
-  border: 2px solid #d3d3d3;
+#toggleId, #slower, #play, #pause, #reset, #faster{
   border-radius: 5px;
   padding: 2px 15px;
   background-image: linear-gradient(to bottom right, #43AA8B, #277DA1);
+  border: #277DA1;
 }
-#slower:hover, #play-pause:hover, #reset:hover, #faster:hover{
+#toggleId:hover, #slower:hover, #play:hover, #pause:hover, #reset:hover, #faster:hover{
   background-color: #ca7878;
   cursor: pointer;
   background-image: linear-gradient(to bottom right, #CE4257, #FF9B54);
@@ -82,7 +82,23 @@ body {
   text-align: center;
   margin-bottom: 0px;
 }
-
+div.tooltip { /* Tooltip hover formatting */
+  color: white;
+  position: absolute;
+  text-align: left;
+  width: 200px;
+  padding: 5px;
+  font-size: 16px; 
+  font-family: 'Mohave', sans-serif;;
+  background: rgb(72, 90, 136);
+  border: 1px solid #5a6164;
+  pointer-events: none;
+  border-radius: 5px;
+}
+text {
+  font-size: 1.3em;
+  fill: #fff;
+}
 h1 {
 	font-size: 2.5em;
 	padding: 3px 0px;
@@ -141,14 +157,14 @@ text {
 .leftlabel {
   color: white;
   position: absolute; 
-  top: 8%;
+  top: -10%;
   right: 76.5%;
 }
 
 .rightlabel {
   color: white;
   position:absolute; 
-  top: 8%;
+  top: -10%;
   left: 76.5%;
 }
 
@@ -166,20 +182,20 @@ input[type="range"] {
   -webkit-appearance: none;
   position: relative;
   overflow: hidden;
-  height: 30px;
+  height: 20px;
   width: 600px;
   cursor: pointer;
   border-radius: 5px;
 }
 
 ::-webkit-slider-runnable-track {
-  background: #ddd;
+  background: #b6cbd4;
 }
 
 ::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 30px; /* 1 */
-  height: 30px;
+  width: 20px; /* 1 */
+  height: 20px;
   background: #fff;
   box-shadow: -600px 0 0 600px rgb(4, 131, 131); /* 2 */
   border: 2px solid #999; /* 1 */

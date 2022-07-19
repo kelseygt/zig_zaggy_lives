@@ -28,25 +28,25 @@
   </div>
   <!-- <div style="line-height:50%;"><br></div> -->
   <div id="animation-area">
+    <div class="inline-div">
+      <h2 id="yrcount">Year <span class="cnt">1</span></h2>
+      <h2>:</h2>
+      <h2 id="term"><span class="trm">Fall 2011</span></h2>
+    </div>
     <div id="button-container"> <!-- just using the same CSS here that was built for the buttons below -->
-      <div class="inline-div">
-        <h2 id="yrcount">Year <span class="cnt">1</span></h2>
-        <h2>:</h2>
-        <h2 id="term"><span class="trm">Fall 2011</span></h2>
-      </div>
     <div class="slidecontainer" style="text-align:center">
       <span class="leftlabel">Fall 2011</span>
       <input type="range" min="1" max="30" value="1" class="slider" step="1" id="myRange" onchange="getSliderValue(this)" list="tickmarks">
       <span class="rightlabel">Summer 2021</span>
     </div>
-
     <div id="button-container" style="font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0; cursor: pointer;">
-      <button id="slower" class="material-symbols-outlined" style="font-size:36px;color:#fbfbee;">fast_rewind</button>
-      <button id="play-pause" class="material-symbols-outlined" style="font-size:36px;color:#fbfbee;">play_arrow</button>
-      <button id="reset" class="material-symbols-outlined" style="font-size:36px;color:#fbfbee;">restart_alt</button>
-      <button id="faster" class="material-symbols-outlined" style="font-size:36px;color:#fbfbee;">fast_forward</button>
+      <button id="slower" class="material-symbols-outlined" style="font-size:24px;color:#fbfbee;">fast_rewind</button>
+      <!-- <button id="play" class="material-symbols-outlined" style="font-size:24px;color:#fbfbee;">play_arrow</button>
+      <button id="pause" class="material-symbols-outlined" style="font-size:24px;color:#fbfbee;">pause</button> -->
+      <button id="toggleId" class="material-symbols-outlined" style="font-size:24px;color:#fbfbee;" onclick="toggleMaker()">play_arrow</button>
+      <button id="reset" class="material-symbols-outlined" style="font-size:24px;color:#fbfbee;">restart_alt</button>
+      <button id="faster" class="material-symbols-outlined" style="font-size:24px;color:#fbfbee;">fast_forward</button>
     </div>
-  
     <h4 id="transition-speed">[Transition Speed: <span class="spd">5</span> seconds]</h4>
     </div>
     <div id="chart"></div>

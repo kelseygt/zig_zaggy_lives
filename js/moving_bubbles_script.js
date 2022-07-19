@@ -25,12 +25,12 @@ let timeNotes = {
 }
 
 // Buttons.
-d3.select('button#play-pause')
+d3.select('button#toggleId')
   .on('click', function () {
     let self = d3.select(this)
     PAUSE = !PAUSE
     console.log(`Animation ${PAUSE ? 'paused' : 'playing'}`)
-    self.text(PAUSE ? 'Play' : 'Pause')
+    // self.text(PAUSE ? 'Play' : 'Pause')
   })
   // .text(PAUSE ? 'Play' : 'Pause')
 
@@ -88,9 +88,9 @@ const termLabels = [
 // Group coordinates and meta info.
 
 // Coordinates have been converted to dynamic coordinates (rather than hard-coded) based on the chart dimensions. 
-// Still needs work, since this only stays valid if the dimension ratio of the chart stays the same.
+// Temporary fix, as this still needs work, since this only stays valid if the dimension ratio of the chart stays the same.
 const groups = {
-  "Starting Cohort": { x: width*0.5, y: height*.19, color: "#843b97", cnt: 0, fullname: "Starting Cohort" }, // was x: 120 for a circle, doesn't fit well though
+  "Starting Cohort": { x: width*0.5, y: height*.15, color: "#843b97", cnt: 0, fullname: "Starting Cohort" }, // was x: 120 for a circle, doesn't fit well though
   "Sabbatical": { x: width*0.5, y: height*0.47, color: "#Eae61a", cnt: 0, fullname: "Sabbatical", hovertext: "'Sabbatical' is defined here as when a student takes one or more semesters off between enrolled semesters, excluding the summer term." },
   "Freshman": { x: width*0.8, y: height*0.236, color: "#7DD9C1", cnt: 0, fullname: "Freshman" },
   "Sophomore": { x: width*0.89, y: height*0.47, color: "#3AC6A0", cnt: 0, fullname: "Sophomore" },
@@ -441,3 +441,12 @@ function updateSliderPosition(value) {
   slider.value = Math.min(Math.max(value, 1), 30);
 }
 
+function toggleMaker() {
+  var toggleElement = document.getElementById("toggleId")
+  if(toggleElement.innerHTML === "play_arrow") {
+    toggleElement.innerHTML = "pause";
+  }
+  else {
+    toggleElement.innerHTML = "play_arrow";
+  }
+}

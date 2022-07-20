@@ -74,7 +74,7 @@ body {
   cursor: pointer;
   background-image: linear-gradient(to bottom right, #CE4257, #FF9B54);
 }
-#slower:active, #play-pause:active, #reset:active, #faster:active {
+#toggleId:active, #slower:active, #play-pause:active, #reset:active, #faster:active {
   transform: translateY(5px);
 }
 .inline-div {
@@ -82,7 +82,8 @@ body {
   text-align: center;
   margin-bottom: 0px;
 }
-div.tooltip { /* Tooltip hover formatting */
+/* Tooltip hover formatting */
+div.tooltip {
   color: white;
   position: absolute;
   text-align: left;
@@ -130,13 +131,13 @@ h3 {
   color: #fff;
 }
 h4 {
-	font-size: 0.8em;
+	font-size: 1em;
 	padding: 3px 0px;
 	font-weight: normal;
   text-align: center;
   margin-top:0px;
   margin-bottom: 0px;
-  color: #fff;
+  color: rgb(65, 65, 65);
 }
 h5 {
 	font-size: 1.2em;
@@ -245,4 +246,37 @@ input[type="range"] {
 
 ::-ms-tooltip { 
   display: none;
+}
+
+/* Tooltip container */
+.spd-tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+/* Tooltip text */
+.spd-tooltip .tooltiptext {
+  visibility: hidden;
+  width: 114px;
+  background-color: #b6cbd4;
+  color: rgb(65, 65, 65);
+  text-align: center;
+  border-radius: 5px;
+
+  /* Position the tooltip text */
+  position: absolute;
+  z-index: 1;
+  top: 125%;
+  left: 50%;
+  margin-left: -60px;
+
+  /* Fade in tooltip */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.spd-tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
 }

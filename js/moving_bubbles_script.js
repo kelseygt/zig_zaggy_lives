@@ -1,15 +1,15 @@
-// Dimensions of chart.
+// Dimensions of chart
 const margin = { top: 20, right: 20, bottom: 20, left: 20 };
 const width = 1200 - margin.left - margin.right;
 const height = 1100 - margin.top - margin.bottom;
 
-// Initialize global constants.
+// Initialize global constants
 const radius = 3; // Size of the nodes
 const padding = 3 * radius; // Space between nodes
 const cluster_padding = 2 * padding; // Space between nodes in different stages
 
-// Initialize global variables.
-let simulationRate = 5000; // in milliseconds
+// Initialize global variables
+let simulationRate = 5000;
 let sliderValue = 1;
 let previousSliderValue = sliderValue;
 let slider = document.querySelector("input[type='range']");
@@ -24,15 +24,13 @@ let timeNotes = {
  27: "And here we are at year 10. The majority of students will have settled into their final classification by now, be it dropped out, transferred out, or graduated. Even still, a small handful of students continue on their educational journey at MSU Denver. Pause here for a final snapshot of this cohort."
 }
 
-// Buttons.
+// Play, pause, faster, and slower buttons
 d3.select('button#toggleId')
   .on('click', function () {
     let self = d3.select(this)
     PAUSE = !PAUSE
     console.log(`Animation ${PAUSE ? 'paused' : 'playing'}`)
-    // self.text(PAUSE ? 'Play' : 'Pause')
   })
-  // .text(PAUSE ? 'Play' : 'Pause')
 
 d3.select('button#reset')
   .on('click', function () {
@@ -40,16 +38,15 @@ d3.select('button#reset')
     previousSliderValue = 0;
   })
 
-// Adjust play rate if needed.
+// Adjust the transition speed
 d3.select('button#slower')
   .on('click', function () {
-    simulationRate += 500
-    console.log(simulationRate)
+    updateTransitionSpeedHoverText(500)
   })
+
 d3.select('button#faster')
   .on('click', function () {
-    simulationRate = Math.max(500, (simulationRate - 500));
-    console.log(simulationRate);
+    updateTransitionSpeedHoverText(-500)
   })
 
 const termLabels = [
@@ -85,12 +82,12 @@ const termLabels = [
   "Summer 2021",
 ];
 
-// Group coordinates and meta info.
+// Group coordinates and meta info
 
-// Coordinates have been converted to dynamic coordinates (rather than hard-coded) based on the chart dimensions. 
-// Temporary fix, as this still needs work, since this only stays valid if the dimension ratio of the chart stays the same.
+// Coordinates have been converted to dynamic coordinates (rather than hard-coded) based on the chart dimensions
+// Temporary fix, as this still needs work, since this only stays valid if the dimension ratio of the chart stays the same
 const groups = {
-  "Starting Cohort": { x: width*0.5, y: height*.15, color: "#843b97", cnt: 0, fullname: "Starting Cohort" }, // was x: 120 for a circle, doesn't fit well though
+  "Starting Cohort": { x: width*0.5, y: height*.15, color: "#843b97", cnt: 0, fullname: "Starting Cohort" },
   "Sabbatical": { x: width*0.5, y: height*0.47, color: "#Eae61a", cnt: 0, fullname: "Sabbatical", hovertext: "'Sabbatical' is defined here as when a student takes one or more semesters off between enrolled semesters, excluding the summer term." },
   "Freshman": { x: width*0.8, y: height*0.236, color: "#7DD9C1", cnt: 0, fullname: "Freshman" },
   "Sophomore": { x: width*0.89, y: height*0.47, color: "#3AC6A0", cnt: 0, fullname: "Sophomore" },
@@ -111,19 +108,19 @@ const svg = d3
 
 d3.select("#chart").style("width", width + margin.left + margin.right + "px");
 
-// Load data.
+// Load in data
 const stages = d3.tsv("data/201150_ftf_piv.tsv", d3.autoType);
 
-// Once data is loaded...
+// Once the data is loaded...
 stages.then(function (data) {
-  // Initialize local variables.
+  // Initialize local variables
   let people = {};
   let currentTerm = -1;
   let currentNote = timeNotes[currentTerm];
   let previousNote = timeNotes[currentTerm - 1];
 
-  // Consolidate stages by pid.
-  // The data file is one row per stage change.
+  // Consolidate stages by pid
+  // The data file is one row per stage change
   data.forEach((d) => {
     if (d3.keys(people).includes(d.pid + "")) {
       people[d.pid + ""].push(d);
@@ -134,9 +131,9 @@ stages.then(function (data) {
 
   numNodes = Object.keys(people).length
 
-  // Create node data.
+  // Create node data
   var nodes = d3.keys(people).map(function (d) {
-    // Initialize count for each group.
+    // Initialize count for each group
     groups[people[d][0].grp].cnt += 1;
 
     return {
@@ -152,7 +149,7 @@ stages.then(function (data) {
     };
   });
 
-  // Circle for each node.
+  // Circle for each student
   const circle = svg
     .append("g")
     .selectAll("circle")
@@ -162,7 +159,7 @@ stages.then(function (data) {
     .attr("cy", (d) => d.y)
     .attr("fill", (d) => d.color);
 
-  // Ease in the circles.
+  // Ease in the circles
   circle
     .transition()
     .delay((d, i) => i)
@@ -172,14 +169,14 @@ stages.then(function (data) {
       return (t) => (d.r = i(t));
     });
 
-  // Define the div for the tooltip
+  // Define the div for the hovertext
   const div = d3
     .select('body')
     .append('div')
     .attr('class', 'tooltip')
     .style('opacity', 0);
 
-  // Group name labels
+  // Group name labels and hovertext with definitions (where applicable)
   svg
     .selectAll(".grp")
     .data(d3.keys(groups))
@@ -208,7 +205,7 @@ stages.then(function (data) {
         .style('opacity', 0);
     });
 
-  // Group counts
+  // Group counts and percentages
   svg
     .selectAll(".grpcnt")
     .data(d3.keys(groups))
@@ -229,7 +226,7 @@ stages.then(function (data) {
     .alpha(0.09)
     .alphaDecay(0);
 
-  // Adjust position of circles.
+  // Adjust position of circles
   simulation.on("tick", () => {
     circle
       .attr("cx", (d) => d.x)
@@ -237,11 +234,13 @@ stages.then(function (data) {
       .attr("fill", (d) => groups[d.group].color);
   });
 
+  // Starting text instructing user to click play to start, and then fades out
   d3.select("#starting-note")
   .style("opacity", 1)
   .style("color", "#ffffff")
   .text("#starting-note .start").text(start);
 
+  // Pause animation if the pause button is selected
   function simulateNodes() {
     if (PAUSE === true) {
       setTimeout(simulateNodes, 100);
@@ -250,18 +249,18 @@ stages.then(function (data) {
     }
   }
 
-  // Make time pass. Adjust node stage as necessary.
+  // Simulation function
   function playSimulation() {
-    // Increment time.
+    // Increment time
     currentTerm += 1;
 
-    // Loop back to beginning.
+    // Loop back to beginning
     if (currentTerm == 30) {
       sliderValue = 1;
       previousSliderValue = 0;
     }
 
-    // If slider has changed, set nodes' istage to the slider value.
+    // If slider has changed, set nodes' istage to the slider value
     if (sliderValue !== previousSliderValue) {
       console.log(`sliderValue: ${sliderValue}\nprevious: ${previousSliderValue}`);
       nodes.forEach((o) => (o.istage = Math.max(sliderValue - 1, 0)));
@@ -269,35 +268,33 @@ stages.then(function (data) {
       currentTerm = sliderValue - 1;
     }
 
-    // Update slider position based on loop.
+    // Update slider position based on loop
     updateSliderPosition(currentTerm + 1);
 
     // Update node positions.
     nodes.forEach(function (node) {
       node.timeleft = Math.max(node.timeleft - 1, 0);
       if (node.timeleft == 0) {
-        // Decrease counter for previous group.
+        // Decrease counter for previous group
         groups[node.group].cnt -= 1;
 
-        // Update current node to new group.
+        // Update current node to new group
         node.istage += 1;
         node.group = node.stages[node.istage].grp;
         node.timeleft = node.stages[node.istage].duration;
 
-        // Increment counter for new group.
+        // Increment counter for new group
         groups[node.group].cnt += 1;
       }
     });
 
-    // Update subtitles.
+    // Update subtitles
     d3.select("#term .trm").text(`${termLabels[currentTerm]}`);
     d3.select("#timecount .cnt").text(currentTerm);
     d3.select("#yrcount .cnt").text(Math.floor(currentTerm / 3) + 1);
-    d3.select("#transition-speed .spd").text(simulationRate / 1000);
     
-    // The below ~50 lines of code are very hacky and very ugly (but functional), and need reworked somehow.
-    // currentNote = timeNotes[currentTerm] ?? currentNote
-    // previousNote = timeNotes[currentTerm - 1] ?? previousNote
+    // Adds commentary that fades in and out
+    // The below ~50 lines of code are very hacky and very ugly (but functional), and need reworked somehow
 
     if (currentTerm < 9) {
       currentNote = timeNotes[0]
@@ -345,7 +342,7 @@ stages.then(function (data) {
       .text("#current-note .note").text(`${currentNote}`);
     }
 
-    // Fade out the starting instructions after the user starts the animation.
+    // Fade out the starting instructions after the user starts the animation
     if (currentTerm < 0) {
       d3.select("#starting-note")
       .style("opacity", 1)
@@ -360,18 +357,18 @@ stages.then(function (data) {
       .text("#starting-note .start").text(start);
     }
 
-    // Update counters.
+    // Update count and percentages
     svg.selectAll(".grpcnt").text((d) => `n = ${groups[d].cnt} (${Math.round((groups[d].cnt / numNodes) * 1000) / 10}%)`);
 
-    // Do it again.
+    // And repeat
     setTimeout(simulateNodes, simulationRate);
   }
 
-  // Start things off after a few seconds.
+  // Start things off
   setTimeout(simulateNodes, simulationRate);
 });
 
-// Force to increment nodes to groups.
+// Force to increment nodes to groups
 function forceCluster() {
   const strength = 0.3;
   let nodes;
@@ -388,7 +385,7 @@ function forceCluster() {
   return force;
 }
 
-// Force for collision detection.
+// Force for collision detection
 function forceCollide() {
   const alpha = 0.15; // fixed for greater rigidity!
   let nodes;
@@ -431,7 +428,7 @@ function forceCollide() {
   return force;
 }
 
-// Slider functions.
+// Slider functions
 function getSliderValue(run) {
   previousSliderValue = sliderValue;
   sliderValue = run.value;
@@ -441,6 +438,7 @@ function updateSliderPosition(value) {
   slider.value = Math.min(Math.max(value, 1), 30);
 }
 
+// Changes the play button into a pause button and back again
 function toggleMaker() {
   var toggleElement = document.getElementById("toggleId")
   if(toggleElement.innerHTML === "play_arrow") {
@@ -449,4 +447,11 @@ function toggleMaker() {
   else {
     toggleElement.innerHTML = "play_arrow";
   }
+}
+
+function updateTransitionSpeedHoverText(increment) {
+  simulationRate = Math.min(Math.max(500, simulationRate + increment), 10000)
+  console.log(simulationRate)
+  d3.select("#transition-speed1 .spd").text(simulationRate / 1000); // One hovertext for the "slower" button
+  d3.select("#transition-speed2 .spd").text(simulationRate / 1000); // One hovertext for the "faster" button
 }

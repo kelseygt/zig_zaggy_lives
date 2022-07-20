@@ -48,89 +48,6 @@ body {
 #chart {
   margin: 0px auto;
 }
-#play-pause {
-  font-family: 'Mohave', sans-serif;
-  background-color: #7a7f8c;
-  border: none;
-  color: white;
-  /* padding: 8px 20px; */
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  opacity: 1;
-  height: 30px;
-  width: 70px;
-}
-#play-pause:hover{
-  background-color: #ca7878;
-  opacity: 0.7;
-  transition: 0.3s;
-}
-#slow {
-  font-family: 'Mohave', sans-serif;
-  background-color: #7a7f8c;
-  border: none;
-  color: white;
-  /* padding: 8px 20px; */
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  opacity: 1;
-  height: 30px;
-  width: 70px;
-}
-#slow:hover{
-  background-color: #ca7878;
-  opacity: 0.7;
-  transition: 0.3s;
-}
-#fast {
-  font-family: 'Mohave', sans-serif;
-  background-color: #7a7f8c;
-  border: none;
-  color: white;
-  /* padding: 8px 20px; */
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  opacity: 1;
-  height: 30px;
-  width: 70px;
-}
-#fast:hover{
-  background-color: #ca7878;
-  opacity: 0.7;
-  transition: 0.3s;
-}
-#reset {
-  font-family: 'Mohave', sans-serif;
-  background-color: #7a7f8c;
-  border: none;
-  color: white;
-  /* padding: 8px 20px; */
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  opacity: 1;
-  height: 30px;
-  width: 70px;
-}
-#reset:hover{
-  background-color: #ca7878;
-  opacity: 0.7;
-  transition: 0.3s;
-}
-#button-container{
-  text-align: center;
-  width: 70%; /* Width of the outside container */
-  margin-left: auto !important;
-  margin-right: auto !important;
-  position: relative;
-}
 #starting-note {
   font-size: 1.2em;
 	padding: 3px 0px;
@@ -140,40 +57,49 @@ body {
   margin-bottom: 0px;
   color: #fff;
 }
-
-/* #new-buttons{
+#button-container{
   text-align: center;
   margin-left: auto !important;
   margin-right: auto !important;
   position: relative;
 }
-#test1:hover{
-  background-color: #ca7878;
-  opacity: 0.7;
-  transition: 0.3s;
+#toggleId, #slower, #play, #pause, #reset, #faster{
+  border-radius: 5px;
+  padding: 2px 15px;
+  background-image: linear-gradient(to bottom right, #43AA8B, #277DA1);
+  border: #277DA1;
 }
-#test2:hover{
+#toggleId:hover, #slower:hover, #play:hover, #pause:hover, #reset:hover, #faster:hover{
   background-color: #ca7878;
-  opacity: 0.7;
-  transition: 0.3s;
+  cursor: pointer;
+  background-image: linear-gradient(to bottom right, #CE4257, #FF9B54);
 }
-#test3:hover{
-  background-color: #ca7878;
-  opacity: 0.7;
-  transition: 0.3s;
+#toggleId:active, #slower:active, #play-pause:active, #reset:active, #faster:active {
+  transform: translateY(5px);
 }
-#test4:hover{
-  background-color: #ca7878;
-  opacity: 0.7;
-  transition: 0.3s;
-} */
-
 .inline-div {
   display: block;
   text-align: center;
-  margin-bottom: 10px;
+  margin-bottom: 0px;
 }
-
+/* Tooltip hover formatting */
+div.tooltip {
+  color: white;
+  position: absolute;
+  text-align: left;
+  width: 200px;
+  padding: 5px;
+  font-size: 16px; 
+  font-family: 'Mohave', sans-serif;;
+  background: rgb(72, 90, 136);
+  border: 1px solid #5a6164;
+  pointer-events: none;
+  border-radius: 5px;
+}
+text {
+  font-size: 1.3em;
+  fill: #fff;
+}
 h1 {
 	font-size: 2.5em;
 	padding: 3px 0px;
@@ -190,7 +116,7 @@ h2 {
 	font-weight: normal;
   text-align: center;
   margin-top: 0px;
-  margin-bottom: -10px;
+  margin-bottom: -5px;
   color: #fff;
   display: inline-block;
   text-align: center;
@@ -205,13 +131,13 @@ h3 {
   color: #fff;
 }
 h4 {
-	font-size: 0.8em;
+	font-size: 1em;
 	padding: 3px 0px;
 	font-weight: normal;
   text-align: center;
   margin-top:0px;
   margin-bottom: 0px;
-  color: #fff;
+  color: rgb(65, 65, 65);
 }
 h5 {
 	font-size: 1.2em;
@@ -228,75 +154,129 @@ text {
   fill: #fff;
 }
 
-.slidecontainer {
-    font-size: 20px;
-    width: 100%; /* Width of the outside container */
-    margin-left: auto !important;
-    margin-right: auto !important;
-    position: relative;
-  }
-  
-  /* The slider itself */
-  .slider {
-    -webkit-appearance: none;  /* Override default CSS styles */
-    appearance: none;
-    width: 55%;
-    height: 25px; /* Specified height */
-    background: #d3d3d3; /* Grey background */
-    outline: none; /* Remove outline */
-    opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
-    -webkit-transition: .2s; /* 0.2 seconds transition on hover */
-    transition: opacity .2s;
-  }
-  
-  /* Mouse-over effects */
-  .slider:hover {
-    opacity: 1; /* Fully shown on mouse-over */
-  }
-  
-  /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
-  .slider::-webkit-slider-thumb {
-    -webkit-appearance: none; /* Override default look */
-    appearance: none;
-    width: 25px; /* Set a specific slider handle width */
-    height: 25px; /* Slider handle height */
-    background: #7a7f8c; /* Blue background */
-    cursor: pointer; /* Cursor on hover */
-  }
-  
-  .slider::-moz-range-thumb {
-    width: 25px; /* Set a specific slider handle width */
-    height: 25px; /* Slider handle height */
-    background: #7a7f8c; /* Blue background */
-    cursor: pointer; /* Cursor on hover */
-  }
-
-
-/* Tooltip hover formatting */
-div.tooltip {
-  color: white;
-  position: absolute;
-  text-align: left;
-  width: 200px;
-  /* height: 28px; */
-  padding: 5px;
-  font-size: 16px; 
-  font-family: 'Mohave', sans-serif;;
-  background: #4a6b96;
-  border: 1px solid black;
-  pointer-events: none;
-}
-
+/* Term labels for slider */
 .leftlabel {
   color: white;
   position: absolute; 
-  top: 8%;
-  right: 78%;
+  top: -10%;
+  right: 76.5%;
 }
 
 .rightlabel {
   color: white;
   position:absolute; 
-  top: 8%;
-  left: 78%;
+  top: -10%;
+  left: 76.5%;
+}
+
+.slidecontainer {
+  text-align: center;
+  font-size: 20px;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  position: relative;
+  align-items: center;
+}
+
+input[type="range"] { 
+  margin: auto;
+  -webkit-appearance: none;
+  position: relative;
+  overflow: hidden;
+  height: 20px;
+  width: 600px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+::-webkit-slider-runnable-track {
+  background: #b6cbd4;
+}
+
+::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px; /* 1 */
+  height: 20px;
+  background: #fff;
+  box-shadow: -600px 0 0 600px rgb(4, 131, 131); /* 2 */
+  border: 2px solid #999; /* 1 */
+}
+
+::-moz-range-track {
+  height: 40px;
+  background: #ddd;
+}
+
+::-moz-range-thumb {
+  background: #fff;
+  height: 40px;
+  width: 20px;
+  border: 3px solid #999;
+  border-radius: 0 !important;
+  box-shadow: -200px 0 0 200px rgb(4, 131, 131);
+  box-sizing: border-box;
+}
+
+::-ms-fill-lower { 
+  background: rgb(4, 131, 131);
+}
+
+::-ms-thumb { 
+  background: #fff;
+  border: 2px solid #999;
+  height: 40px;
+  width: 20px;
+  box-sizing: border-box;
+}
+
+::-ms-ticks-after { 
+  display: none; 
+}
+
+::-ms-ticks-before { 
+  display: none; 
+}
+
+::-ms-track { 
+  background: #ddd;
+  color: transparent;
+  height: 40px;
+  border: none;
+}
+
+::-ms-tooltip { 
+  display: none;
+}
+
+/* Tooltip container */
+.spd-tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+/* Tooltip text */
+.spd-tooltip .tooltiptext {
+  visibility: hidden;
+  width: 114px;
+  background-color: #b6cbd4;
+  color: rgb(65, 65, 65);
+  text-align: center;
+  border-radius: 5px;
+
+  /* Position the tooltip text */
+  position: absolute;
+  z-index: 1;
+  top: 125%;
+  left: 50%;
+  margin-left: -60px;
+
+  /* Fade in tooltip */
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.spd-tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
 }

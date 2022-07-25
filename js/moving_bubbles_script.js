@@ -428,16 +428,6 @@ function forceCollide() {
   return force;
 }
 
-// Slider functions
-function getSliderValue(run) {
-  previousSliderValue = sliderValue;
-  sliderValue = run.value;
-}
-
-function updateSliderPosition(value) {
-  slider.value = Math.min(Math.max(value, 1), 30);
-}
-
 // Changes the play button into a pause button and back again
 function toggleMaker() {
   var toggleElement = document.getElementById("toggleId")
@@ -449,9 +439,35 @@ function toggleMaker() {
   }
 }
 
+// Updates the transition speed tooltip every time you click
 function updateTransitionSpeedHoverText(increment) {
   simulationRate = Math.min(Math.max(500, simulationRate + increment), 10000)
   console.log(simulationRate)
   d3.select("#transition-speed1 .spd").text(simulationRate / 1000); // One hovertext for the "slower" button
   d3.select("#transition-speed2 .spd").text(simulationRate / 1000); // One hovertext for the "faster" button
 }
+
+const range = document.getElementById('myRange');
+const rangeV = document.getElementById('rangeV');
+
+// Slider functions
+function updateSliderHandleTooltipPosition() {
+  const newValue = Number( (range.value - range.min) * 100 / (range.max - range.min) );
+  const newPosition = 10 - (newValue * 0.2);
+  rangeV.innerHTML = `<span>${termLabels[range.value - 1]}</span>`;
+  rangeV.style.left = `calc(${newValue}% + (${newPosition}px))`;
+};
+
+function getSliderValue(run) {
+  previousSliderValue = sliderValue;
+  sliderValue = run.value;
+}
+
+function updateSliderPosition(value) {
+  slider.value = Math.min(Math.max(value, 1), 30);
+  updateSliderHandleTooltipPosition();
+}
+
+document.addEventListener("DOMContentLoaded", updateSliderHandleTooltipPosition);
+range.addEventListener('input', updateSliderHandleTooltipPosition);
+

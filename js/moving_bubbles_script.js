@@ -470,4 +470,3 @@ function updateSliderPosition(value) {
 
 document.addEventListener("DOMContentLoaded", updateSliderHandleTooltipPosition);
 range.addEventListener('input', updateSliderHandleTooltipPosition);
-

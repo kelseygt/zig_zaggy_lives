@@ -57,15 +57,19 @@ body {
   margin-bottom: 0px;
   color: #fff;
 }
-#button-container{
-  text-align: center;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  position: relative;
+#left-button-container{
+  margin-top: 32px;
+  width: 25%;
+  text-align: right;
+}
+#right-button-container{
+  margin-top: 32px;
+  width: 25%;
+  text-align: left;
 }
 #toggleId, #slower, #play, #pause, #reset, #faster{
   border-radius: 5px;
-  padding: 2px 15px;
+  /* padding: 1px 15px; */
   background-image: linear-gradient(to bottom right, #43AA8B, #277DA1);
   border: #277DA1;
 }
@@ -78,7 +82,7 @@ body {
   transform: translateY(5px);
 }
 .inline-div {
-  display: block;
+  display: flex;
   text-align: center;
   margin-bottom: 0px;
 }
@@ -157,10 +161,11 @@ text {
 .slidecontainer {
   width: 50%;
   text-align: center;
-  font-size: 20px;
-  margin-left: auto !important;
-  margin-right: auto !important;
+  /* font-size: 20px; */
+  margin-left: 4px;
+  margin-right: 4px;
   margin-top: 20px;
+  margin-bottom: 30px;
   position: relative;
   align-items: center;
 }
@@ -168,10 +173,10 @@ text {
 input[type="range"] { 
   margin: auto;
   -webkit-appearance: none;
-  margin-top: 2.2%;
+  margin-top: 1.9%;
   position: relative;
   overflow: hidden;
-  height: 20px;
+  height: 22px;
   width: 100%;
   cursor: pointer;
   border-radius: 5px;
@@ -183,8 +188,8 @@ input[type="range"] {
 
 ::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 20px; /* 1 */
-  height: 20px;
+  width: 23px; /* 1 */
+  height: 23px;
   background: #fff;
   box-shadow: -600px 0 0 600px rgb(4, 131, 131); /* 2 */
   border: 2px solid #999; /* 1 */
@@ -304,11 +309,11 @@ input[type="range"] {
 	margin-top: -1px;
 }
 
-/* Range slider static point-in-time text boxes -- this is very hacky and should not be hard-coded*/
+/* Range slider static point-in-time text boxes -- this is very hacky and really shouldn't be be hard-coded */
 /* Year 4 point in time text box */
 .yr4 {
   position: absolute;
-	top: -50%;
+	top: 110%;
 	width: 50px;
 	height: 22px;
 	line-height: 24px;
@@ -326,7 +331,7 @@ input[type="range"] {
 /* Year 6 point in time text box */
 .yr6 {
   position: absolute;
-	top: -50%;
+	top: 110%;
 	width: 50px;
 	height: 22px;
 	line-height: 24px;
@@ -347,13 +352,13 @@ input[type="range"] {
 	position: absolute;
 	width: 0;
 	height: 0;
-	border-top: 10px solid #fa8c3d;
+	border-bottom: 10px solid #CE4257;
 	border-left: 5px solid transparent;
 	border-right: 5px solid transparent;
-	top: 7%;
+	top: 8%;
 	left: calc(37.93% + 2.41px);
 	margin-left: -5px;
-	margin-top: -1px;
+	margin-top: 30px;
 }
 /* Tiny arrow for the year 6 point in time text box */
 .yr6-tiny-arrow {
@@ -361,11 +366,11 @@ input[type="range"] {
 	position: absolute;
 	width: 0;
 	height: 0;
-	border-top: 10px solid #fa8c3d;
+	border-bottom: 10px solid #CE4257;
 	border-left: 5px solid transparent;
 	border-right: 5px solid transparent;
-	top: 7%;
+	top: 8%;
 	left: calc(58.62% - 1.72px);
 	margin-left: -5px;
-	margin-top: -1px;
+	margin-top: 30px;
 }

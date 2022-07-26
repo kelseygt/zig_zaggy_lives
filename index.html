@@ -36,35 +36,39 @@
   </div>
   <!-- <div style="line-height:50%;"><br></div> -->
   <div id="animation-area">
+    <h2 id="yrcount">Year <span class="cnt">1</span></h2>
     <div class="inline-div">
-      <h2 id="yrcount">Year <span class="cnt">1</span></h2>
-      <h2>:</h2>
-      <h2 id="term"><span class="trm">Fall 2011</span></h2>
-    </div>
-    <div class="slidecontainer" style="text-align:center">
-      <div class="range-value" id="rangeV"></div>
-      <input type="range" min="1" max="30" value="1" class="slider" step="1" id="myRange"
-        onchange="getSliderValue(this)" list="tickmarks">
-    </div>
-    <div id="button-container" style="font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0; cursor: pointer;">
-      <div class="spd-tooltip">
-        <button id="slower" class="material-symbols-outlined" style="font-size:24px;color:#fbfbee;">fast_rewind</button>
-        <span class="tooltiptext">
-          <h4 id="transition-speed1">Transition Speed: <span class="spd">5</span> seconds</h4>
-        </span>
+      <div id="left-button-container" style="font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0; cursor: pointer;">
+        <button id="toggleId" class="material-symbols-outlined" style="font-size:20px;color:#fbfbee;"
+          onclick="toggleMaker()">play_arrow</button>
+        <button id="reset" class="material-symbols-outlined" style="font-size:20px;color:#fbfbee;">restart_alt</button>
       </div>
-      <button id="toggleId" class="material-symbols-outlined" style="font-size:24px;color:#fbfbee;"
-        onclick="toggleMaker()">play_arrow</button>
-      <button id="reset" class="material-symbols-outlined" style="font-size:24px;color:#fbfbee;">restart_alt</button>
-      <div class="spd-tooltip">
-        <button id="faster" class="material-symbols-outlined"
-          style="font-size:24px;color:#fbfbee;">fast_forward</button>
-        <span class="tooltiptext">
-          <h4 id="transition-speed2">Transition Speed: <span class="spd">5</span> seconds</h4>
-        </span>
+      <div class="slidecontainer" style="text-align:center">
+        <div class="range-value" id="rangeV"></div>
+        <div class="yr4">Year 4</div>
+        <div class="yr4-tiny-arrow"></div>
+        <div class="yr6">Year 6</div>
+        <div class="yr6-tiny-arrow"></div>
+        <input type="range" min="1" max="30" value="1" class="slider" step="1" id="myRange"
+          onchange="getSliderValue(this)">
+      </div>
+      <div id="right-button-container" style="font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0; cursor: pointer;">
+        <div class="spd-tooltip">
+          <button id="slower" class="material-symbols-outlined"
+            style="font-size:20px;color:#fbfbee;">fast_rewind</button>
+          <span class="tooltiptext">
+            <h4 id="transition-speed1">Transition Speed: <span class="spd">5</span> seconds</h4>
+          </span>
+        </div>
+        <div class="spd-tooltip">
+          <button id="faster" class="material-symbols-outlined"
+            style="font-size:20px;color:#fbfbee;">fast_forward</button>
+          <span class="tooltiptext">
+            <h4 id="transition-speed2">Transition Speed: <span class="spd">5</span> seconds</h4>
+          </span>
+        </div>
       </div>
     </div>
-    <!-- <h4 id="transition-speed">[Transition Speed: <span class="spd">5</span> seconds]</h4> -->
     <div id="chart"></div>
   </div>
 </div>

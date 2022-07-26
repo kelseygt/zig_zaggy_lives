@@ -428,8 +428,6 @@ function forceCollide() {
   return force;
 }
 
-
-
 // Changes the play button into a pause button and back again
 function toggleMaker() {
   var toggleElement = document.getElementById("toggleId")

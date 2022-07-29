@@ -11,6 +11,7 @@ const cluster_padding = 2 * padding; // Space between nodes in different stages
 // Initialize global variables
 let simulationRate = 5000;
 let sliderValue = 1;
+let maxTerm = 30;
 let previousSliderValue = sliderValue;
 let slider = document.querySelector("input[type='range']");
 let PAUSE = true;
@@ -255,7 +256,7 @@ stages.then(function (data) {
     currentTerm += 1;
 
     // Loop back to beginning
-    if (currentTerm == 30) {
+    if (currentTerm == maxTerm) {
       sliderValue = 1;
       previousSliderValue = 0;
     }
@@ -448,14 +449,14 @@ function updateTransitionSpeedHoverText(increment) {
 }
 
 const range = document.getElementById('myRange');
-const rangeV = document.getElementById('rangeV');
+const rangeValue = document.getElementById('rangeValue');
 
 // Slider functions
 function updateSliderHandleTooltipPosition() {
   const newValue = Number( (range.value - range.min) * 100 / (range.max - range.min) );
   const newPosition = 10 - (newValue * 0.2);
-  rangeV.innerHTML = `<span>${termLabels[range.value - 1]}</span>`;
-  rangeV.style.left = `calc(${newValue}% + (${newPosition}px))`;
+  rangeValue.innerHTML = `<span>${termLabels[range.value - 1]}</span>`;
+  rangeValue.style.left = `calc(${newValue}% + (${newPosition}px))`;
 };
 
 function getSliderValue(run) {
@@ -464,9 +465,10 @@ function getSliderValue(run) {
 }
 
 function updateSliderPosition(value) {
-  slider.value = Math.min(Math.max(value, 1), 30);
+  slider.value = Math.min(Math.max(value, 1), maxTerm);
   updateSliderHandleTooltipPosition();
 }
 
 document.addEventListener("DOMContentLoaded", updateSliderHandleTooltipPosition);
 range.addEventListener('input', updateSliderHandleTooltipPosition);
+

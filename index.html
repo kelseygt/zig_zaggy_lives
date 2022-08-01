@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <title>The Lives of Students</title>
-  <link rel="stylesheet" href="style/style.css" type="text/css" media="screen" />
+  <link rel="stylesheet" href="style/style.css" type="text/css" media="screen">
+  <link rel="stylesheet" href="style/nouislider.css" type="text/css" media="screen">
   <!-- font for labels -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,13 +45,18 @@
         <button id="reset" class="material-symbols-outlined" style="font-size:20px;color:#fbfbee;">restart_alt</button>
       </div>
       <div class="slidecontainer" style="text-align:center">
-        <div class="range-value" id="rangeValue"></div>
+        <!-- <div class="range-value" id="rangeValue" onchange="getSliderValue(this)"></div>
+        <input type="range" min="1" max="30" value="1" class="slider" step="1" id="myRange"
+          onchange="getSliderValue(this)"> -->
+
         <div class="yr4">Year 4</div>
         <div class="yr4-tiny-arrow"></div>
         <div class="yr6">Year 6</div>
         <div class="yr6-tiny-arrow"></div>
-        <input type="range" min="1" max="30" value="1" class="slider" step="1" id="myRange"
-          onchange="getSliderValue(this)">
+
+        <div id="slider"></div>
+
+
       </div>
       <div id="right-button-container" style="font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0; cursor: pointer;">
         <div class="spd-tooltip">
@@ -73,5 +79,6 @@
   </div>
 </div>
 
+<script src="js/nouislider.js"></script>
 <script src="js/d3.v5.min.js"></script>
 <script src="js/moving_bubbles_script.js" type="text/javascript"></script>

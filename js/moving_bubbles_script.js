@@ -7,49 +7,6 @@ const height = 1100 - margin.top - margin.bottom;
 const radius = 3; // Size of the nodes
 const padding = 3 * radius; // Space between nodes
 const cluster_padding = 2 * padding; // Space between nodes in different stages
-
-// Initialize global variables
-let simulationRate = 5000;
-let sliderValue = 1;
-let maxTerm = 30;
-let previousSliderValue = sliderValue;
-let slider = document.querySelector("input[type='range']");
-let PAUSE = true;
-let numNodes;
-let start = "Click 'Play' to get started."
-let timeNotes = {
-  0: "We start with just over 2000 full- and part-time first-time freshman. By the end of the first semester, over 8% have dropped out. That percentage doubles by the end of the first year. By this same time, around the same number of students have opted to take at least one semester off.",
-  9: "Here we hit the fourth year of study for this cohort. By the end of this year, we'll have seen almost a third of this cohort drop out, and only about 6% of the students graduate. However, almost a third of students are still on track in their studies. Pause at the summer semester to really digest where this cohort stands.",
- 15: "Here marks the start of the sixth year from when this group of students began. By the end of the academic year, the number of graduates will jump to four times as many as we had two years ago at the 4-year mark. Pause at the summer semester again to absorb the overall picture.",
- 19: "From here, during the seventh year, things start to slow down, as most students -- but not all -- have come to the end of their chosen path.",
- 27: "And here we are at year 10. The majority of students will have settled into their final classification by now, be it dropped out, transferred out, or graduated. Even still, a small handful of students continue on their educational journey at MSU Denver. Pause here for a final snapshot of this cohort."
-}
-
-// Play, pause, faster, and slower buttons
-d3.select('button#toggleId')
-  .on('click', function () {
-    let self = d3.select(this)
-    PAUSE = !PAUSE
-    console.log(`Animation ${PAUSE ? 'paused' : 'playing'}`)
-  })
-
-d3.select('button#reset')
-  .on('click', function () {
-    sliderValue = 1;
-    previousSliderValue = 0;
-  })
-
-// Adjust the transition speed
-d3.select('button#slower')
-  .on('click', function () {
-    updateTransitionSpeedHoverText(500)
-  })
-
-d3.select('button#faster')
-  .on('click', function () {
-    updateTransitionSpeedHoverText(-500)
-  })
-
 const termLabels = [
   "Fall 2011",
   "Spring 2012",
@@ -82,6 +39,84 @@ const termLabels = [
   "Spring 2021",
   "Summer 2021",
 ];
+
+// Initialize global variables
+let simulationRate = 5000;
+let minTerm = 1;
+let maxTerm = 30;
+let slider = document.getElementById('slider');
+noUiSlider.create(slider, {
+  start: [minTerm, minTerm, maxTerm - 25],
+  step: 1,
+  tooltips: {
+    from: function(value) {
+            return termLabels[Math.round(value - 1)];
+        },
+    to: function(value) {
+            return termLabels[Math.round(value - 1)];
+        }
+    },
+  connect: [false, true, true, false],
+  range: {
+      'min': 1,
+      'max': 30
+  }
+});
+
+function getSliderValues() {
+  let sliderValueArray = slider.noUiSlider.get(true)
+  return {
+    sliderWindowMin: Math.round(sliderValueArray[0]),
+    sliderValue: Math.round(sliderValueArray[1]),
+    sliderWindowMax: Math.round(sliderValueArray[2])
+  }
+}
+
+let {sliderWindowMin, sliderValue, sliderWindowMax} = getSliderValues();
+// let sliderValue = 1;
+// let sliderWindowMin = slider.noUiSlider.get()[0];
+// let sliderWindowMax = slider.noUiSlider.get()[2];
+let previousSliderValue = sliderValue;
+console.log(slider.noUiSlider.get(true));
+
+// let slider = document.querySelector("input[type='range']");
+let PAUSE = true;
+let numNodes;
+let start = "Click 'Play' to get started."
+let timeNotes = {
+  0: "We start with just over 2000 full- and part-time first-time freshman. By the end of the first semester, over 8% have dropped out. That percentage doubles by the end of the first year. By this same time, around the same number of students have opted to take at least one semester off.",
+  9: "Here we hit the fourth year of study for this cohort. By the end of this year, we'll have seen almost a third of this cohort drop out, and only about 6% of the students graduate. However, almost a third of students are still on track in their studies. Pause at the summer semester to really digest where this cohort stands.",
+ 15: "Here marks the start of the sixth year from when this group of students began. By the end of the academic year, the number of graduates will jump to four times as many as we had two years ago at the 4-year mark. Pause at the summer semester again to absorb the overall picture.",
+ 19: "From here, during the seventh year, things start to slow down, as most students -- but not all -- have come to the end of their chosen path.",
+ 27: "And here we are at year 10. The majority of students will have settled into their final classification by now, be it dropped out, transferred out, or graduated. Even still, a small handful of students continue on their educational journey at MSU Denver. Pause here for a final snapshot of this cohort."
+}
+
+// Play, pause, faster, and slower buttons
+d3.select('button#toggleId')
+  .on('click', function () {
+    let self = d3.select(this)
+    PAUSE = !PAUSE
+    console.log(`Animation ${PAUSE ? 'paused' : 'playing'}`)
+  })
+
+d3.select('button#reset')
+  .on('click', function () {
+    // sliderValue = sliderWindowMin;
+    // previousSliderValue = 0;
+    slider.noUiSlider.reset();
+  })
+
+// Adjust the transition speed
+d3.select('button#slower')
+  .on('click', function () {
+    updateTransitionSpeedHoverText(500)
+  })
+
+d3.select('button#faster')
+  .on('click', function () {
+    updateTransitionSpeedHoverText(-500)
+  })
+
 
 // Group coordinates and meta info
 
@@ -116,9 +151,9 @@ const stages = d3.tsv("data/201150_ftf_piv.tsv", d3.autoType);
 stages.then(function (data) {
   // Initialize local variables
   let people = {};
-  let currentTerm = -1;
-  let currentNote = timeNotes[currentTerm];
-  let previousNote = timeNotes[currentTerm - 1];
+  // let currentTerm = sliderValue;
+  let currentNote = timeNotes[sliderValue];
+  let previousNote = timeNotes[sliderValue - 1];
 
   // Consolidate stages by pid
   // The data file is one row per stage change
@@ -145,7 +180,7 @@ stages.then(function (data) {
       color: groups[people[d][0].grp].color,
       group: people[d][0].grp,
       timeleft: people[d][0].duration,
-      istage: 0,
+      istage: 0, 
       stages: people[d],
     };
   });
@@ -249,77 +284,79 @@ stages.then(function (data) {
       setTimeout(playSimulation, 100);
     }
   }
-
+  
   // Simulation function
   function playSimulation() {
-    // Increment time
-    currentTerm += 1;
-
-    // Loop back to beginning
-    if (currentTerm == maxTerm) {
-      sliderValue = 1;
-      previousSliderValue = 0;
+    // Get current slider values
+    ({sliderWindowMin, sliderValue, sliderWindowMax} = getSliderValues());
+    
+    console.log(`before node update:\nsliderValue: ${sliderValue}\nmin_slider_value: ${sliderWindowMin}\nmax_slider_value: ${sliderWindowMax}`);
+    
+    // Loop back to beginning if slider reaches the max
+    if (sliderValue === sliderWindowMax) {
+      sliderValue = sliderWindowMin;
+      slider.noUiSlider.set([null, sliderWindowMin, null])
     }
-
-    // If slider has changed, set nodes' istage to the slider value
-    if (sliderValue !== previousSliderValue) {
-      console.log(`sliderValue: ${sliderValue}\nprevious: ${previousSliderValue}`);
-      nodes.forEach((o) => (o.istage = Math.max(sliderValue - 1, 0)));
-      previousSliderValue = sliderValue;
-      currentTerm = sliderValue - 1;
-    }
-
-    // Update slider position based on loop
-    updateSliderPosition(currentTerm + 1);
-
-    // Update node positions.
-    nodes.forEach(function (node) {
-      node.timeleft = Math.max(node.timeleft - 1, 0);
-      if (node.timeleft == 0) {
-        // Decrease counter for previous group
-        groups[node.group].cnt -= 1;
-
-        // Update current node to new group
-        node.istage += 1;
-        node.group = node.stages[node.istage].grp;
-        node.timeleft = node.stages[node.istage].duration;
-
-        // Increment counter for new group
+    
+    // nodes.forEach((o) => (o.istage = sliderValue));
+    // If slider has changed or the animation has reset, set nodes' istage to the slider value
+    // if ((sliderValue !== previousSliderValue) || (sliderValue === sliderWindowMin)) {
+      // }
+      
+      // Update node positions.
+      nodes.forEach(function (node) {
+        node.timeleft = Math.max(node.timeleft - 1, 0);
+        if (node.timeleft == 0) {
+          // Decrease counter for previous group
+          groups[node.group].cnt -= 1;
+          
+          // Update current node to new group
+          // node.istage += 1;
+          node.group = node.stages[sliderValue].grp;
+          node.timeleft = node.stages[sliderValue].duration;
+          
+          // Increment counter for new group
         groups[node.group].cnt += 1;
       }
     });
-
+    
+    slider.noUiSlider.set([null, sliderValue + 1, null]);
+    ({sliderWindowMin, sliderValue, sliderWindowMax} = getSliderValues());
+    console.log(`after node update:\nsliderValue: ${sliderValue}\nmin_slider_value: ${sliderWindowMin}\nmax_slider_value: ${sliderWindowMax}`);
+    // Finally, after all checks, update the previous slider value
+    // previousSliderValue = sliderValue;
+    
     // Update subtitles
-    d3.select("#term .trm").text(`${termLabels[currentTerm]}`);
-    d3.select("#timecount .cnt").text(currentTerm);
-    d3.select("#yrcount .cnt").text(Math.floor(currentTerm / 3) + 1);
+    d3.select("#term .trm").text(`${termLabels[sliderValue]}`);
+    d3.select("#timecount .cnt").text(sliderValue);
+    d3.select("#yrcount .cnt").text(Math.floor(sliderValue / 3) + 1);
     
     // Adds commentary that fades in and out
     // The below ~50 lines of code are very hacky and very ugly (but functional), and need reworked somehow
 
-    if (currentTerm < 9) {
+    if (sliderValue < 9) {
       currentNote = timeNotes[0]
-    } else if (currentTerm < 15) {
+    } else if (sliderValue < 15) {
       currentNote = timeNotes[9]
-    } else if (currentTerm < 19) {
+    } else if (sliderValue < 19) {
       currentNote = timeNotes[15]
-    } else if (currentTerm < 27) {
+    } else if (sliderValue < 27) {
       currentNote = timeNotes[19]
-    } else if (currentTerm >= 27) {
+    } else if (sliderValue >= 27) {
       currentNote = timeNotes[27]
     }
 
-    if (currentTerm == 0) {
+    if (sliderValue == 0) {
       previousNote = timeNotes[27]
-    } else if (currentTerm <= 9) {
+    } else if (sliderValue <= 9) {
       previousNote = timeNotes[0]
-    } else if (currentTerm <= 15) {
+    } else if (sliderValue <= 15) {
       previousNote = timeNotes[9]
-    } else if (currentTerm <= 19) {
+    } else if (sliderValue <= 19) {
       previousNote = timeNotes[15]
-    }else if (currentTerm <= 27) {
+    }else if (sliderValue <= 27) {
       previousNote = timeNotes[19]
-    } else if (currentTerm > 27) {
+    } else if (sliderValue > 27) {
       previousNote = timeNotes[27]
     }
 
@@ -333,7 +370,7 @@ stages.then(function (data) {
       .text("#current-note .note").text(`${currentNote}`);
     }
 
-    if (currentTerm == 3 || currentTerm == 12 || currentTerm == 18 || currentTerm == 23) {
+    if (sliderValue == 3 || sliderValue == 12 || sliderValue == 18 || sliderValue == 23) {
       d3.select("#current-note")
       .style("opacity", 1)
       .transition()
@@ -344,7 +381,7 @@ stages.then(function (data) {
     }
 
     // Fade out the starting instructions after the user starts the animation
-    if (currentTerm < 0) {
+    if (sliderValue < 0) {
       d3.select("#starting-note")
       .style("opacity", 1)
       .style("color", "#ffffff")
@@ -448,27 +485,60 @@ function updateTransitionSpeedHoverText(increment) {
   d3.select("#transition-speed2 .spd").text(simulationRate / 1000); // One hovertext for the "faster" button
 }
 
-const range = document.getElementById('myRange');
-const rangeValue = document.getElementById('rangeValue');
+// const range = document.getElementById('myRange');
+// const rangeValue = document.getElementById('rangeValue');
 
 // Slider functions
-function updateSliderHandleTooltipPosition() {
-  const newValue = Number( (range.value - range.min) * 100 / (range.max - range.min) );
-  const newPosition = 10 - (newValue * 0.2);
-  rangeValue.innerHTML = `<span>${termLabels[range.value - 1]}</span>`;
-  rangeValue.style.left = `calc(${newValue}% + (${newPosition}px))`;
-};
+// function updateSliderHandleTooltipPosition() {
+//   const newValue = Number( (range.value - range.min) * 100 / (range.max - range.min) );
+//   const newPosition = 10 - (newValue * 0.2);
+//   rangeValue.innerHTML = `<span>${termLabels[range.value - 1]}</span>`;
+//   rangeValue.style.left = `calc(${newValue}% + (${newPosition}px))`;
+// };
 
-function getSliderValue(run) {
-  previousSliderValue = sliderValue;
-  sliderValue = run.value;
-}
+// function getSliderValue(run) {
+//   previousSliderValue = sliderValue;
+//   sliderValue = run.value;
+// }
 
-function updateSliderPosition(value) {
-  slider.value = Math.min(Math.max(value, 1), maxTerm);
-  updateSliderHandleTooltipPosition();
-}
+// function updateSliderPosition(value) {
+//   slider.value = Math.min(Math.max(value, 1), maxTerm);
+//   updateSliderHandleTooltipPosition();
+// }
 
-document.addEventListener("DOMContentLoaded", updateSliderHandleTooltipPosition);
-range.addEventListener('input', updateSliderHandleTooltipPosition);
+// document.addEventListener("DOMContentLoaded", updateSliderHandleTooltipPosition);
+// range.addEventListener('input', updateSliderHandleTooltipPosition);
 
+
+// let sliderWindowMin = document.getElementById("sliderWindowMin");
+// let sliderCurrentValue = document.getElementById("sliderCurrentValue");
+// let sliderWindowMax = document.getElementById("sliderWindowMax");
+
+// slider.noUiSlider.on("update", function (values, handle) {
+  
+//   let slider_values = slider.noUiSlider.get();
+
+//   const sliderWindowMinNewVal = Number( (parseInt(slider_values[0]) - minTerm) * 100 / (maxTerm - minTerm) );
+//   const sliderWindowMinNewPos = 10 - (sliderWindowMinNewVal * 0.2);
+//   sliderWindowMin.innerHTML = `<span>${termLabels[parseInt(slider_values[0])- 1]}</span>`;
+//   sliderWindowMin.style.left = `calc(${sliderWindowMinNewVal}% + (${sliderWindowMinNewPos}px))`;
+
+//   const sliderCurrentValueNewVal = Number( (parseInt(slider_values[1]) - minTerm) * 100 / (maxTerm - minTerm) );
+//   const sliderCurrentValueNewPos = 10 - (sliderCurrentValueNewVal * 0.2);
+//   sliderCurrentValue.innerHTML = `<span>${termLabels[parseInt(slider_values[1])- 1]}</span>`;
+//   sliderCurrentValue.style.left = `calc(${sliderCurrentValueNewVal}% + (${sliderCurrentValueNewPos}px))`;
+
+//   const sliderWindowMaxNewVal = Number( (parseInt(slider_values[2]) - minTerm) * 100 / (maxTerm - minTerm) );
+//   const sliderWindowMaxNewPos = 10 - (sliderWindowMaxNewVal * 0.2);
+//   sliderWindowMax.innerHTML = `<span>${termLabels[parseInt(slider_values[2])- 1]}</span>`;
+//   sliderWindowMax.style.left = `calc(${sliderWindowMaxNewVal}% + (${sliderWindowMaxNewPos}px))`;
+
+// });
+
+
+          
+
+
+// slider.noUiSlider.on('update', function (values, handle) {
+//   currentTerm = slider.noUiSlider.get()[1] + 1;
+// });

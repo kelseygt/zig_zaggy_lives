@@ -41,10 +41,10 @@ const re = new RegExp("(20\\d{2})(30|40|50)");  // matches years in this milleni
 const semesterLabels = { "30": "Fall", "40": "Spring", "50": "Summer" };
 
 // Once the promise has been fulfilled:
-rawData.then(function loadData(studentData) {
+rawData.then(async function loadData(studentData) {
   //Initialize local variables
-  termCodes = Object.keys(studentData[0]).filter((k) => re.test(k));
-  termLabels = termCodes.map(getTermLabel);
+  const termCodes = Object.keys(studentData[0]).filter((k) => re.test(k));
+  const termLabels = termCodes.map(getTermLabel);
 
   // Create node data
   let studentNodes = studentData.map(initializeNode)
@@ -84,8 +84,21 @@ rawData.then(function loadData(studentData) {
     circle
     .attr("cx", (d) => d.x)
     .attr("cy", (d) => d.y)
-    .attr("fill", (d) => groups["Starting Cohort"].color);
+    .attr("fill", (d) => groups[d.group].color);
   });
+
+  // Update node position
+  termCodes.forEach((term, i) => {
+    setTimeout(() => {
+      studentNodes.forEach((node) => {
+        node.x = groups[node.group].x + Math.random();
+        node.y = groups[node.group].y + Math.random();
+        node.color = groups[node.group].color;
+        node.group = node[term];
+      });
+    }, i * 5000)
+  });
+
 });
 
 // Functions

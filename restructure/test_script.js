@@ -1,29 +1,74 @@
+// START OF SETUP
 
-// Dimensions of chart
+// Initialize global variables
+
+// Simulation-specific variables
+let simulationRate = 3000;
+let pauseSimulation = true;
+
+// Initialize global constants
+
+// Regex for term codes to get term labels, and semester code -> semester label mapping
+const re = new RegExp("(20\\d{2})(30|40|50)"); // matches years in this millenium (20xx) followed by 30, 40, or 50
+const semesterLabels = { 30: "Fall", 40: "Spring", 50: "Summer" };
+
+// Chart dimensions
 const margin = { top: 20, right: 20, bottom: 20, left: 20 };
 const width = 1200 - margin.left - margin.right;
 const height = 1100 - margin.top - margin.bottom;
 
-// Initialize global constants
-const radius = 3; // Size of the studentNodes
-const padding = 3 * radius; // Space between studentNodes
-const cluster_padding = 2 * padding; // Space between studentNodes in different stages
+// Bubble stuff
+const radius = 3; // Base radius of a bubble
+const padding = 3 * radius; // Space between bubbles
+const cluster_padding = 2 * padding; // Space between bubbles of different type
 
-// Establishing groups
-const groups = {
-  "Starting Cohort": { x: width * 0.5, y: height * .15, color: "#843b97", count: 0 },
-  "Freshman": { x: width * 0.8, y: height * 0.236, color: "#7DD9C1", count: 0 },
-  "Sophomore": { x: width * 0.89, y: height * 0.47, color: "#3AC6A0", count: 0 },
-  "Junior": { x: width * 0.8, y: height * 0.71, color: "#35B794", count: 0 },
-  "Senior": { x: width * 0.5, y: height * 0.80, color: "#31A888", count: 0 },
-  "Graduated": { x: width * 0.2, y: height * 0.71, color: "#34C3D5", count: 0, hovertext: "'Graduated' here is defined as bachelor's degree recipients." },
-  "Transferred Out": { x: width * 0.11, y: height * 0.47, color: "#f8882a", count: 0, hovertext: "'Transferred Out' is here defined as when we have established evidence of a student enrolling at an external institution. This category is not terminal; students may have evidence of transferring out, but may subsequently return to MSU Denver." },
-  "Dropped Out": { x: width * 0.2, y: height * 0.236, color: "#d53739", count: 0, hovertext: "'Dropped Out' is here defined as a student who has no subsequent enrollment at MSU Denver to date, and no enrollment at any external institution. This category is terminal." },
-  "Sabbatical": { x: width * 0.5, y: height * 0.47, color: "#Eae61a", count: 0, hovertext: "'Sabbatical' is defined here as when a student takes one or more semesters off between enrolled semesters, excluding the summer term." },
+// Stage locations and properties
+const stages = {
+  "Starting Cohort": {
+    x: width * 0.5,
+    y: height * 0.15,
+    color: "#843b97",
+    count: 0,
+  },
+  Freshman: { x: width * 0.8, y: height * 0.236, color: "#7DD9C1", count: 0 },
+  Sophomore: { x: width * 0.89, y: height * 0.47, color: "#3AC6A0", count: 0 },
+  Junior: { x: width * 0.8, y: height * 0.71, color: "#35B794", count: 0 },
+  Senior: { x: width * 0.5, y: height * 0.8, color: "#31A888", count: 0 },
+  Graduated: {
+    x: width * 0.2,
+    y: height * 0.71,
+    color: "#34C3D5",
+    count: 0,
+    hovertext: "'Graduated' here is defined as bachelor's degree recipients.",
+  },
+  "Transferred Out": {
+    x: width * 0.11,
+    y: height * 0.47,
+    color: "#f8882a",
+    count: 0,
+    hovertext:
+      "'Transferred Out' is here defined as when we have established evidence of a student enrolling at an external institution. This category is not terminal; students may have evidence of transferring out, but may subsequently return to MSU Denver.",
+  },
+  "Dropped Out": {
+    x: width * 0.2,
+    y: height * 0.236,
+    color: "#d53739",
+    count: 0,
+    hovertext:
+      "'Dropped Out' is here defined as a student who has no subsequent enrollment at MSU Denver to date, and no enrollment at any external institution. This category is terminal.",
+  },
+  Sabbatical: {
+    x: width * 0.5,
+    y: height * 0.47,
+    color: "#Eae61a",
+    count: 0,
+    hovertext:
+      "'Sabbatical' is defined here as when a student takes one or more semesters off between enrolled semesters, excluding the summer term.",
+  },
 };
 
-// Creating chart SVG
-const svg = d3
+// D3 initialization
+const SVG = d3
   .select("#chart")
   .append("svg")
   .attr("width", width + margin.left + margin.right)
@@ -31,108 +76,107 @@ const svg = d3
   .append("g")
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+// Dunno why this step is separate
 d3.select("#chart").style("width", width + margin.left + margin.right + "px");
 
-// Load in data
-const rawData = d3.csv("../data/ftf_data_files_final/201150_ftf.csv", d3.autoType);
-
-// Initialize global variables
-const re = new RegExp("(20\\d{2})(30|40|50)");  // matches years in this millenium (20xx) followed by 30, 40, or 50
-const semesterLabels = { "30": "Fall", "40": "Spring", "50": "Summer" };
-
-// Once the promise has been fulfilled:
-rawData.then(async function loadData(studentData) {
-  //Initialize local variables
-  const termCodes = Object.keys(studentData[0]).filter((k) => re.test(k));
-  const termLabels = termCodes.map(getTermLabel);
-
-  // Create node data
-  let studentNodes = studentData.map(initializeNode)
-   
-  // Bubble for each student
-  const circle = svg
-  .append("g")
-  .selectAll("circle")
-  .data(studentNodes)
-  .join("circle")
-  .attr("cx", (d) => d.x)
-  .attr("cy", (d) => d.y)
-  .attr("fill", () => groups["Starting Cohort"].color);
-
-  // Ease in the circles
-  circle
-  .transition()
-  .delay((d, i) => i)
-  .duration(800)
-  .attrTween("r", (d) => {
-    const i = d3.interpolate(0, d.r);
-    return (t) => (d.r = i(t));
-  });
-  
-  // Forces
-  const simulation = d3
-  .forceSimulation(studentNodes)
-  .force("x", (d) => d3.forceX(d.x))
-  .force("y", (d) => d3.forceY(d.y))
-  .force("cluster", forceCluster())
-  .force("collide", forceCollide())
-  .alpha(0.09)
-  .alphaDecay(0);
-  
-  // Adjust position of circles
-  simulation.on("tick", () => {
-    circle
-    .attr("cx", (d) => d.x)
-    .attr("cy", (d) => d.y)
-    .attr("fill", (d) => groups[d.group].color);
-  });
-
-  // Update node position
-  termCodes.forEach((term, i) => {
-    setTimeout(() => {
-      studentNodes.forEach((node) => {
-        node.x = groups[node.group].x + Math.random();
-        node.y = groups[node.group].y + Math.random();
-        node.color = groups[node.group].color;
-        node.group = node[term];
-      });
-    }, i * 5000)
-  });
-
+d3.select("button#toggleId").on("click", () => {
+  pauseSimulation = !pauseSimulation;
+  console.log(`Animation ${pauseSimulation ? "paused" : "playing"}`);
 });
 
-// Functions
+// Helper functions
 
-// Initializing starting positions of nodes
+// Changes the play button into a pause button and back again
+function toggleMaker() {
+  var toggleElement = document.getElementById("toggleId");
+  if (toggleElement.innerHTML === "play_arrow") {
+    toggleElement.innerHTML = "pause";
+  } else {
+    toggleElement.innerHTML = "play_arrow";
+  }
+}
+
+// d3.select("button#reset").on("click", function () {
+//   sliderValue = 1;
+//   previousSliderValue = 0;
+// });
+
+function* termCodeGeneratorFactory(termCodes) {
+  // Scrubbable generator into which you can send an object with this structure:
+  //   newSimulationInstructions = {
+  //     newMin: <integer between 0 and termCodes.length - 1>,
+  //     newMax: <integer between newMin + 1 and termCodes.length>,
+  //     newIter: <integer between newMin and newMax>
+  //   }
+  //
+  // NOTE: Any of the above properties can be omitted
+  //
+  // USAGE:
+  //   To pass new instructions: termCodeGenerator.next(newInstructions)
+  //
+  // EXAMPLES:
+  //   To set the animation's bookmarks (i.e., the user moved either or both of the bookmarks):
+  //     termCodeGenerator.next({ newMin: minBookmark, newMax: maxBookmark})
+  //   To set the animation to a new term (i.e., the slider handle was moved by the user):
+  //     termCodeGenerator.next({ newIter: sliderValue })
+  //   To do nothing:
+  //     termCodeGenerator.next()
+  //
+  i = 0;
+  min = 0;
+  max = termCodes.length;
+  // This generator will loop between `min` and `max` forever
+  while (true) {
+    const received = yield termCodes[i];
+
+    // If we don't receive new instructions, carry on
+    if (typeof received === "undefined") {
+      i++;
+      // otherwise, get new instructions
+    } else {
+      let { newMin, newMax, newIter } = received;
+      min = newMin ? typeof newMin !== "undefined" : min;
+      max = newMax ? typeof newMax !== "undefined" : max;
+      i = newIter ? typeof newIter !== "undefined" : i;
+    }
+
+    // Loop back to beginning
+    if (i === max) {
+      i = min;
+    }
+  }
+}
+
+// Initializing starting position of a student node
 function initializeNode(student) {
   return {
     ...student,
-    x: groups["Starting Cohort"].x + Math.random(),
-    y: groups["Starting Cohort"].y + Math.random(),
+    x: stages["Starting Cohort"].x + Math.random(),
+    y: stages["Starting Cohort"].y + Math.random(),
     r: radius * (1 + Math.random()),
-    group: "Starting Cohort",
-  }
+    stage: "Starting Cohort",
+  };
 }
 
 // Creating dynamic labels
 function getTermLabel(termCode) {
-  let [_, year, semCode] = termCode.match(re);  // Array destructuring
-  return `${semesterLabels[semCode]} ${year}`;
+  let [_, year, semesterCode] = termCode.match(re); // Array destructuring
+  return `${semesterLabels[semesterCode]} ${year}`;
 }
 
-// Force to increment studentNodes to groups
+// Force to increment nodes to stages
 function forceCluster() {
   const strength = 0.3;
-  let nodes;
+  let studentNodes;
 
   function force(alpha) {
     const l = alpha * strength;
-    for (const d of nodes) {
-      d.vx -= (d.x - groups[d.group].x) * l;
-      d.vy -= (d.y - groups[d.group].y) * l;
+    for (const d of studentNodes) {
+      d.vx -= (d.x - stages[d.stage].x) * l;
+      d.vy -= (d.y - stages[d.stage].y) * l;
     }
   }
-  force.initialize = (_) => (nodes = _);
+  force.initialize = (_) => (studentNodes = _);
 
   return force;
 }
@@ -140,16 +184,12 @@ function forceCluster() {
 // Force for collision detection
 function forceCollide() {
   const alpha = 0.15; // fixed for greater rigidity!
-  let nodes;
+  let studentNodes;
   let maxRadius;
 
   function force() {
-    const quadtree = d3.quadtree(
-      nodes,
-      (d) => d.x,
-      (d) => d.y
-    );
-    for (const d of nodes) {
+    const quadtree = d3.quadtree(studentNodes, (d) => d.x, (d) => d.y);
+    for (const d of studentNodes) {
       const r = d.r + maxRadius;
       const nx1 = d.x - r;
       const ny1 = d.y - r;
@@ -159,7 +199,7 @@ function forceCollide() {
         if (!q.length)
           do {
             if (q.data !== d) {
-              const r = d.r + q.data.r + (d.group === q.data.group ? padding : cluster_padding);
+              const r = d.r + q.data.r + (d.stage === q.data.stage ? padding : cluster_padding);
               let x = d.x - q.data.x;
               let y = d.y - q.data.y;
               let l = Math.hypot(x, y);
@@ -175,7 +215,126 @@ function forceCollide() {
     }
   }
 
-  force.initialize = (_) => (maxRadius = d3.max((nodes = _), (d) => d.r) + Math.max(padding, cluster_padding));
+  force.initialize = (_) => (maxRadius = d3.max((studentNodes = _), (d) => d.r) + Math.max(padding, cluster_padding));
 
   return force;
 }
+// END OF SETUP
+
+// MAIN PROGRAM
+// Load data, and then...
+d3.csv("../data/ftf_data_files_final/201150_ftf.csv", d3.autoType).then(
+  function loadData(studentData) {
+    // Get term codes from dataset
+    const termCodes = Object.keys(studentData[0]).filter((k) => re.test(k));
+
+    // Create node data
+    let studentNodes = studentData.map(initializeNode);
+
+    // // Create circles
+    // const circle = SVG
+    //   // .append("g")
+    //   .selectAll("circle")
+    //   .data(studentNodes)
+    //   .join("circle")
+    //   .attr("cx", (d) => d.x)
+    //   .attr("cy", (d) => d.y)
+    //   .attr("fill", (d) => stages[d.stage].color);
+
+    // Ease in the circles
+    // circle
+    //   .transition()
+    //   .delay((d, i) => i)
+    //   .duration(800)
+    //   .attrTween("r", (d) => {
+    //     const i = d3.interpolate(0, d.r);
+    //     return (t) => (d.r = i(t));
+    //   });
+
+    // Draw a bubble for each student
+    const bubbles = SVG
+      .append("g")
+      .selectAll("circle")
+      .data(studentNodes)
+      .join("circle")
+      .attr("fill", (d) => stages[d.stage].color) // Starting stage/color established in initializeNode()
+      .attr("cx", (d) => d.x)
+      .attr("cy", (d) => d.y)
+      .attr("r", (d) => d.r)
+
+    // The actual code which, given a term code, updates each node's position and color
+    function updateNodeData(term) {
+      studentNodes.forEach(function updateSingleNode(node) {
+        stage = node[term];
+        node.x = stages[stage].x + Math.random();
+        node.y = stages[stage].y + Math.random();
+        node.color = stages[stage].color;
+        node.stage = stage;
+        stages[stage].count += 1;
+      });
+    }
+
+    function transitionBubbles() {
+      bubbles
+        // .transition()
+        // .duration(simulationRate * 0.95)
+        .attr("cx", (d) => d.x)
+        .attr("cy", (d) => d.y)
+        .attr("fill", (d) => stages[d.stage].color);
+    }
+
+    // function updateBubbles() {
+    //   bubbles
+    //     .attr("cx", (d) => d.x)
+    //     .attr("cy", (d) => d.y)
+    //     .attr("fill", (d) => stages[d.stage].color);
+    // }
+
+    // Creates a d3 simulation object with these physics
+    const physics = d3
+      .forceSimulation(studentNodes)
+      .force("x", (d) => d3.forceX(d.x))
+      .force("y", (d) => d3.forceY(d.y))
+      .force("cluster", forceCluster())
+      .force("collide", forceCollide())
+      .alpha(0.09)
+      .alphaDecay(0);
+
+    // Tells d3 how to apply physics to nodes
+    physics.on("tick", transitionBubbles);
+
+    // Initializes a termCode generator, we're getting ready to actually start animating
+    let termCodeGenerator = termCodeGeneratorFactory(termCodes);
+
+    // Debug by following a single student
+    let studentX = Math.floor(Math.random() * studentNodes.length);
+
+    // The global simulation controller; this is essentially the "circuitry" to which the pauseSimulation BUTTON is actually wired
+    function simulationController() {
+      if (pauseSimulation) {
+        setTimeout(simulationController, 100); // Wait 100ms and check again if the simulation is still paused
+      } else {
+        setTimeout(simulationStep, 10); // Simulation was unpaused, wait 10ms and then go back to simulationStepFunction
+      }
+    }
+
+    // Everything that needs to happen for a single animation frame
+    function simulationStep() {
+      // Get the next term code from the generator
+      // instead of this plain .next(), this is where you'd implement your bookmark and slider handle onChange listeners
+      let term = termCodeGenerator.next().value;
+      updateNodeData(term);
+
+      // Debug stuff for student X
+      let { pid, x, y, stage } = studentNodes[studentX];
+      console.log(`term: ${term}\nstudent ${pid}:\n  stage: ${stage}\n  x: ${x}\n  y: ${y}`);
+
+      // transitionBubbles();
+      setTimeout(simulationController, simulationRate);
+    }
+
+    // Finally ready to start the animation...
+    // Launch the algorithm!
+    setTimeout(simulationController, 10);
+  }
+);

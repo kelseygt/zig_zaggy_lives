@@ -158,9 +158,10 @@ stages.then(function (data) {
     .attr("cx", (d) => d.x)
     .attr("cy", (d) => d.y)
     .attr("fill", (d) => d.color);
-
-  // Ease in the circles
-  circle
+  
+    
+    // Ease in the circles
+    circle
     .transition()
     .delay((d, i) => i)
     .duration(800)
@@ -168,16 +169,16 @@ stages.then(function (data) {
       const i = d3.interpolate(0, d.r);
       return (t) => (d.r = i(t));
     });
-
-  // Define the div for the hovertext
-  const div = d3
+    
+    // Define the div for the hovertext
+    const div = d3
     .select('body')
     .append('div')
     .attr('class', 'tooltip')
     .style('opacity', 0);
-
-  // Group name labels and hovertext with definitions (where applicable)
-  svg
+    
+    // Group name labels and hovertext with definitions (where applicable)
+    svg
     .selectAll(".grp")
     .data(d3.keys(groups))
     .join("text")
@@ -189,24 +190,24 @@ stages.then(function (data) {
     .on('mouseover', d => {
       if (groups[d].hovertext) {
         div
-          .transition()
-          .duration(200)
-          .style('opacity', 0.9);
+        .transition()
+        .duration(200)
+        .style('opacity', 0.9);
         div
-          .html(groups[d].hovertext)
-          .style('left', (d3.event.pageX - 275) + 'px')
-          .style('top', (d3.event.pageY - 28) + 'px');
+        .html(groups[d].hovertext)
+        .style('left', (d3.event.pageX - 275) + 'px')
+        .style('top', (d3.event.pageY - 28) + 'px');
       }
     })
     .on('mouseout', () => {
       div
-        .transition()
-        .duration(500)
-        .style('opacity', 0);
+      .transition()
+      .duration(500)
+      .style('opacity', 0);
     });
 
-  // Group counts and percentages
-  svg
+    // Group counts and percentages
+    svg
     .selectAll(".grpcnt")
     .data(d3.keys(groups))
     .join("text")
@@ -215,9 +216,9 @@ stages.then(function (data) {
     .attr("x", (d) => groups[d].x)
     .attr("y", (d) => groups[d].y + 125)
     .text((d) => `n = ${groups[d].cnt} (${Math.round((groups[d].cnt / numNodes) * 1000) / 10}%)`);
-
-  // Forces
-  const simulation = d3
+    
+    // Forces
+    const simulation = d3
     .forceSimulation(nodes)
     .force("x", (d) => d3.forceX(d.x))
     .force("y", (d) => d3.forceY(d.y))
@@ -225,7 +226,7 @@ stages.then(function (data) {
     .force("collide", forceCollide())
     .alpha(0.09)
     .alphaDecay(0);
-
+    
   // Adjust position of circles
   simulation.on("tick", () => {
     circle

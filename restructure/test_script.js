@@ -9,7 +9,7 @@ let pauseSimulation = true;
 // Initialize global constants
 
 // Regex for term codes to get term labels, and semester code -> semester label mapping
-const re = new RegExp("(20\\d{2})(30|40|50)"); // matches years in this millenium (20xx) followed by 30, 40, or 50
+const re = new RegExp("(20\\d{2})(30|40|50)"); // matches years in this millennium (20xx) followed by 30, 40, or 50
 const semesterLabels = { 30: "Fall", 40: "Spring", 50: "Summer" };
 
 // Chart dimensions
@@ -18,10 +18,10 @@ const width = 1200 - margin.left - margin.right;
 const height = 1100 - margin.top - margin.bottom;
 
 // Bubble stuff
-const meanRadius = 4; // Base radius of a bubble
-// const variance = 0.5 * meanRadius; // How much by which the radius of a bubble can vary
-const padding = 2 * meanRadius; // Space between bubbles
-const cluster_padding = 2 * padding; // Space between bubbles of different type
+const bubbleRadius = 5;  // Base radius of a bubble
+const bubblePadding = 1.5;  // Collision detection uses this number times the radius of each bubble
+const bubbleRadiusVariance = 0.25 * bubbleRadius  // By how much the radius of a bubble can vary
+let predicateFunction = filterNone // predicateFunction will always need to be defined
 
 // Stage locations and properties
 const stages = {
@@ -82,7 +82,6 @@ d3.select("#chart").style("width", width + margin.left + margin.right + "px");
 
 d3.select("button#toggleId").on("click", () => {
   pauseSimulation = !pauseSimulation;
-  console.log(`Animation ${pauseSimulation ? "paused" : "playing"}`);
 });
 
 // Helper functions
@@ -95,6 +94,33 @@ function toggleMaker() {
   } else {
     toggleElement.innerHTML = "play_arrow";
   }
+}
+
+// Filters for various criteria need to be implemented here, they should 
+// take a filter criteria, and return a function which tests a given node
+// against that criteria and returns a boolean
+function filterSex(sex) {
+  return (d) => { return d.sex === sex }
+}
+
+// This is the only "filter" function which does not return a function
+function filterNone(d) {
+  return true
+}
+
+// Tell bubbles where to go next
+function updateBubblePositions() {
+  d3.selectAll("circle")
+    .attr("cx", (d) => d.x)
+    .attr("cy", (d) => d.y)
+}
+
+// Call this function to filter out bubbles based on the predicate passed in
+function updateBubbleColors(predicate = predicateFunction) {
+  d3.selectAll("circle")
+    .transition()
+    .duration(simulationRate * 0.25)  // How quickly the color transitions
+    .attr("fill", (d) => predicate(d) ? stages[d.stage].color : "#354162");
 }
 
 // d3.select("button#reset").on("click", function () {
@@ -124,8 +150,8 @@ function* termCodeGeneratorFactory(termCodes) {
   //     termCodeGenerator.next()
   //
   i = 0;
-  min = 0;
-  max = termCodes.length;
+  iterMin = 0;
+  iterMax = termCodes.length;
   // This generator will loop between `min` and `max` forever
   while (true) {
     const received = yield termCodes[i];
@@ -136,39 +162,31 @@ function* termCodeGeneratorFactory(termCodes) {
       // otherwise, get new instructions
     } else {
       let { newMin, newMax, newIter } = received;
-      min = newMin ? typeof newMin !== "undefined" : min;
-      max = newMax ? typeof newMax !== "undefined" : max;
-      i = newIter ? typeof newIter !== "undefined" : i;
+      iterMin = newMin ?? iterMin;
+      iterMax = newMax ?? iterMax;
+      i = newIter ?? i;
+      i = Math.max(Math.min(i, iterMax), iterMin);
     }
 
     // Loop back to beginning
-    if (i === max) {
-      i = min;
+    if (i > iterMax) {
+      i = iterMin;
     }
   }
 }
 
-// function randBetween(min, max) {
-//   return Math.random() * (max - min) + min;
-// }
-
-// Given a mean, return a random number with mean +/- variance
-function plusMinus(mean, variance) {
-  return Math.round(mean + (2 * variance * Math.random() - variance));
+// Return a random number in the range [x - c, x + c]
+function plusMinus(x, c) {
+  return Math.round(x + c * (2 * Math.random() - 1));
 }
 
 // Initializing starting position of a student node
-function initializeNode(student) {
-  let stage = "Starting Cohort";
-  let x = stages[stage].x;
-  let y = stages[stage].y;
-  let color = stages[stage].color;
+function initializeNode(stage, x, y, student) {
   return {
     ...student,
-    x: plusMinus(x, 0.01 * height),
-    y: plusMinus(y, 0.01 * width),
-    r: plusMinus(meanRadius, meanRadius / 2),
-    color: color,
+    x: x + Math.random(),
+    y: y + Math.random(),
+    r: plusMinus(bubbleRadius, bubbleRadiusVariance),
     stage: stage,
   };
 }
@@ -181,63 +199,20 @@ function getTermLabel(termCode) {
 
 // Force to increment nodes to stages
 function forceCluster() {
-  const strength = 0.3;
-  let studentNodes;
+  const strength = 0.25;
+  let nodes;
 
   function force(alpha) {
-    const l = alpha * strength;
-    for (const d of studentNodes) {
-      d.vx -= (d.x - stages[d.stage].x) * l;
-      d.vy -= (d.y - stages[d.stage].y) * l;
+    const k = alpha * strength;
+    for (const d of nodes) {
+      d.vx -= k * (d.x - stages[d.stage].x);
+      d.vy -= k * (d.y - stages[d.stage].y);
     }
   }
-  force.initialize = (_) => (studentNodes = _);
+  force.initialize = (_) => (nodes = _);
 
   return force;
 }
-
-// Force for collision detection
-// function forceCollide() {
-//   const alpha = 0.15; // fixed for greater rigidity!
-//   let studentNodes;
-//   let maxRadius;
-
-//   function force() {
-//     const quadtree = d3.quadtree(
-//       studentNodes,
-//       (d) => d.x,
-//       (d) => d.y
-//     );
-//     for (const d of studentNodes) {
-//       const r = d.r + maxRadius;
-//       const nx1 = d.x - r;
-//       const ny1 = d.y - r;
-//       const nx2 = d.x + r;
-//       const ny2 = d.y + r;
-//       quadtree.visit((q, x1, y1, x2, y2) => {
-//         if (!q.length)
-//           do {
-//             if (q.data !== d) {
-//               const r = d.r + q.data.r + (d.stage === q.data.stage ? padding : cluster_padding);
-//               let x = d.x - q.data.x;
-//               let y = d.y - q.data.y;
-//               let l = Math.hypot(x, y);
-//               if (l < r) {
-//                 l = ((l - r) / l) * alpha;
-//                 (d.x -= x *= l), (d.y -= y *= l);
-//                 (q.data.x += x), (q.data.y += y);
-//               }
-//             }
-//           } while ((q = q.next));
-//         return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
-//       });
-//     }
-//   }
-
-//   force.initialize = (_) => (maxRadius = d3.max((studentNodes = _), (d) => d.r) + Math.max(padding, cluster_padding));
-
-//   return force;
-// }
 // END OF SETUP
 
 // MAIN PROGRAM
@@ -246,39 +221,18 @@ d3.csv("../data/201150_ftf.csv", d3.autoType).then(function loadData(studentData
   // Get term codes from dataset
   const termCodes = Object.keys(studentData[0]).filter((k) => re.test(k));
 
-  // Create node data
-  let studentNodes = studentData.map(initializeNode);
-  stages["Starting Cohort"].count = studentNodes.length;
-  // studentNodes.forEach((node) => console.log(`${node.x} ${node.y}`));
-
-  // // Create circles
-  // const circle = SVG
-  //   // .append("g")
-  //   .selectAll("circle")
-  //   .data(studentNodes)
-  //   .join("circle")
-  //   .attr("cx", (d) => d.x)
-  //   .attr("cy", (d) => d.y)
-  //   .attr("fill", (d) => stages[d.stage].color);
-
-  // Ease in the circles
-  // circle
-  //   .transition()
-  //   .delay((d, i) => i)
-  //   .duration(800)
-  //   .attrTween("r", (d) => {
-  //     const i = d3.interpolate(0, d.r);
-  //     return (t) => (d.r = i(t));
-  //   });
+  // Initialize student nodes
+  let stage = "Starting Cohort";
+  let x = stages[stage].x;
+  let y = stages[stage].y;
+  let studentNodes = studentData.map((student) => initializeNode(stage, x, y, student))//.slice(0, 1000);
+  stages[stage].count = studentNodes.length;
 
   // Draw a bubble for each student
   SVG.append("g")
     .selectAll("circle")
     .data(studentNodes)
     .join("circle")
-    // .transition()
-    // .delay((_, i) => i)
-    // .duration(1000)
     .attr("fill", (d) => stages[d.stage].color) // Starting stage/color established in initializeNode()
     .attr("cx", (d) => d.x)
     .attr("cy", (d) => d.y)
@@ -287,48 +241,22 @@ d3.csv("../data/201150_ftf.csv", d3.autoType).then(function loadData(studentData
   // The actual code which, given a term code, updates each node's position and color
   function updateNodeData(term) {
     studentNodes.forEach(function updateSingleNode(node) {
-      let stage = node[term];
       stages[node.stage].count -= 1;
-      node.x = stages[stage].x;
-      node.y = stages[stage].y;
-      node.color = stages[stage].color;
-      node.stage = stage;
-      stages[stage].count += 1;
+      node.stage = node[term];
+      stages[node.stage].count += 1;
     });
   }
-
-  function transitionBubbles() {
-    d3.selectAll("circle")
-      .transition()
-      // .delay((d, i) => i * 5)
-      // .duration(simulationRate * 0.95)
-      .attr("cx", (d) => d.x)
-      .attr("cy", (d) => d.y)
-      .attr("fill", (d) => d.color);
-  }
-
-  // function updateBubbles() {
-  //   bubbles
-  //     .attr("cx", (d) => d.x)
-  //     .attr("cy", (d) => d.y)
-  //     .attr("fill", (d) => stages[d.stage].color);
-  // }
 
   // Creates a d3 simulation object with these physics
   const physics = d3
     .forceSimulation(studentNodes)
-    // .force("x", (d) => d3.forceX(d.x))
-    // .force("y", (d) => d3.forceY(d.y))
-    // .force("cluster", forceCluster())
-    .force(
-      "collide",
-      d3.forceCollide((d) => d.r)
-    )
+    .force("cluster", forceCluster())
+    .force("collide", d3.forceCollide((d) => bubblePadding * d.r))
     .alpha(0.09)
     .alphaDecay(0);
 
   // Tells d3 how to apply physics to nodes
-  physics.on("tick", transitionBubbles);
+  physics.on("tick", updateBubblePositions);
 
   // Initializes a termCode generator, we're getting ready to actually start animating
   let termCodeGenerator = termCodeGeneratorFactory(termCodes);
@@ -339,7 +267,7 @@ d3.csv("../data/201150_ftf.csv", d3.autoType).then(function loadData(studentData
   // The global simulation controller; this is essentially the "circuitry" to which the pauseSimulation BUTTON is actually wired
   function simulationController() {
     if (pauseSimulation) {
-      setTimeout(simulationController, 100); // Wait 100ms and check again if the simulation is still paused
+      setTimeout(simulationController, 100); // Wait 100ms, then check again if the simulation is still paused
     } else {
       setTimeout(simulationStep, 10); // Simulation was unpaused, wait 10ms and then go back to simulationStepFunction
     }
@@ -349,18 +277,23 @@ d3.csv("../data/201150_ftf.csv", d3.autoType).then(function loadData(studentData
   function simulationStep() {
     // Get the next term code from the generator
     // instead of this plain .next(), this is where you'd implement your bookmark and slider handle onChange listeners
+
+    // Suppose the user wants to filter on sex == female
+    // predicateFunction = filterSex("M")  // Then pass `predicate` to updateBubbleColors
     let term = termCodeGenerator.next().value;
     updateNodeData(term);
 
-    // Debug stuff for student X
-    let { pid, x, y, stage } = studentNodes[studentX];
-    console.log(`term: ${term}\nstudent ${pid}:\n  stage: ${stage}\n  x: ${x}\n  y: ${y}`);
-
+    // Debug print statements for student X
+    let { pid, x, y, stage, sex } = studentNodes[studentX];
     let counts = Object.keys(stages).map((k) => stages[k].count);
-    console.log(`counts: ${counts}\ntotal: ${counts.reduce((s, x) => s + x, 0)}`);
+    console.log(
+      `term: ${term}\ncounts: ${counts}\ntotal: ${counts.reduce(
+        (s, x) => s + x,
+        0
+      )}\nstudent ${pid} (sex: ${sex}):\n  stage: ${stage}\n  x: ${x}\n  y: ${y}`
+    );
 
-    // transitionBubbles();
-    // physics.tick();
+    updateBubbleColors();
     setTimeout(simulationController, simulationRate);
   }
 

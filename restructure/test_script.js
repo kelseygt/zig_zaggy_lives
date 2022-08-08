@@ -3,8 +3,9 @@
 // Initialize global variables
 
 // Simulation-specific variables
-let simulationRate = 3000;
+let simulationRate = 1000;
 let pauseSimulation = true;
+let DEBUG = false;
 
 // Initialize global constants
 
@@ -18,10 +19,10 @@ const width = 1200 - margin.left - margin.right;
 const height = 1100 - margin.top - margin.bottom;
 
 // Bubble stuff
-const bubbleRadius = 5;  // Base radius of a bubble
-const bubblePadding = 1.5;  // Collision detection uses this number times the radius of each bubble
-const bubbleRadiusVariance = 0.25 * bubbleRadius  // By how much the radius of a bubble can vary
-let predicateFunction = filterNone // predicateFunction will always need to be defined
+const bubbleRadius = 5; // Base radius of a bubble
+const bubblePadding = 1.5; // Collision detection uses this number times the radius of each bubble
+const bubbleRadiusVariance = 0.25 * bubbleRadius; // By how much the radius of a bubble can vary
+let predicateFunction = filterNone; // predicateFunction will always need to be defined
 
 // Stage locations and properties
 const stages = {
@@ -96,31 +97,33 @@ function toggleMaker() {
   }
 }
 
-// Filters for various criteria need to be implemented here, they should 
+// Filters for various criteria need to be implemented here, they should
 // take a filter criteria, and return a function which tests a given node
 // against that criteria and returns a boolean
 function filterSex(sex) {
-  return (d) => { return d.sex === sex }
+  return (d) => {
+    return d.sex === sex;
+  };
 }
 
 // This is the only "filter" function which does not return a function
 function filterNone(d) {
-  return true
+  return true;
 }
 
 // Tell bubbles where to go next
 function updateBubblePositions() {
   d3.selectAll("circle")
     .attr("cx", (d) => d.x)
-    .attr("cy", (d) => d.y)
+    .attr("cy", (d) => d.y);
 }
 
 // Call this function to filter out bubbles based on the predicate passed in
 function updateBubbleColors(predicate = predicateFunction) {
   d3.selectAll("circle")
     .transition()
-    .duration(simulationRate * 0.25)  // How quickly the color transitions
-    .attr("fill", (d) => predicate(d) ? stages[d.stage].color : "#354162");
+    .duration(simulationRate * 0.25) // How quickly the color transitions
+    .attr("fill", (d) => (predicate(d) ? stages[d.stage].color : "#354162"));
 }
 
 // d3.select("button#reset").on("click", function () {
@@ -154,6 +157,10 @@ function* termCodeGeneratorFactory(termCodes) {
   iterMax = termCodes.length;
   // This generator will loop between `min` and `max` forever
   while (true) {
+    // Loop back to beginning
+    if (i === iterMax) {
+      i = iterMin;
+    }
     const received = yield termCodes[i];
 
     // If we don't receive new instructions, carry on
@@ -166,11 +173,6 @@ function* termCodeGeneratorFactory(termCodes) {
       iterMax = newMax ?? iterMax;
       i = newIter ?? i;
       i = Math.max(Math.min(i, iterMax), iterMin);
-    }
-
-    // Loop back to beginning
-    if (i > iterMax) {
-      i = iterMin;
     }
   }
 }
@@ -225,7 +227,7 @@ d3.csv("../data/201150_ftf.csv", d3.autoType).then(function loadData(studentData
   let stage = "Starting Cohort";
   let x = stages[stage].x;
   let y = stages[stage].y;
-  let studentNodes = studentData.map((student) => initializeNode(stage, x, y, student))//.slice(0, 1000);
+  let studentNodes = studentData.map((student) => initializeNode(stage, x, y, student)); //.slice(0, 1000);
   stages[stage].count = studentNodes.length;
 
   // Draw a bubble for each student
@@ -251,7 +253,10 @@ d3.csv("../data/201150_ftf.csv", d3.autoType).then(function loadData(studentData
   const physics = d3
     .forceSimulation(studentNodes)
     .force("cluster", forceCluster())
-    .force("collide", d3.forceCollide((d) => bubblePadding * d.r))
+    .force(
+      "collide",
+      d3.forceCollide((d) => bubblePadding * d.r)
+    )
     .alpha(0.09)
     .alphaDecay(0);
 
@@ -261,8 +266,20 @@ d3.csv("../data/201150_ftf.csv", d3.autoType).then(function loadData(studentData
   // Initializes a termCode generator, we're getting ready to actually start animating
   let termCodeGenerator = termCodeGeneratorFactory(termCodes);
 
-  // Debug by following a single student
+  // DEBUG by following a single student
   let studentX = Math.floor(Math.random() * studentNodes.length);
+
+  function debugStatements() {
+    // DEBUG print statements for student X
+    let { pid, x, y, stage, sex } = studentNodes[studentX];
+    let counts = Object.keys(stages).map((k) => stages[k].count);
+    console.log(
+      `term: ${term}\ncounts: ${counts}\ntotal: ${counts.reduce(
+        (s, x) => s + x,
+        0
+      )}\nstudent ${pid} (sex: ${sex}):\n  stage: ${stage}\n  x: ${x}\n  y: ${y}`
+    );
+  }
 
   // The global simulation controller; this is essentially the "circuitry" to which the pauseSimulation BUTTON is actually wired
   function simulationController() {
@@ -283,15 +300,9 @@ d3.csv("../data/201150_ftf.csv", d3.autoType).then(function loadData(studentData
     let term = termCodeGenerator.next().value;
     updateNodeData(term);
 
-    // Debug print statements for student X
-    let { pid, x, y, stage, sex } = studentNodes[studentX];
-    let counts = Object.keys(stages).map((k) => stages[k].count);
-    console.log(
-      `term: ${term}\ncounts: ${counts}\ntotal: ${counts.reduce(
-        (s, x) => s + x,
-        0
-      )}\nstudent ${pid} (sex: ${sex}):\n  stage: ${stage}\n  x: ${x}\n  y: ${y}`
-    );
+    if (DEBUG) {
+      debugStatements();
+    }
 
     updateBubbleColors();
     setTimeout(simulationController, simulationRate);

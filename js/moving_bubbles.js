@@ -1,13 +1,9 @@
 // START OF SETUP
 
-// Initialize global variables
-
 // Simulation-specific variables
 let simulationRate = 1000;
 let pauseSimulation = true;
 let DEBUG = false;
-
-// Initialize global constants
 
 // Regex for term codes to get term labels, and semester code -> semester label mapping
 const re = new RegExp("(20\\d{2})(30|40|50)"); // matches years in this millennium (20xx) followed by 30, 40, or 50
@@ -26,14 +22,19 @@ let predicateFunction = filterNone; // predicateFunction will always need to be 
 
 // Text stuff
 let timeNotes = {
-  "start": "Click play to get started.",
-  201150: "We start with just over 2000 full- and part-time first-time freshman. By the end of the first semester, over 8% have dropped out. That percentage doubles by the end of the first year. By this same time, around the same number of students have opted to take at least one semester off.",
+  start: "Click play to get started.",
+  201150:
+    "We start with just over 2000 full- and part-time first-time freshman. By the end of the first semester, over 8% have dropped out. That percentage doubles by the end of the first year. By this same time, around the same number of students have opted to take at least one semester off.",
   201250: "",
-  201450: "Here we hit the fourth year of study for this cohort. By the end of this year, we'll have seen almost a third of this cohort drop out, and only about 6% of the students graduate. However, almost a third of students are still on track in their studies. Pause at the summer semester to really digest where this cohort stands.",
+  201450:
+    "Here we hit the fourth year of study for this cohort. By the end of this year, we'll have seen almost a third of this cohort drop out, and only about 6% of the students graduate. However, almost a third of students are still on track in their studies. Pause at the summer semester to really digest where this cohort stands.",
   201550: "",
-  201650: "Here marks the start of the sixth year from when this group of students began. By the end of the academic year, the number of graduates will jump to four times as many as we had two years ago at the 4-year mark. Pause at the summer semester again to absorb the overall picture.",
-  201750: "From here, during the seventh year, things start to slow down, as most students -- but not all -- have come to the end of their chosen path.",
-  202050: "And here we are at year 10. The majority of students will have settled into their final classification by now, be it dropped out, transferred out, or graduated. Even still, a small handful of students continue on their educational journey at MSU Denver. Pause here for a final snapshot of this cohort.",
+  201650:
+    "Here marks the start of the sixth year from when this group of students began. By the end of the academic year, the number of graduates will jump to four times as many as we had two years ago at the 4-year mark. Pause at the summer semester again to absorb the overall picture.",
+  201750:
+    "From here, during the seventh year, things start to slow down, as most students -- but not all -- have come to the end of their chosen path.",
+  202050:
+    "And here we are at year 10. The majority of students will have settled into their final classification by now, be it dropped out, transferred out, or graduated. Even still, a small handful of students continue on their educational journey at MSU Denver. Pause here for a final snapshot of this cohort.",
 };
 
 // Stage locations and properties
@@ -50,28 +51,32 @@ const stages = {
     y: height * 0.236,
     color: "#7DD9C1",
     count: 0,
-    hovertext: "Freshman are defined as those students having earned fewer than 30 credit hours prior to the start of the term in question.",
+    hovertext:
+      "Freshman are defined as those students having earned fewer than 30 credit hours prior to the start of the term in question.",
   },
   Sophomore: {
     x: width * 0.89,
     y: height * 0.47,
     color: "#3AC6A0",
     count: 0,
-    hovertext: "Sophomores are defined as those students having earned fewer than 60 credit hours prior to the start of the term in question.",
+    hovertext:
+      "Sophomores are defined as those students having earned fewer than 60 credit hours prior to the start of the term in question.",
   },
   Junior: {
     x: width * 0.8,
     y: height * 0.71,
     color: "#35B794",
     count: 0,
-    hovertext: "Juniors are defined as those students having earned fewer than 90 credit hours prior to the start of the term in question.",
+    hovertext:
+      "Juniors are defined as those students having earned fewer than 90 credit hours prior to the start of the term in question.",
   },
   Senior: {
     x: width * 0.5,
     y: height * 0.8,
     color: "#31A888",
     count: 0,
-    hovertext: "Seniors are defined as those students having earned at least 90 credit hours prior to the start of the term in question.",
+    hovertext:
+      "Seniors are defined as those students having earned at least 90 credit hours prior to the start of the term in question.",
   },
   Graduated: {
     x: width * 0.2,
@@ -85,21 +90,24 @@ const stages = {
     y: height * 0.47,
     color: "#f8882a",
     count: 0,
-    hovertext: "'Transferred Out' is here defined as when we have established evidence of a student enrolling at an external institution. This category is not terminal; students may have evidence of transferring out, but may subsequently return to MSU Denver.",
+    hovertext:
+      "'Transferred Out' is here defined as when we have established evidence of a student enrolling at an external institution. This category is not terminal; students may have evidence of transferring out, but may subsequently return to MSU Denver.",
   },
   "Dropped Out": {
     x: width * 0.2,
     y: height * 0.236,
     color: "#d53739",
     count: 0,
-    hovertext: "'Dropped Out' is here defined as a student who has no subsequent enrollment at MSU Denver to date, and no enrollment at any external institution. This category is terminal.",
+    hovertext:
+      "'Dropped Out' is here defined as a student who has no subsequent enrollment at MSU Denver to date, and no enrollment at any external institution. This category is terminal.",
   },
   Sabbatical: {
     x: width * 0.5,
     y: height * 0.47,
     color: "#Eae61a",
     count: 0,
-    hovertext: "'Sabbatical' is defined here as when a student takes one or more semesters off between enrolled semesters, excluding the summer term.",
+    hovertext:
+      "'Sabbatical' is defined here as when a student takes one or more semesters off between enrolled semesters, excluding the summer term.",
   },
 };
 
@@ -115,17 +123,20 @@ const SVG = d3
 // Dunno why this step is separate
 d3.select("#chart").style("width", width + margin.left + margin.right + "px");
 
+// Buttons
 d3.select("button#toggleId").on("click", () => {
   pauseSimulation = !pauseSimulation;
 });
 
-// Define the div for the hovertext
-const div = d3
-  .select("body")
-  .append("div")
-  .attr("class", "tooltip")
-  .style("opacity", 0);
+// d3.select("button#reset").on("click", function () {
+//   sliderValue = 1;
+//   previousSliderValue = 0;
+// });
 
+// Define the div for the hovertext
+const div = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
+
+// Draw chart elements for the first time
 function initialDraws(studentNodes) {
   // A bubble for each student
   SVG.append("g")
@@ -147,10 +158,7 @@ function initialDraws(studentNodes) {
     .text((d) => d)
     .on("mouseover", (d) => {
       if (stages[d].hovertext) {
-        div
-          .transition()
-          .duration(200)
-          .style("opacity", 0.9);
+        div.transition().duration(200).style("opacity", 0.9);
         div
           .html(stages[d].hovertext)
           .style("left", d3.event.pageX - 275 + "px")
@@ -163,8 +171,7 @@ function initialDraws(studentNodes) {
 
   // Initializes the group counts and percentages label locations
   // but does not actually draw the Ns and %s (see updateLabels function)
-  SVG
-    .selectAll(".groupPercentages")
+  SVG.selectAll(".groupPercentages")
     .data(d3.keys(stages))
     .join("text")
     .attr("class", "groupPercentages")
@@ -172,9 +179,9 @@ function initialDraws(studentNodes) {
     .attr("x", (d) => stages[d].x)
     .attr("y", (d) => stages[d].y + 125);
 
-  // The 'click play to get started'
+  // The 'click play to get started' note
 
-  // Year 1, etc...
+  // Any other items you want to draw as part of first time chart setup
 }
 
 // Creates a physics environment
@@ -192,21 +199,6 @@ function makePhysicsEnvironment(studentNodes) {
   physics.on("tick", updateBubblePositions);
 }
 
-function simulationControllerFactory(simulationStepFunction) {
-  // The global simulation controller; this is essentially the "circuitry" to which the pauseSimulation BUTTON is actually wired
-  function simulationController() {
-    if (pauseSimulation) {
-      setTimeout(simulationController, 100); // Wait 100ms, then check again if the simulation is still paused
-    } else {
-      setTimeout(simulationStepFunction, 10); // Simulation was unpaused, wait 10ms and then go back to doSimulationStep
-    }
-  }
-
-  return simulationController
-}
-
-
-
 // Changes the play button into a pause button and back again
 function toggleMaker() {
   var toggleElement = document.getElementById("toggleId");
@@ -217,18 +209,47 @@ function toggleMaker() {
   }
 }
 
-// Filters for various criteria need to be implemented here, they should
-// take a filter criteria, and return a function which tests a given node
-// against that criteria and returns a boolean
-function filterSex(sex) {
-  return (d) => {
-    return d.sex === sex;
-  };
+// Various filter criteria here
+// Each function should take a student node as argument,
+// and return a boolean whether they match the criteria or not
+function filterMale(student) {
+  return student.sex === "M"
+}
+
+function filterFemale(student) {
+  return student.sex === "F"
 }
 
 // This is the only "filter" function which does not return a function
-function filterNone(d) {
-  return true;
+// Underscore signifies that the argument (a student node) is unused
+// Returns false because no student matches this criteria
+function filterNone(_) {
+  return false;
+}
+
+// This'll go back up at the top with the other constants
+const filters = {
+  "male": filterMale,
+  "female": filterFemale,
+  // etc.
+}
+
+// Return a function which takes an arbitrary number of predicate
+// functions and evaluates the boolean AND across all of them
+// Note: fails fast (returns false at first failed criteria; don't bother checking rest)
+// E.g.: predicateFactory(filterMale, filterWhite) returns the function
+// (student) => filterMale(student) && filterWhite(student)
+function predicateFactory(...criteria) {
+  function predicate(student) {
+    for (const pred of criteria) {
+      if (!pred(student)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  return predicate
 }
 
 // Updaters that run on every simulation step
@@ -247,23 +268,18 @@ function updateBubbleColors(predicate = predicateFunction) {
     .attr("fill", (d) => (predicate(d) ? stages[d.stage].color : "#354162"));
 }
 
+// Updates the stage Ns and %s as well as the year label
+// Any other labels that should be updated on every step of the animation
+// should go here as well
 function updateLabels(studentNodes, year) {
-  SVG.selectAll(".groupPercentages")
-    .text(
-      (d) => {
-        let n = stages[d].count;
-        let pct = Math.round((n / studentNodes.length) * 1000) / 10
-        return `n = ${n} (${pct}%)`
-      }
-    );
+  SVG.selectAll(".groupPercentages").text((d) => {
+    let n = stages[d].count;
+    let pct = Math.round((n / studentNodes.length) * 1000) / 10;
+    return `n = ${n} (${pct}%)`;
+  });
 
   d3.select("#yrcount .cnt").text(year);
 }
-
-// d3.select("button#reset").on("click", function () {
-//   sliderValue = 1;
-//   previousSliderValue = 0;
-// });
 
 function* termCodeGeneratorFactory(termCodes) {
   // Scrubbable generator into which you can send an object with this structure:
@@ -346,7 +362,7 @@ function updateNodes(studentNodes, term) {
   });
 }
 
-// Creating dynamic labels
+// Map a term code to a human-readable 'Semester Year' label
 function termLabelFromTermCode(termCode) {
   let [_, year, semesterCode] = termCode.match(re); // Array destructuring
   return `${semesterLabels[semesterCode]} ${year}`;
@@ -354,7 +370,7 @@ function termLabelFromTermCode(termCode) {
 
 // Force to increment nodes to stages
 function forceCluster() {
-  const strength = 0.20;
+  const strength = 0.2;
   let nodes;
 
   function force(alpha) {
@@ -369,7 +385,50 @@ function forceCluster() {
   return force;
 }
 
-function getStudentNodesAndTermCodes(studentData) {
+// Return a controller which encapsulates everything that  needs to happen for a single animation frame
+function animatorControllerFactory(studentNodes, termCodeGenerator, studentX) {
+  // THIS IS THE MAIN LOGIC FOR THE ANIMATION ITSELF;
+  // EVERYTHING ELSE IN THIS FILE IS A HELPER FUNCTION, A VARIABLE, OR SETUP CODE
+  function controller() {
+    if (pauseSimulation) {
+      setTimeout(controller, 10);
+    } else {
+      // Slider handle onChange event listener goes here
+
+      // Bookmark onChange event listener goes here
+
+      // Filter criteria listener goes here
+
+      // Dataset switcher listener goes here
+      // if dataset changes, call setTimeout(animateStudentData, 10, fileName)
+
+      // Get the next term code from the generator
+      // instead of this plain .next(), this is where you'd implement your bookmark and slider handle onChange listeners
+      let [term, year] = termCodeGenerator.next().value;
+
+      updateNodes(studentNodes, term);
+      updateLabels(studentNodes, year);
+
+      // Suppose the user wants to filter on sex == female
+      // predicateFunction = filterSex("M")
+      updateBubbleColors();
+
+      if (DEBUG) {
+        debugStatements(studentNodes, studentX, term);
+      }
+
+      setTimeout(controller, simulationRate);
+    }
+  }
+
+  return controller;
+}
+
+// Load data, generate term codes, and initialize student nodes
+async function loadStudentData(fileName) {
+  // Wait for D3 to resolve the promise
+  let studentData = await d3.csv(`../data/${fileName}`, d3.autoType);
+
   // Get term codes from dataset
   const termCodes = Object.keys(studentData[0]).filter((k) => re.test(k));
 
@@ -380,21 +439,26 @@ function getStudentNodesAndTermCodes(studentData) {
   let studentNodes = studentData.map((student) => initializeNodes(stage, x, y, student)); //.slice(0, 1000);
   stages[stage].count = studentNodes.length;
 
-  return Promise.resolve([studentNodes, termCodes]);
+  return [studentNodes, termCodes];
 }
 // END OF SETUP
 
 // MAIN PROGRAM
-function animateStudentData([studentNodes, termCodes]) {
-  // Initial drawings
+// Set up animation and then launch the algorithm!
+async function animateStudentData(fileName) {
+  // Load data and initialize nodes with their starting locations
+  let [studentNodes, termCodes] = await loadStudentData(fileName);
+
+  // Clear the chart
+  SVG.selectAll("*").remove();
+
+  // Draw chart elements first time
   initialDraws(studentNodes);
 
   // Give the labels their Ns and %s
   updateLabels(studentNodes, 1);
 
-  // If studentNodes needs to change (i.e., switching datasets), you may need to reinitialize physics
-  // which means that `const` should be replaced with `let`, and then when you make new physics,
-  // you'll need to also update the `physics.on()`
+  // Tells d3 to create a physics engine in which the physics will apply to studentNodes
   makePhysicsEnvironment(studentNodes);
 
   // Initializes a termCode generator, we're getting ready to actually start animating
@@ -403,34 +467,12 @@ function animateStudentData([studentNodes, termCodes]) {
   // DEBUG by following a single student
   let studentX = Math.floor(Math.random() * studentNodes.length);
 
-  // THIS IS THE MAIN LOGIC FOR THE ANIMATION ITSELF; EVERYTHING ELSE IN THIS FILE IS A HELPER FUNCTION OR A VARIABLE
-  // Everything that needs to happen for a single animation frame
-  function doSimulationStep() {
-    // Get the next term code from the generator
-    // instead of this plain .next(), this is where you'd implement your bookmark and slider handle onChange listeners
-    let [term, year] = termCodeGenerator.next().value;
-
-    updateNodes(studentNodes, term);
-    updateLabels(studentNodes, year);
-
-    // Suppose the user wants to filter on sex == female
-    // predicateFunction = filterSex("M")
-    updateBubbleColors();
-
-    if (DEBUG) {
-      debugStatements(studentNodes, studentX, term);
-    }
-    setTimeout(simulationController, simulationRate);
-  }
-
-  // The simulation controller which is the global pause button listener
-  let simulationController = simulationControllerFactory(doSimulationStep)
-
   // Finally ready to start the animation...
   // Launch the algorithm!
-  setTimeout(simulationController, 10);
+  let controller = animatorControllerFactory(studentNodes, termCodeGenerator, studentX);
+  controller();
 }
 // END OF MAIN PROGRAM
 
-// Load data, and then...
-d3.csv("../data/201150_ftf.csv", d3.autoType).then(getStudentNodesAndTermCodes).then(animateStudentData);
+// Finally, actually call the main program with whatever dataset you want to start with (just the filename)
+animateStudentData("201150_ftf.csv");

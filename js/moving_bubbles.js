@@ -265,7 +265,7 @@ function updateBubbleColors(predicate = predicateFunction) {
   d3.selectAll("circle")
     .transition()
     .duration(simulationRate * 0.25) // How quickly the color transitions
-    .attr("fill", (d) => (predicate(d) ? stages[d.stage].color : "#354162"));
+    .attr("fill", (d) => (predicate(d) ? "#354162" : stages[d.stage].color));  // If the predicate is true, fade the bubble out
 }
 
 // Updates the stage Ns and %s as well as the year label

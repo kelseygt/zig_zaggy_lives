@@ -7,7 +7,7 @@ let DEBUG = false;
 
 // Regex for term codes to get term labels, and semester code -> semester label mapping
 const re = new RegExp("(20\\d{2})(30|40|50)"); // matches years in this millennium (20xx) followed by 30, 40, or 50
-const semesterLabels = { 30: "Fall", 40: "Spring", 50: "Summer" };
+const semesterLabels = { 50: "Fall", 30: "Spring", 40: "Summer" };
 
 // Chart dimensions
 const margin = { top: 20, right: 20, bottom: 20, left: 20 };
@@ -123,15 +123,26 @@ const SVG = d3
 // Dunno why this step is separate
 d3.select("#chart").style("width", width + margin.left + margin.right + "px");
 
-// Buttons
+// Play, pause, faster, and slower buttons
 d3.select("button#toggleId").on("click", () => {
   pauseSimulation = !pauseSimulation;
 });
 
-// d3.select("button#reset").on("click", function () {
-//   sliderValue = 1;
-//   previousSliderValue = 0;
-// });
+d3.select('button#slower') // Transition speed slower
+  .on('click', function () {
+    updateTransitionSpeedHoverText(500)
+  })
+
+d3.select('button#faster') // Transition speed faster
+  .on('click', function () {
+    updateTransitionSpeedHoverText(-500)
+  })
+
+// Does not currently work
+// d3.select('button#reset')
+//   .on('click', function () {
+//     termSlider.noUiSlider.reset();
+//   })
 
 // Define the div for the hovertext
 const div = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
@@ -200,13 +211,21 @@ function makePhysicsEnvironment(studentNodes) {
 }
 
 // Changes the play button into a pause button and back again
-function toggleMaker() {
+function togglePlayPause() {
   var toggleElement = document.getElementById("toggleId");
-  if (toggleElement.innerHTML === "play_arrow") {
-    toggleElement.innerHTML = "pause";
+  if (pauseSimulation) {
+    toggleElement.innerHTML = "pause"
   } else {
     toggleElement.innerHTML = "play_arrow";
   }
+}
+
+// Updates the transition speed tooltip every time you click
+function updateTransitionSpeedHoverText(increment) {
+  simulationRate = Math.min(Math.max(500, simulationRate + increment), 10000)
+  console.log(`Simulation speed: ${simulationRate}`)
+  d3.select("#transition-speed1 .spd").text(simulationRate / 1000); // One hovertext for the "slower" button
+  d3.select("#transition-speed2 .spd").text(simulationRate / 1000); // One hovertext for the "faster" button
 }
 
 // Various filter criteria here
@@ -281,7 +300,7 @@ function updateLabels(studentNodes, year) {
   d3.select("#yrcount .cnt").text(year);
 }
 
-function* termCodeGeneratorFactory(termCodes) {
+function* termCodeGeneratorFactory(termCodes, timeNotes) {
   // Scrubbable generator into which you can send an object with this structure:
   //   newSimulationInstructions = {
   //     newMin: <integer between 0 and termCodes.length - 1>,
@@ -302,22 +321,27 @@ function* termCodeGeneratorFactory(termCodes) {
   //   To do nothing:
   //     termCodeGenerator.next()
   //
-  i = 0;
+  i = -1;
   iterMin = 0;
-  iterMax = termCodes.length;
+  iterMax = termCodes.length - 1;
   // This generator will loop between `min` and `max` forever
   while (true) {
     // Loop back to beginning
-    if (i === iterMax) {
+    if (i > iterMax) {
       i = iterMin;
     }
-    const received = yield [termCodes[i], Math.floor(i / 3) + 1];
+
+    updateSliderPosition(i);
+    // console.log("iter values:", iterMin, i, iterMax);
+    // console.log("slider values:", sliderWindowMin, sliderValue, sliderWindowMax)
+    let received = yield [termCodes[i], Math.floor(i / 3) + 1];
 
     // If we don't receive new instructions, carry on
     if (typeof received === "undefined") {
       i++;
       // otherwise, get new instructions
     } else {
+      console.log("TERM CODE GENERATOR RECEIVED:", received)
       let { newMin, newMax, newIter } = received;
       iterMin = newMin ?? iterMin;
       iterMax = newMax ?? iterMax;
@@ -365,7 +389,7 @@ function updateNodes(studentNodes, term) {
 // Map a term code to a human-readable 'Semester Year' label
 function termLabelFromTermCode(termCode) {
   let [_, year, semesterCode] = termCode.match(re); // Array destructuring
-  return `${semesterLabels[semesterCode]} ${year}`;
+  return `${semesterLabels[semesterCode]} ${year}`
 }
 
 // Force to increment nodes to stages
@@ -385,6 +409,11 @@ function forceCluster() {
   return force;
 }
 
+let sliderChanged = false;
+
+// Adds an event listener which simply sets sliderChanged to true
+termSlider.addEventListener('click', () => sliderChanged = true);
+
 // Return a controller which encapsulates everything that  needs to happen for a single animation frame
 function animatorControllerFactory(studentNodes, termCodeGenerator, studentX) {
   // THIS IS THE MAIN LOGIC FOR THE ANIMATION ITSELF;
@@ -393,18 +422,28 @@ function animatorControllerFactory(studentNodes, termCodeGenerator, studentX) {
     if (pauseSimulation) {
       setTimeout(controller, 10);
     } else {
+      // Get the next term code from the generator
       // Slider handle onChange event listener goes here
-
-      // Bookmark onChange event listener goes here
+      let generatorResponse;
+      if (sliderChanged) {
+        sliderChanged = false;  // Reset the sliderChanged boolean to false
+        let sliderValues = getSliderValues();
+        let generatorPayload = {
+          newMin: sliderValues.sliderWindowMin,
+          newMax: sliderValues.sliderWindowMax,
+          newIter: sliderValues.sliderValue
+        }
+        console.log("SLIDER HAS CHANGED, PASSING PAYLOAD TO GENERATOR:", generatorPayload);
+        generatorResponse = termCodeGenerator.next(generatorPayload)
+      } else {
+        generatorResponse = termCodeGenerator.next()
+      }
+      let [term, year] = generatorResponse.value;
 
       // Filter criteria listener goes here
 
       // Dataset switcher listener goes here
       // if dataset changes, call setTimeout(animateStudentData, 10, fileName)
-
-      // Get the next term code from the generator
-      // instead of this plain .next(), this is where you'd implement your bookmark and slider handle onChange listeners
-      let [term, year] = termCodeGenerator.next().value;
 
       updateNodes(studentNodes, term);
       updateLabels(studentNodes, year);
@@ -441,6 +480,58 @@ async function loadStudentData(fileName) {
 
   return [studentNodes, termCodes];
 }
+
+// Slider functions
+function createSlider(termCodes) {
+  var termSlider = document.getElementById('termSlider');
+  noUiSlider.create(termSlider, {
+    start: [0, 0, termCodes.length - 1],
+    connect: [false, true, true, false],
+    step: 1,
+    range: {
+      'min': 0,
+      'max': termCodes.length - 1
+    },
+    tooltips: {
+      from: function (value) {
+        return termLabelFromTermCode(termCodes[Math.round(value)]);
+      },
+      to: function (value) {
+        return termLabelFromTermCode(termCodes[Math.round(value)]);
+      }
+    },
+    pips: {
+      mode: 'steps',
+      filter: filterPipsClosure(termCodes),
+      format: {
+        to: (value) => `Year ${Math.floor(value / 3) + 1}`,
+        from: (value) => `Year ${Math.floor(value / 3) + 1}`
+      }
+    }
+  })
+};
+
+function filterPipsClosure(termCodes) {
+  function filterPips(value, _) {
+    let years4And6 = [termCodes[11] ?? false, termCodes[17] ?? false]
+    return years4And6.includes(termCodes[value]) ? 2 : -1
+  }
+  return filterPips
+}
+
+function updateSliderPosition(currentTerm) {
+  termSlider.noUiSlider.set([null, currentTerm, null])
+}
+
+function getSliderValues() {
+  let sliderValueArray = termSlider.noUiSlider.get(true)
+  return {
+    sliderWindowMin: Math.round(sliderValueArray[0]),
+    sliderValue: Math.round(sliderValueArray[1]),
+    sliderWindowMax: Math.round(sliderValueArray[2])
+  }
+}
+
 // END OF SETUP
 
 // MAIN PROGRAM
@@ -448,6 +539,9 @@ async function loadStudentData(fileName) {
 async function animateStudentData(fileName) {
   // Load data and initialize nodes with their starting locations
   let [studentNodes, termCodes] = await loadStudentData(fileName);
+
+  // Load in slider
+  createSlider(termCodes);
 
   // Clear the chart
   SVG.selectAll("*").remove();
@@ -463,6 +557,7 @@ async function animateStudentData(fileName) {
 
   // Initializes a termCode generator, we're getting ready to actually start animating
   let termCodeGenerator = termCodeGeneratorFactory(termCodes);
+  termCodeGenerator.next()  // Throwaway the first value from the generator so that it can recieve payloads
 
   // DEBUG by following a single student
   let studentX = Math.floor(Math.random() * studentNodes.length);

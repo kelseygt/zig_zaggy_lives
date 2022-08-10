@@ -58,12 +58,12 @@ body {
   color: #fff;
 }
 #left-button-container{
-  margin-top: 32px;
+  margin-top: 20px;
   width: 25%;
   text-align: right;
 }
 #right-button-container{
-  margin-top: 32px;
+  margin-top: 20px;
   width: 25%;
   text-align: left;
 }
@@ -120,7 +120,7 @@ h2 {
 	font-weight: normal;
   text-align: center;
   margin-top: 0px;
-  margin-bottom: -5px;
+  margin-bottom: 15px;
   color: #fff;
   display: inline-block;
   text-align: center;
@@ -170,77 +170,6 @@ text {
   align-items: center;
 }
 
-input[type="range"] { 
-  margin: auto;
-  -webkit-appearance: none;
-  margin-top: 1.9%;
-  position: relative;
-  overflow: hidden;
-  height: 22px;
-  width: 100%;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-::-webkit-slider-runnable-track {
-  background: #b6cbd4;
-}
-
-::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 23px; /* 1 */
-  height: 23px;
-  background: #fff;
-  box-shadow: -600px 0 0 600px rgb(4, 131, 131); /* 2 */
-  border: 2px solid #999; /* 1 */
-}
-
-::-moz-range-track {
-  height: 40px;
-  background: #ddd;
-}
-
-::-moz-range-thumb {
-  background: #fff;
-  height: 40px;
-  width: 20px;
-  border: 3px solid #999;
-  border-radius: 0 !important;
-  box-shadow: -200px 0 0 200px rgb(4, 131, 131);
-  box-sizing: border-box;
-}
-
-::-ms-fill-lower { 
-  background: rgb(4, 131, 131);
-}
-
-::-ms-thumb { 
-  background: #fff;
-  border: 2px solid #999;
-  height: 40px;
-  width: 20px;
-  box-sizing: border-box;
-}
-
-::-ms-ticks-after { 
-  display: none; 
-}
-
-::-ms-ticks-before { 
-  display: none; 
-}
-
-::-ms-track { 
-  background: #ddd;
-  color: transparent;
-  height: 40px;
-  border: none;
-}
-
-::-ms-tooltip { 
-  display: none;
-}
-
 /* Tooltip container */
 .spd-tooltip {
   position: relative;
@@ -274,46 +203,11 @@ input[type="range"] {
   opacity: 1;
 }
 
-/* Range slider label text */
-.range-value {
-	position: absolute;
-	top: -50%;
-}
-.range-value span {
-	width: 90px;
-	height: 22px;
-	line-height: 24px;
-	text-align: center;
-  background-image: linear-gradient(to bottom right, #43AA8B, #277DA1);
-	color: #fff;
-	font-size: 16px;
-	display: block;
-	position: absolute;
-	left: 50%;
-	transform: translate(-50%, 0);
-	border-radius: 5px;
-  z-index: 2;
-}
-/* Arrow on the slider tooltip */
-.range-value span:before {
-	content: "";
-	position: absolute;
-	width: 0;
-	height: 0;
-	border-top: 10px solid rgb(4, 131, 131);
-	border-left: 5px solid transparent;
-	border-right: 5px solid transparent;
-	top: 100%;
-	left: 50%;
-	margin-left: -5px;
-	margin-top: -1px;
-}
-
 /* Range slider static point-in-time text boxes -- this is very hacky and really shouldn't be be hard-coded */
 /* Year 4 point in time text box */
 .yr4 {
   position: absolute;
-	top: 110%;
+	top: 150%;
 	width: 50px;
 	height: 22px;
 	line-height: 24px;
@@ -331,7 +225,7 @@ input[type="range"] {
 /* Year 6 point in time text box */
 .yr6 {
   position: absolute;
-	top: 110%;
+	top: 150%;
 	width: 50px;
 	height: 22px;
 	line-height: 24px;
@@ -355,7 +249,7 @@ input[type="range"] {
 	border-bottom: 10px solid #CE4257;
 	border-left: 5px solid transparent;
 	border-right: 5px solid transparent;
-	top: 8%;
+	top: -32%;
 	left: calc(37.93% + 2.41px);
 	margin-left: -5px;
 	margin-top: 30px;
@@ -369,7 +263,7 @@ input[type="range"] {
 	border-bottom: 10px solid #CE4257;
 	border-left: 5px solid transparent;
 	border-right: 5px solid transparent;
-	top: 8%;
+	top: -32%;
 	left: calc(58.62% - 1.72px);
 	margin-left: -5px;
 	margin-top: 30px;

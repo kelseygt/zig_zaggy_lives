@@ -19,6 +19,7 @@ const bubbleRadius = 4; // Base radius of a bubble
 const bubblePadding = 1.5; // Collision detection uses this number times the radius of each bubble
 const bubbleRadiusVariance = 0.25 * bubbleRadius; // By how much the radius of a bubble can vary
 let predicateFunction = filterNone; // predicateFunction will always need to be defined
+let animStart = true;
 
 // Text stuff
 let timeNotes = {
@@ -384,7 +385,10 @@ function createSlider(termCodes) {
   });
 
   d3.select('button#reset')
-    .on('click', termSlider.noUiSlider.reset)
+    .on('click', () => {
+      termSlider.noUiSlider.reset();
+      animStart = true;
+    })
 };
 
 function filterPipsClosure(termCodes) {
@@ -397,8 +401,8 @@ function filterPipsClosure(termCodes) {
 
 function incrementSlider() {
   let [min, i, max] = termSlider.noUiSlider.get(true).map(Math.round);
-  let next = Math.max(min, (i + 1) % max)
-  console.log(`i: ${i}, min: ${min}, max: ${max}, next: ${next}`)
+  let next = Math.max(min, (i + 1) % (max + 1));
+  console.log(`i: ${i}, min: ${min}, max: ${max}, next: ${next}`);
 
   termSlider.noUiSlider.setHandle(1, next);
 }
@@ -420,12 +424,19 @@ function animatorControllerFactory(studentNodes, termCodes, studentX) {
   // EVERYTHING ELSE IN THIS FILE IS A HELPER FUNCTION, A VARIABLE, OR SETUP CODE
   function controller() {
     if (pauseSimulation) {
-      setTimeout(controller, 10);
+      setTimeout(controller, 100, animStart);
     } else {
       // Filter criteria listener goes here
 
       // Dataset switcher listener goes here
       // if dataset changes, call setTimeout(animateStudentData, 10, fileName)
+
+      // If the animStart global flag is false, increment the slider
+      // animStart will be true when an animation is first started
+      // AND whenever the reset button is clicked
+      if (!animStart) {
+        incrementSlider();
+      }
 
       let [term, year] = getTermAndYear(termCodes)
       console.log(term)
@@ -442,9 +453,7 @@ function animatorControllerFactory(studentNodes, termCodes, studentX) {
       }
 
       // Finally, move the slider
-      if (term !== termCodes[0]) {
-        incrementSlider()
-      }
+      animStart = false;
       setTimeout(controller, simulationRate);
     }
   }
@@ -498,6 +507,7 @@ async function animateStudentData(fileName) {
   // Finally ready to start the animation...
   // Launch the algorithm!
   let controller = animatorControllerFactory(studentNodes, termCodes, studentX);
+
   controller();
 }
 // END OF MAIN PROGRAM

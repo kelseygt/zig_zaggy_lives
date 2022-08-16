@@ -19,7 +19,10 @@ const bubbleRadius = 4; // Base radius of a bubble
 const bubblePadding = 1.5; // Collision detection uses this number times the radius of each bubble
 const bubbleRadiusVariance = 0.25 * bubbleRadius; // By how much the radius of a bubble can vary
 let predicateFunction = filterNone; // predicateFunction will always need to be defined
+
+// Global flags for controller to listen to
 let animStart = true;
+let datasetSwitched = false;
 
 // Text stuff
 let timeNotes = {
@@ -436,12 +439,14 @@ function animatorControllerFactory(studentNodes, termCodes, studentX) {
   // EVERYTHING ELSE IN THIS FILE IS A HELPER FUNCTION, A VARIABLE, OR SETUP CODE
   function controller() {
     if (pauseSimulation) {
-      setTimeout(controller, 100, animStart);
+      setTimeout(controller, 100);
     } else {
       // Filter criteria listener goes here
 
       // Dataset switcher listener goes here
-      // if dataset changes, call setTimeout(animateStudentData, 10, fileName)
+      // if (datasetSwitched) {
+      //   setTimeout(animateStudentData, 10, fileName)
+      // }
 
       // If the animStart global flag is false, increment the slider
       // animStart will be true when an animation is first started

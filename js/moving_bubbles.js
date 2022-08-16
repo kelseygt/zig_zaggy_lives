@@ -384,12 +384,24 @@ function createSlider(termCodes) {
     }
   });
 
+  termSlider.noUiSlider.on("change", sliderHandleWasMoved)
+
   d3.select('button#reset')
     .on('click', () => {
       termSlider.noUiSlider.reset();
       animStart = true;
     })
 };
+
+function sliderHandleWasMoved(_, handle, _, _, _, _) {
+  console.log("a slider handle was moved!")
+  if (handle === 1) {
+    console.log("the current term handle was moved!")
+    animStart = true;
+  } else {
+    console.log("a bookmark handle was moved!")
+  }
+}
 
 function filterPipsClosure(termCodes) {
   function filterPips(value, _) {

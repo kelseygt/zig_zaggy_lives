@@ -2,6 +2,8 @@
 
 // Simulation-specific variables
 let simulationRate = 1000;
+d3.select("#transition-speed1 .spd").text(simulationRate / 1000);
+d3.select("#transition-speed2 .spd").text(simulationRate / 1000);
 let pauseSimulation = true;
 let DEBUG = false;
 
@@ -29,10 +31,10 @@ let timeNotes = {
   start: "Click play to get started.",
   201150:
     "We start with just over 2000 full- and part-time first-time freshman. By the end of the first semester, over 8% have dropped out. That percentage doubles by the end of the first year. By this same time, around the same number of students have opted to take at least one semester off.",
-  201250: "",
+  201250: false,
   201450:
     "Here we hit the fourth year of study for this cohort. By the end of this year, we'll have seen almost a third of this cohort drop out, and only about 6% of the students graduate. However, almost a third of students are still on track in their studies. Pause at the summer semester to really digest where this cohort stands.",
-  201550: "",
+  201550: false,
   201650:
     "Here marks the start of the sixth year from when this group of students began. By the end of the academic year, the number of graduates will jump to four times as many as we had two years ago at the 4-year mark. Pause at the summer semester again to absorb the overall picture.",
   201750:
@@ -148,7 +150,7 @@ d3.select('button#faster') // Transition speed faster
 const div = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
 
 // Draw chart elements for the first time
-function initialDraws(studentNodes) {
+function initialDraws(studentNodes, cohortType, cohortName) {
   // A bubble for each student
   SVG.append("g")
     .selectAll("circle")
@@ -190,7 +192,40 @@ function initialDraws(studentNodes) {
     .attr("x", (d) => stages[d].x)
     .attr("y", (d) => stages[d].y + 125);
 
-  // The 'click play to get started' note
+  // Fade in the number of students for this cohort
+  d3.select("#num-students")
+    .style("opacity", 0)
+    .transition()
+    .duration(500)
+    .style("opacity", 1)
+    .style("color", "#43AA8B")  // MAYBE A GRADIENT?!!!!
+    .text(studentNodes.length.toLocaleString());
+
+  // Fade in the cohort type
+  d3.select("#cohort-type")
+    .style("opacity", 0)
+    .transition()
+    .duration(1000)
+    .style("opacity", 1)
+    .style("color", "#ffffff")
+    .text(cohortType);
+
+  d3.select("#cohort-year")
+    // .style("opacity", 0)
+    .transition()
+    // .duration(1000)
+    .style("opacity", 1)
+    .style("color", "#FF9B54")
+    .text(cohortName);
+
+
+  // Fade in the super sexy author
+  d3.select("#author")
+    .style("opacity", 0)
+    .transition()
+    .duration(1500)
+    .style("opacity", 1)
+    .style("color", "#ffffff");
 
   // Any other items you want to draw as part of first time chart setup
 }
@@ -290,6 +325,30 @@ function updateBubbleColors(predicate = predicateFunction) {
 // Updates the stage Ns and %s as well as the year label
 // Any other labels that should be updated on every step of the animation
 // should go here as well
+
+function updateTimeNotes(term) {
+  if (typeof timeNotes[term] === "undefined") {
+    return
+  }
+
+  if (timeNotes[term]) {
+    d3.select("#time-notes")
+      .style("opacity", 0)
+      .transition()
+      .duration(500)
+      .style("opacity", 1)
+      .style("color", "#ffffff")
+      .text("#current-note .note").text(`${timeNotes[term]}`);
+  } else {
+    d3.select("#time-notes")
+      .style("opacity", 1)
+      .transition()
+      .duration(500)
+      .style("opacity", 0)
+      .style("color", "#ffffff")
+  }
+}
+
 function updateLabels(studentNodes, year) {
   SVG.selectAll(".groupPercentages").text((d) => {
     let n = stages[d].count;
@@ -397,19 +456,26 @@ function createSlider(termCodes) {
 };
 
 function sliderHandleWasMoved(_, handle, _, _, _, _) {
-  console.log("a slider handle was moved!")
+  // console.log("a slider handle was moved!")
   if (handle === 1) {
-    console.log("the current term handle was moved!")
+    // console.log("the current term handle was moved!")
     animStart = true;
+    // Fade out the current timenote because it may not be 
+    d3.select("#time-notes")
+      .style("opacity", 1)
+      .transition()
+      .duration(1000)
+      .style("opacity", 0)
+      .style("color", "#ffffff")
   } else {
-    console.log("a bookmark handle was moved!")
+    // console.log("a bookmark handle was moved!")
   }
 }
 
 function filterPipsClosure(termCodes) {
   function filterPips(value, _) {
-    let years4And6 = [termCodes[11] ?? false, termCodes[17] ?? false]
-    return years4And6.includes(termCodes[value]) ? 2 : -1
+    let pointsInTime = [termCodes[2] ?? false, termCodes[11] ?? false, termCodes[17] ?? false, termCodes[29] ?? false]
+    return pointsInTime.includes(termCodes[value]) ? 2 : -1
   }
   return filterPips
 }
@@ -460,6 +526,7 @@ function animatorControllerFactory(studentNodes, termCodes, studentX) {
 
       updateNodes(studentNodes, term);
       updateLabels(studentNodes, year);
+      updateTimeNotes(term);
 
       // Suppose the user wants to filter on sex == female
       // predicateFunction = filterSex("M")
@@ -510,7 +577,7 @@ async function animateStudentData(fileName) {
   createSlider(termCodes);
 
   // Draw chart elements first time
-  initialDraws(studentNodes);
+  initialDraws(studentNodes, "First-Time Freshman", termLabelFromTermCode(termCodes[0]));
 
   // Give the labels their Ns and %s
   updateLabels(studentNodes, 1);

@@ -69,7 +69,7 @@ body {
   text-align: left;
   padding-left: 2.5px;
 }
-#toggleId, #slower, #play, #pause, #reset, #faster{
+#toggleId, #slower, #reset, #faster{
   border-radius: 5px;
   /* padding: 1px 15px; */
   background-image: linear-gradient(to bottom right, #43AA8B, #277DA1);
@@ -80,7 +80,7 @@ body {
   cursor: pointer;
   background-image: linear-gradient(to bottom right, #CE4257, #FF9B54);
 }
-#toggleId:active, #slower:active, #play-pause:active, #reset:active, #faster:active {
+#toggleId:active, #slower:active, #reset:active, #faster:active {
   transform: translateY(5px);
 }
 .inline-div {
@@ -116,11 +116,13 @@ div.tooltip {
   padding: 5px;
   font-size: 16px; 
   font-family: 'Mohave', sans-serif;;
-  background: rgb(72, 90, 136);
+  background: #267e79;
   border: 1px solid #5a6164;
   pointer-events: none;
   border-radius: 5px;
 }
+
+/* General text formatting */
 text {
   font-size: 1.3em;
   fill: #fff;
@@ -191,13 +193,13 @@ text {
   align-items: center;
 }
 
-/* Tooltip container */
+/* Simulation speed tooltip container */
 .spd-tooltip {
   position: relative;
   display: inline-block;
 }
 
-/* Tooltip text */
+/* Simulation speed tooltip text */
 .spd-tooltip .tooltiptext {
   visibility: hidden;
   width: 114px;
@@ -218,74 +220,8 @@ text {
   transition: opacity 0.3s;
 }
 
-/* Hover text for speed buttons */
+/* Simulation speed hover text */
 .spd-tooltip:hover .tooltiptext {
   visibility: visible;
   opacity: 1;
-}
-
-/* Range slider static point-in-time text boxes -- this is very hacky and really shouldn't be be hard-coded */
-/* Year 4 point in time text box */
-.yr4 {
-  position: absolute;
-	top: 150%;
-	width: 50px;
-	height: 22px;
-	line-height: 24px;
-	text-align: center;
-  background-image: linear-gradient(to bottom right, #CE4257, #FF9B54);
-	color: #fff;
-	font-size: 16px;
-	display: block;
-	position: absolute;
-	left: calc(37.93% + 2.41px);
-	transform: translate(-50%, 0);
-	border-radius: 5px;
-  z-index: 1;
-}
-/* Year 6 point in time text box */
-.yr6 {
-  position: absolute;
-	top: 150%;
-	width: 50px;
-	height: 22px;
-	line-height: 24px;
-	text-align: center;
-  background-image: linear-gradient(to bottom right, #CE4257, #FF9B54);
-	color: #fff;
-	font-size: 16px;
-	display: block;
-	position: absolute;
-	left: calc(58.62% - 1.72px);
-	transform: translate(-50%, 0);
-	border-radius: 5px;
-  z-index: 1;
-}
-/* Tiny arrow for the year 4 point in time text box */
-.yr4-tiny-arrow {
-	content: "";
-	position: absolute;
-	width: 0;
-	height: 0;
-	border-bottom: 10px solid #CE4257;
-	border-left: 5px solid transparent;
-	border-right: 5px solid transparent;
-	top: -32%;
-	left: calc(37.93% + 2.41px);
-	margin-left: -5px;
-	margin-top: 30px;
-}
-/* Tiny arrow for the year 6 point in time text box */
-.yr6-tiny-arrow {
-	content: "";
-	position: absolute;
-	width: 0;
-	height: 0;
-	border-bottom: 10px solid #CE4257;
-	border-left: 5px solid transparent;
-	border-right: 5px solid transparent;
-	top: -32%;
-	left: calc(58.62% - 1.72px);
-	margin-left: -5px;
-	margin-top: 30px;
 }

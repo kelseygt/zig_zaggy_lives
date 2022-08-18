@@ -97,7 +97,7 @@ const stages = {
     color: "#f8882a",
     count: 0,
     hovertext:
-      "'Transferred Out' is here defined as when we have established evidence of a student enrolling at an external institution. This category is not terminal; students may have evidence of transferring out, but may subsequently return to MSU Denver.",
+      "'Transferred Out' is here defined as when we have established evidence of a student enrolling at an external institution. This category is not terminal; students may have evidence of transferring out, but may also subsequently return to MSU Denver.",
   },
   "Dropped Out": {
     x: width * 0.2,
@@ -132,8 +132,14 @@ d3.select("#chart").style("width", width + margin.left + margin.right + "px");
 // Buttons and sliders
 const termSlider = document.getElementById('termSlider');
 
+// Plays and pauses the animation, and also fades out starting text on first click
 d3.select("button#toggleId").on("click", () => {
   pauseSimulation = !pauseSimulation;
+  d3.select("#starting-note")
+    .transition()
+    .duration(500)
+    .style("opacity", 0)
+    .text(timeNotes['start'])
 });
 
 d3.select('button#slower') // Transition speed slower
@@ -150,7 +156,7 @@ d3.select('button#faster') // Transition speed faster
 const div = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
 
 // Draw chart elements for the first time
-function initialDraws(studentNodes, cohortType, cohortName) {
+function initialDraws(studentNodes, cohortType, cohortName, timeNotes) {
   // A bubble for each student
   SVG.append("g")
     .selectAll("circle")
@@ -192,6 +198,9 @@ function initialDraws(studentNodes, cohortType, cohortName) {
     .attr("x", (d) => stages[d].x)
     .attr("y", (d) => stages[d].y + 125);
 
+  d3.select("#starting-note")
+    .text(timeNotes['start'])
+
   // Fade in the number of students for this cohort
   d3.select("#num-students")
     .style("opacity", 0)
@@ -217,7 +226,6 @@ function initialDraws(studentNodes, cohortType, cohortName) {
     .style("opacity", 1)
     // .style("color", "#FF9B54")
     .text(cohortName);
-
 
   // Fade in the super sexy author
   d3.select("#author")
@@ -577,7 +585,7 @@ async function animateStudentData(fileName) {
   createSlider(termCodes);
 
   // Draw chart elements first time
-  initialDraws(studentNodes, "First-Time Freshman", termLabelFromTermCode(termCodes[0]));
+  initialDraws(studentNodes, "First-Time Freshman", termLabelFromTermCode(termCodes[0]), timeNotes);
 
   // Give the labels their Ns and %s
   updateLabels(studentNodes, 1);

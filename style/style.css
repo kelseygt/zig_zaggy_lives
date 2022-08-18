@@ -88,6 +88,25 @@ body {
   text-align: center;
   margin-bottom: 0px;
 }
+
+#num-students {
+  /* background: linear-gradient(to bottom right, #43AA8B, #277DA1); */
+  background: linear-gradient(to right, #ff8a00 0%, #dd4c4f 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  /* font-weight: bold; */
+}
+
+#cohort-year {
+  /* background: linear-gradient(to bottom right, #43AA8B, #277DA1); */
+  background: linear-gradient(to right, #ff8a00 0%, #dd4c4f 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  font-weight: bold;
+}
+
 /* Tooltip hover formatting */
 div.tooltip {
   color: white;

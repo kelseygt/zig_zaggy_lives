@@ -198,7 +198,7 @@ function initialDraws(studentNodes, cohortType, cohortName) {
     .transition()
     .duration(500)
     .style("opacity", 1)
-    .style("color", "#43AA8B")  // MAYBE A GRADIENT?!!!!
+    // .style("color", "#43AA8B")  // MAYBE A GRADIENT?!!!!
     .text(studentNodes.length.toLocaleString());
 
   // Fade in the cohort type
@@ -207,7 +207,7 @@ function initialDraws(studentNodes, cohortType, cohortName) {
     .transition()
     .duration(1000)
     .style("opacity", 1)
-    .style("color", "#ffffff")
+    // .style("color", "#ffffff")
     .text(cohortType);
 
   d3.select("#cohort-year")
@@ -215,7 +215,7 @@ function initialDraws(studentNodes, cohortType, cohortName) {
     .transition()
     // .duration(1000)
     .style("opacity", 1)
-    .style("color", "#FF9B54")
+    // .style("color", "#FF9B54")
     .text(cohortName);
 
 
@@ -225,7 +225,7 @@ function initialDraws(studentNodes, cohortType, cohortName) {
     .transition()
     .duration(1500)
     .style("opacity", 1)
-    .style("color", "#ffffff");
+  // .style("color", "#ffffff");
 
   // Any other items you want to draw as part of first time chart setup
 }

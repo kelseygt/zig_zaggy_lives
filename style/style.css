@@ -12,7 +12,6 @@ body {
 #sidebar{
   display: inline-block;
   width: 500px;
-  /* float: left; */
   margin-right: 30px;
   padding-right: 20px;
   border-right: 1px solid #ccc;
@@ -33,7 +32,9 @@ body {
   font-weight: 400; 
   font-size: 1.15em; 
   line-height: 1.4em;
-  padding-top: 100px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  height: 110px;
 }
 #source {
   position: absolute;
@@ -49,11 +50,12 @@ body {
   margin: 0px auto;
 }
 #starting-note {
-  font-size: 1.2em;
+  font-weight: bold;
+  font-size: 1.15em;
 	padding: 3px 0px;
 	font-weight: normal;
   text-align: left;
-  margin-top: 0px;
+  margin-top: -40px;
   margin-bottom: 0px;
   color: #fff;
 }
@@ -90,7 +92,6 @@ body {
 }
 
 #num-students {
-  /* background: linear-gradient(to bottom right, #43AA8B, #277DA1); */
   background: linear-gradient(to right, #ff8a00 0%, #dd4c4f 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -152,7 +153,7 @@ h3 {
 	font-size: 1.15em;
 	padding: 3px 0px;
 	font-weight: normal;
-  text-align: left;
+  text-align: justify;
   margin-top: 20px;
   margin-bottom: 0px;
   color: #fff;
@@ -224,4 +225,33 @@ text {
 .spd-tooltip:hover .tooltiptext {
   visibility: visible;
   opacity: 1;
+}
+
+/* Drop-down menu */
+.select-cohort {
+  font-family: 'Mohave', sans-serif;
+  font-size: 16px;
+  position: relative;
+  padding: 10px;
+  border: none;
+  border-right: 10px solid #fff;
+  outline: none;
+  width: 200px;
+  border-radius: 4px;
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
+}
+
+#drop-down-menu-container{
+  margin-left: 50px; /* [Sidebar width - 2 x drop-down width] / 2) */
+}
+
+/* Whitespace for timeNotes so the drop-downs won't shift */
+pre {
+  font-family: 'Mohave', sans-serif;
+  width: 500px;
+  white-space: pre-wrap;       /* Since CSS 2.1 */
+  white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+  white-space: -pre-wrap;      /* Opera 4-6 */
+  white-space: -o-pre-wrap;    /* Opera 7 */
+  word-wrap: break-word;       /* Internet Explorer 5.5+ */
 }

@@ -313,7 +313,6 @@ zig_zag <- function(cohort_data, grad_data, trans_data, max_term_data, drop_data
   
   # export final data set
   write.csv(zz, paste0(cohort, "_", student_type, ".csv"), row.names = F)
-  write.csv(zz_piv, paste0(cohort, "_", student_type, "_piv.csv"), row.names = F)
   
 }
 

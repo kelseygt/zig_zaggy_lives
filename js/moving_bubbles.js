@@ -1,7 +1,7 @@
 // START OF SETUP
 
 // Simulation-specific variables
-let simulationRate = 1000;
+let simulationRate = 3000;
 d3.select("#transition-speed1 .spd").text(simulationRate / 1000);
 d3.select("#transition-speed2 .spd").text(simulationRate / 1000);
 let pauseSimulation = true;
@@ -25,23 +25,6 @@ let predicateFunction = filterNone; // predicateFunction will always need to be 
 // Global flags for controller to listen to
 let animStart = true;
 let datasetSwitched = false;
-
-// Text stuff
-let timeNotes = {
-  start: "Click play to get started.",
-  201150:
-    "We start with just over 2000 full- and part-time first-time freshman. By the end of the first semester, over 8% have dropped out. That percentage doubles by the end of the first year. By this same time, around the same number of students have opted to take at least one semester off.",
-  201250: false,
-  201450:
-    "Here we hit the fourth year of study for this cohort. By the end of this year, we'll have seen almost a third of this cohort drop out, and only about 6% of the students graduate. However, almost a third of students are still on track in their studies. Pause at the summer semester to really digest where this cohort stands.",
-  201550: false,
-  201650:
-    "Here marks the start of the sixth year from when this group of students began. By the end of the academic year, the number of graduates will jump to four times as many as we had two years ago at the 4-year mark. Pause at the summer semester again to absorb the overall picture.",
-  201750:
-    "From here, during the seventh year, things start to slow down, as most students -- but not all -- have come to the end of their chosen path.",
-  202050:
-    "And here we are at year 10. The majority of students will have settled into their final classification by now, be it dropped out, transferred out, or graduated. Even still, a small handful of students continue on their educational journey at MSU Denver. Pause here for a final snapshot of this cohort.",
-};
 
 // Stage locations and properties
 const stages = {
@@ -129,18 +112,29 @@ const SVG = d3
 // Dunno why this step is separate
 d3.select("#chart").style("width", width + margin.left + margin.right + "px");
 
+let physics = d3
+  .forceSimulation([])
+  .force("cluster", forceCluster())
+  .force(
+    "collide",
+    d3.forceCollide((d) => bubblePadding * d.r)
+  )
+  .alpha(0.06)
+  .alphaDecay(0)
+  .on("tick", updateBubblePositions);
+
 // Buttons and sliders
 const termSlider = document.getElementById('termSlider');
 
-// Plays and pauses the animation, and also fades out starting text on first click
-d3.select("button#toggleId").on("click", () => {
-  pauseSimulation = !pauseSimulation;
-  d3.select("#starting-note")
-    .transition()
-    .duration(500)
-    .style("opacity", 0)
-    .text(timeNotes['start'])
-});
+// Plays and pauses the animation, and also fades out starting instructional text on first click
+d3.select("button#toggleId")
+  .on("click", () => {
+    d3.select("#starting-note")
+      .transition()
+      .duration(500)
+      .style("opacity", 0)
+      .text(timeNotes['start'])
+  });
 
 d3.select('button#slower') // Transition speed slower
   .on('click', function () {
@@ -205,23 +199,22 @@ function initialDraws(studentNodes, cohortType, cohortName, timeNotes) {
   d3.select("#num-students")
     .style("opacity", 0)
     .transition()
-    .duration(500)
+    .duration(1000)
     .style("opacity", 1)
-    // .style("color", "#43AA8B")  // MAYBE A GRADIENT?!!!!
     .text(studentNodes.length.toLocaleString());
 
   // Fade in the cohort type
   d3.select("#cohort-type")
     .style("opacity", 0)
     .transition()
-    .duration(1000)
+    .duration(2000)
     .style("opacity", 1)
     // .style("color", "#ffffff")
-    .text(cohortType);
+    .text(cohortType.options[cohortType.selectedIndex].text);
 
   d3.select("#cohort-year")
     // .style("opacity", 0)
-    .transition()
+    // .transition()
     // .duration(1000)
     .style("opacity", 1)
     // .style("color", "#FF9B54")
@@ -229,10 +222,10 @@ function initialDraws(studentNodes, cohortType, cohortName, timeNotes) {
 
   // Fade in the super sexy author
   d3.select("#author")
-    .style("opacity", 0)
-    .transition()
-    .duration(1500)
-    .style("opacity", 1)
+  // .style("opacity", 0)
+  // .transition()
+  // .duration(1500)
+  // .style("opacity", 1)
   // .style("color", "#ffffff");
 
   // Any other items you want to draw as part of first time chart setup
@@ -240,26 +233,18 @@ function initialDraws(studentNodes, cohortType, cohortName, timeNotes) {
 
 // Creates a physics environment
 function makePhysicsEnvironment(studentNodes) {
-  let physics = d3
-    .forceSimulation(studentNodes)
-    .force("cluster", forceCluster())
-    .force(
-      "collide",
-      d3.forceCollide((d) => bubblePadding * d.r)
-    )
-    .alpha(0.06)
-    .alphaDecay(0);
-
-  physics.on("tick", updateBubblePositions);
+  physics.nodes([])
+  physics.nodes(studentNodes)
 }
 
 // Changes the play button into a pause button and back again
 function togglePlayPause() {
+  pauseSimulation = !pauseSimulation;
   let toggleElement = document.getElementById("toggleId");
   if (pauseSimulation) {
-    toggleElement.innerHTML = "pause"
-  } else {
     toggleElement.innerHTML = "play_arrow";
+  } else {
+    toggleElement.innerHTML = "pause"
   }
 }
 
@@ -427,6 +412,9 @@ function forceCluster() {
 
 // Slider functions
 function createSlider(termCodes) {
+  let tooltipCallback = (value) => termLabelFromTermCode(termCodes[Math.round(value)]);
+  let pipFormatCallback = (value) => `Year ${Math.floor(value / 3) + 1}`
+
   noUiSlider.create(termSlider, {
     start: [0, 0, termCodes.length - 1],
     // snap: true,
@@ -437,19 +425,15 @@ function createSlider(termCodes) {
       'max': termCodes.length - 1
     },
     tooltips: {
-      from: function (value) {
-        return termLabelFromTermCode(termCodes[Math.round(value)]);
-      },
-      to: function (value) {
-        return termLabelFromTermCode(termCodes[Math.round(value)]);
-      }
+      from: tooltipCallback,
+      to: tooltipCallback
     },
     pips: {
       mode: 'steps',
       filter: filterPipsClosure(termCodes),
       format: {
-        to: (value) => `Year ${Math.floor(value / 3) + 1}`,
-        from: (value) => `Year ${Math.floor(value / 3) + 1}`
+        to: pipFormatCallback,
+        from: pipFormatCallback
       }
     }
   });
@@ -492,7 +476,6 @@ function incrementSlider() {
   let [min, i, max] = termSlider.noUiSlider.get(true).map(Math.round);
   let next = Math.max(min, (i + 1) % (max + 1));
   console.log(`i: ${i}, min: ${min}, max: ${max}, next: ${next}`);
-
   termSlider.noUiSlider.setHandle(1, next);
 }
 
@@ -507,20 +490,35 @@ function getTermAndYear(termCodes) {
   return [term, year]
 }
 
+function getTimeNotes(fileName, allTimeNotes) {
+  timeNotes = (allTimeNotes[fileName.slice(0, -4)]);
+  return timeNotes;
+}
+
+// Drop-down menu and radio buttons
+let cohortTermCode = document.getElementById("select-cohort");
+let cohortType = document.getElementById("select-student-type");
+
+function changeDataSource() {
+  togglePlayPause();
+  datasetSwitched = true;
+}
+
 // Return a controller which encapsulates everything that  needs to happen for a single animation frame
 function animatorControllerFactory(studentNodes, termCodes, studentX) {
   // THIS IS THE MAIN LOGIC FOR THE ANIMATION ITSELF;
   // EVERYTHING ELSE IN THIS FILE IS A HELPER FUNCTION, A VARIABLE, OR SETUP CODE
   function controller() {
-    if (pauseSimulation) {
+    // Dataset switcher listener goes here
+    if (datasetSwitched) {
+      datasetSwitched = false;
+      termSlider.noUiSlider.destroy();
+      setTimeout(animateStudentData, 10, `${cohortTermCode.value}_${cohortType.value}.csv`)
+    } else if (pauseSimulation) {
       setTimeout(controller, 100);
     } else {
       // Filter criteria listener goes here
 
-      // Dataset switcher listener goes here
-      // if (datasetSwitched) {
-      //   setTimeout(animateStudentData, 10, fileName)
-      // }
 
       // If the animStart global flag is false, increment the slider
       // animStart will be true when an animation is first started
@@ -566,6 +564,7 @@ async function loadStudentData(fileName) {
   let x = stages[stage].x;
   let y = stages[stage].y;
   let studentNodes = studentData.map((student) => initializeNodes(stage, x, y, student)); //.slice(0, 1000);
+  Object.keys(stages).forEach((key) => stages[key].count = 0)
   stages[stage].count = studentNodes.length;
 
   return [studentNodes, termCodes];
@@ -575,8 +574,11 @@ async function loadStudentData(fileName) {
 // MAIN PROGRAM
 // Set up animation and then launch the algorithm!
 async function animateStudentData(fileName) {
+
   // Load data and initialize nodes with their starting locations
+  console.log(`Loading file ${fileName}`)
   let [studentNodes, termCodes] = await loadStudentData(fileName);
+  getTimeNotes(fileName, allTimeNotes)
 
   // Clear the chart
   SVG.selectAll("*").remove();
@@ -585,7 +587,7 @@ async function animateStudentData(fileName) {
   createSlider(termCodes);
 
   // Draw chart elements first time
-  initialDraws(studentNodes, "First-Time Freshman", termLabelFromTermCode(termCodes[0]), timeNotes);
+  initialDraws(studentNodes, cohortType, termLabelFromTermCode(termCodes[0]), timeNotes);
 
   // Give the labels their Ns and %s
   updateLabels(studentNodes, 1);
@@ -598,8 +600,10 @@ async function animateStudentData(fileName) {
 
   // Finally ready to start the animation...
   // Launch the algorithm!
+  animStart = true;
   let controller = animatorControllerFactory(studentNodes, termCodes, studentX);
 
+  console.log("Setup complete, activating controller")
   controller();
 }
 // END OF MAIN PROGRAM

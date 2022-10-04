@@ -501,6 +501,12 @@ let cohortType = document.getElementById("select-student-type");
 
 function changeDataSource() {
   togglePlayPause();
+  d3.select("#time-notes")
+    .style("opacity", 1)
+    .transition()
+    .duration(500)
+    .style("opacity", 0)
+    .style("color", "#ffffff");
   datasetSwitched = true;
 }
 

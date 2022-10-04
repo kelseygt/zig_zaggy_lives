@@ -500,7 +500,9 @@ let cohortTermCode = document.getElementById("select-cohort");
 let cohortType = document.getElementById("select-student-type");
 
 function changeDataSource() {
-  togglePlayPause();
+  // togglePlayPause();
+  pauseSimulation = true
+  document.getElementById("toggleId").innerHTML = "play_arrow"
   d3.select("#time-notes")
     .style("opacity", 1)
     .transition()

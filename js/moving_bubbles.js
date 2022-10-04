@@ -25,6 +25,9 @@ let predicateFunction = filterNone; // predicateFunction will always need to be 
 // Global flags for controller to listen to
 let animStart = true;
 let datasetSwitched = false;
+// Drop-down menu and radio buttons
+let cohortTermCode = document.getElementById("select-cohort");
+let cohortType = document.getElementById("select-student-type");
 
 // Stage locations and properties
 const stages = {
@@ -49,7 +52,7 @@ const stages = {
     color: "#3AC6A0",
     count: 0,
     hovertext:
-      "Sophomores are defined as those students having earned fewer than 60 credit hours prior to the start of the term in question.",
+      "Sophomores are defined as those students having earned between 30 and 59.99 credit hours prior to the start of the term in question.",
   },
   Junior: {
     x: width * 0.8,
@@ -57,7 +60,7 @@ const stages = {
     color: "#35B794",
     count: 0,
     hovertext:
-      "Juniors are defined as those students having earned fewer than 90 credit hours prior to the start of the term in question.",
+      "Juniors are defined as those students having earned between 60 and 89.99 credit hours prior to the start of the term in question.",
   },
   Senior: {
     x: width * 0.5,
@@ -72,7 +75,7 @@ const stages = {
     y: height * 0.71,
     color: "#34C3D5",
     count: 0,
-    hovertext: "'Graduated' here is defined as bachelor's degree recipients.",
+    hovertext: "'Graduated' is here defined as bachelor's degree recipients.",
   },
   "Transferred Out": {
     x: width * 0.11,
@@ -494,10 +497,6 @@ function getTimeNotes(fileName, allTimeNotes) {
   timeNotes = (allTimeNotes[fileName.slice(0, -4)]);
   return timeNotes;
 }
-
-// Drop-down menu and radio buttons
-let cohortTermCode = document.getElementById("select-cohort");
-let cohortType = document.getElementById("select-student-type");
 
 function changeDataSource() {
   // togglePlayPause();

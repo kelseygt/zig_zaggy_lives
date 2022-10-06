@@ -18,7 +18,7 @@ const height = 1100 - margin.top - margin.bottom;
 
 // Bubble stuff
 const bubbleRadius = 4; // Base radius of a bubble
-const bubblePadding = 1.5; // Collision detection uses this number times the radius of each bubble
+const bubblePadding = 1.4; // Collision detection uses this number times the radius of each bubble
 const bubbleRadiusVariance = 0.25 * bubbleRadius; // By how much the radius of a bubble can vary
 let predicateFunction = filterNone; // predicateFunction will always need to be defined
 
@@ -129,8 +129,9 @@ let physics = d3
   .velocityDecay(0.04)
   .alphaDecay(0.3)
   .force("cluster", forceCluster())
-  .force("x", d3.forceX().strength(0))
-  .force("y", d3.forceY().strength(0))
+  // .force('charge', d3.forceManyBody().strength(-4))
+  // .force("x", d3.forceX().strength(0.01))
+  // .force("y", d3.forceY().strength(0.01))
   .force("collide", d3.forceCollide().radius(d => bubblePadding * d.r).strength(0.25))
   .on("tick", updateBubblePositions);
 

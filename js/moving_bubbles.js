@@ -1,7 +1,7 @@
 // START OF SETUP
 
 // Simulation-specific variables
-let simulationRate = 3000;
+let simulationRate = 8000;
 d3.select("#transition-speed1 .spd").text(simulationRate / 1000);
 d3.select("#transition-speed2 .spd").text(simulationRate / 1000);
 let pauseSimulation = true;
@@ -18,7 +18,7 @@ const height = 1100 - margin.top - margin.bottom;
 
 // Bubble stuff
 const bubbleRadius = 4; // Base radius of a bubble
-const bubblePadding = 1.5; // Collision detection uses this number times the radius of each bubble
+const bubblePadding = 1.4; // Collision detection uses this number times the radius of each bubble
 const bubbleRadiusVariance = 0.25 * bubbleRadius; // By how much the radius of a bubble can vary
 let predicateFunction = filterNone; // predicateFunction will always need to be defined
 
@@ -115,15 +115,24 @@ const SVG = d3
 // Dunno why this step is separate
 d3.select("#chart").style("width", width + margin.left + margin.right + "px");
 
+// let physics = d3
+//   .forceSimulation([])
+//   .force("cluster", forceCluster())
+//   .force("collide", d3.forceCollide((d) => bubblePadding * d.r))
+//   .alpha(0.06)
+//   .alphaDecay(0)
+//   .on("tick", updateBubblePositions);
+
 let physics = d3
   .forceSimulation([])
+  .alphaTarget(0.005)
+  .velocityDecay(0.04)
+  .alphaDecay(0.3)
   .force("cluster", forceCluster())
-  .force(
-    "collide",
-    d3.forceCollide((d) => bubblePadding * d.r)
-  )
-  .alpha(0.06)
-  .alphaDecay(0)
+  // .force('charge', d3.forceManyBody().strength(-4))
+  // .force("x", d3.forceX().strength(0.01))
+  // .force("y", d3.forceY().strength(0.01))
+  .force("collide", d3.forceCollide().radius(d => bubblePadding * d.r).strength(0.25))
   .on("tick", updateBubblePositions);
 
 // Buttons and sliders
@@ -253,7 +262,7 @@ function togglePlayPause() {
 
 // Updates the transition speed tooltip every time you click
 function updateTransitionSpeedHoverText(increment) {
-  simulationRate = Math.min(Math.max(500, simulationRate + increment), 10000)
+  simulationRate = Math.min(Math.max(2000, simulationRate + increment), 15000)
   console.log(`Simulation speed: ${simulationRate}`)
   d3.select("#transition-speed1 .spd").text(simulationRate / 1000); // One hovertext for the "slower" button
   d3.select("#transition-speed2 .spd").text(simulationRate / 1000); // One hovertext for the "faster" button

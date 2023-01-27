@@ -93,13 +93,13 @@ const stages = {
     hovertext:
       "'Dropped Out' is here defined as a student who has no subsequent enrollment at MSU Denver to date, and no enrollment at any external institution. This category is terminal.",
   },
-  Sabbatical: {
+  Hiatus: {
     x: width * 0.5,
     y: height * 0.47,
     color: "#Eae61a",
     count: 0,
     hovertext:
-      "'Sabbatical' is defined here as when a student takes one or more semesters off between enrolled semesters, excluding the summer term.",
+      "'Hiatus' is defined here as when a student takes one or more semesters off between enrolled semesters, excluding the summer term.",
   },
 };
 

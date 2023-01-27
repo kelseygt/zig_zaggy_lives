@@ -281,7 +281,7 @@ zig_zag <- function(cohort_data, grad_data, trans_data, max_term_data, drop_data
     mutate(value = ifelse(is.na(value) & na.locf(value) == "Dropped Out", na.locf(value), value))
   zz_drop <- as.data.frame(zz_drop %>% pivot_wider(names_from = name, values_from = value))
   
-  # filling in sabbatical
+  # filling in hiatus
   zz_t <- as.data.frame(t(zz_drop))
   colnames(zz_t) <- zz_drop$PIDM
   rownames(zz_t) <- colnames(zz_drop)
@@ -295,7 +295,7 @@ zig_zag <- function(cohort_data, grad_data, trans_data, max_term_data, drop_data
       (is.na(zz_t[[pidm]]) & is.na(before)) 
       | (is.na(zz_t[[pidm]]) & is.na(after)) 
       | (is.na(zz_t[[pidm]]) & substr(terms, 5, 6) != "40"), 
-      "Sabbatical", zz_t[[pidm]])
+      "hiatus", zz_t[[pidm]])
   }
   zz_sabb <- as.data.frame(sapply(colnames(zz_t), FUN = function(pidm) sabb(pidm)))
   

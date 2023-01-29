@@ -255,3 +255,16 @@ pre {
   white-space: -o-pre-wrap;    /* Opera 7 */
   word-wrap: break-word;       /* Internet Explorer 5.5+ */
 }
+
+#apply-button {
+  background-color: #3aaca4;
+  font-family: 'Mohave', sans-serif;
+  font-size: 16px;
+  position: relative;
+  padding: 10px;
+  border: none;
+  outline: none;
+  width: 100px;
+  border-radius: 4px;
+  cursor: pointer;
+}

@@ -46,9 +46,12 @@
         as
         insufficient time has elapsed to know whether students are potentially just on hiatus, or have transferred out.
       </p>
+      <p>Select from the filters below and click 'Apply' to reload the animation at any time.</p>
     </h3>
-    <div id="drop-down-menu-container">
-      <select id="select-cohort" class="select-cohort">
+    <div id="filter-container">
+      <div class="filter-headers">Cohort</div>
+      <div class="filter-headers">Student Type</div>
+      <select id="select-cohort" class="drop-down-menu">
         <option value="201150">Fall 2011</option>
         <option value="201250">Fall 2012</option>
         <option value="201350">Fall 2013</option>
@@ -58,20 +61,25 @@
         <option value="201750">Fall 2017</option>
         <option value="201850">Fall 2018</option>
       </select>
-      <select id="select-student-type" class="select-cohort">
+      <select id="select-student-type" class="drop-down-menu">
         <option value="ftf">First-Time Freshman</option>
         <option value="trans">Transfer Students</option>
       </select>
-      <select id="select-sex" class="select-cohort">
+      <div class="filter-headers">Sex</div>
+      <div class="filter-headers">Time Status</div>
+      <select id="select-sex" class="drop-down-menu">
         <option value="All">All</option>
         <option value="F">Female</option>
         <option value="M">Male</option>
       </select>
-      <select id="select-time-status" class="select-cohort">
+      <select id="select-time-status" class="drop-down-menu">
         <option value="All">All</option>
         <option value="UG Full-Time">Full-Time</option>
         <option value="UG Part-Time">Part-Time</option>
       </select>
+      <div class="filter-headers"></div>
+      <div class="filter-headers"></div>
+      <div></div>
       <button id="apply-button" onclick="resetAnimation()">Apply</button>
     </div>
 

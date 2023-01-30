@@ -550,5 +550,5 @@ function resetStageCounts() {
 
 // END OF MAIN PROGRAM
 
-// Finally, actually call the main program with whatever dataset you want to start with (just the filename)
+// Finally, actually call the main program
 animateStudentData().then(() => { });

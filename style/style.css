@@ -94,6 +94,7 @@ body {
 #num-students {
   background: linear-gradient(to right, #ff8a00 0%, #dd4c4f 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
   /* font-weight: bold; */
@@ -103,6 +104,7 @@ body {
   /* background: linear-gradient(to bottom right, #43AA8B, #277DA1); */
   background: linear-gradient(to right, #ff8a00 0%, #dd4c4f 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
   font-weight: bold;
@@ -227,8 +229,20 @@ text {
   opacity: 1;
 }
 
+/* #drop-down-menu-container{
+  margin-left: 50px; } /* [Sidebar width - 2 x drop-down width] / 2) */
+
+#filter-container {
+  display: grid;
+  grid-template-columns: auto auto;
+  column-gap: 10px;
+  row-gap: 10px;
+  padding: 10px;
+  justify-content: center;
+}
+
 /* Drop-down menu */
-.select-cohort {
+.drop-down-menu {
   font-family: 'Mohave', sans-serif;
   font-size: 16px;
   position: relative;
@@ -241,8 +255,9 @@ text {
   box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
 }
 
-#drop-down-menu-container{
-  margin-left: 50px; /* [Sidebar width - 2 x drop-down width] / 2) */
+.filter-headers {
+  color: #fff;
+  text-align: flex-start;
 }
 
 /* Whitespace for timeNotes so the drop-downs won't shift */
@@ -260,11 +275,11 @@ pre {
   background-color: #3aaca4;
   font-family: 'Mohave', sans-serif;
   font-size: 16px;
-  position: relative;
   padding: 10px;
   border: none;
   outline: none;
   width: 100px;
   border-radius: 4px;
   cursor: pointer;
+  margin-left: 100px;
 }

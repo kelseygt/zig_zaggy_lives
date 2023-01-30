@@ -110,7 +110,7 @@
         <option value="1GX">Unknown First Generation Status</option>
       </select>
       <!-- Row 7 -->
-      <div class="filter-headers">College of Major</div>
+      <div class="filter-headers">College of Starting Major</div>
       <div class="grid-spacer"></div>
       <div class="filter-headers"></div>
       <!-- Row 8 -->
@@ -123,9 +123,17 @@
         <option value="School of Hospitality">School of Hospitality</option>
       </select>
       <div class="grid-spacer"></div>
-      <button id="apply-button" onclick="resetAnimation()">Apply</button>
+      <button class="filter-button" onclick="resetAnimation()">Apply</button>
       <div class="grid-spacer"></div>
-      <button id="apply-button" onclick="resetDropdowns()">Reset</button>
+      <button class="filter-button" onclick="resetDropdowns()">Reset</button>
+    </div>
+    <div class="filter-headers">
+      <p style="color: white; font-size: 14px; width: 210px; margin-left: 250px;">Please be patient, you may
+        need
+        to
+        wait a moment
+        for any changes to take
+        effect after clicking "Apply" or "Reset".</p>
 
     </div>
 
@@ -173,11 +181,9 @@
   </div>
 </div>
 
-<!-- <script src="js/d3.v5.min.js"></script>
-<script src="js/moving_bubbles_script.js" type="text/javascript"></script> -->
-
 <script src="./js/nouislider.js" type="text/javascript"></script>
 <script src="./js/d3.v5.min.js" type="text/javascript"></script>
-<script src="./js/helper_functions.js" type="text/javascript"></script>
+<script src="./js/filter_functions.js" type="text/javascript"></script>
+<script src="./js/slider_functions.js" type="text/javascript"></script>
 <script src="./js/cohort_time_notes.js" type="text/javascript"></script>
 <script src="./js/moving_bubbles.js" type="text/javascript"></script>

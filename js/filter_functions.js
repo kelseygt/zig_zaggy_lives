@@ -1,3 +1,4 @@
+// Filter functions used in the sidebar
 
 function studentDataFilter(student) {
 
@@ -54,4 +55,11 @@ function resetDropdowns() {
     document.getElementById("select-first-gen-status").selectedIndex = 0;
     document.getElementById("select-college-of-major").selectedIndex = 0;
     resetAnimation();
+}
+
+
+function togglePlayPauseForReset() {
+    globalThis.pauseSimulation = true;
+    let toggleElement = document.getElementById("toggleId");
+    toggleElement.innerHTML = "play_arrow";
 }

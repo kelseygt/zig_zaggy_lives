@@ -134,16 +134,6 @@ let physics = d3
 // Buttons and sliders
 let termSlider = document.getElementById('termSlider');
 
-// // Plays and pauses the animation, and also fades out starting instructional text on first click
-// d3.select("button#toggleId")
-//   .on("click", () => {
-//     d3.select("#starting-note")
-//       .transition()
-//       .duration(500)
-//       .style("opacity", 0)
-//       .text(timeNotes['start'])
-//   });
-
 d3.select('button#slower') // Transition speed slower
   .on('click', function () {
     updateTransitionSpeedHoverText(500)
@@ -251,6 +241,12 @@ function togglePlayPause() {
   } else {
     toggleElement.innerHTML = "pause"
   }
+}
+
+function togglePlayPauseForReset() {
+  globalThis.pauseSimulation = true;
+  let toggleElement = document.getElementById("toggleId");
+  toggleElement.innerHTML = "play_arrow";
 }
 
 // Updates the transition speed tooltip every time you click
@@ -392,19 +388,8 @@ function createSlider(termCodes) {
 };
 
 function sliderHandleWasMoved(_, handle, _, _, _, _) {
-  // console.log("a slider handle was moved!")
   if (handle === 1) {
-    // console.log("the current term handle was moved!")
     globalThis.animStart = true;
-    // Fade out the current timenote because it may not be 
-    d3.select("#time-notes")
-      .style("opacity", 1)
-      .transition()
-      .duration(1000)
-      .style("opacity", 0)
-      .style("color", "#ffffff")
-  } else {
-    // console.log("a bookmark handle was moved!")
   }
 }
 
@@ -452,6 +437,7 @@ function animatorControllerFactory(studentNodes, termCodes, studentX) {
       // If the animStart global flag is false, increment the slider
       // animStart will be true when an animation is first started
       // AND whenever the reset button is clicked
+
       if (!globalThis.animStart) {
         incrementSlider();
       }
@@ -479,6 +465,7 @@ function animatorControllerFactory(studentNodes, termCodes, studentX) {
 
 // Load data, generate term codes, and initialize student nodes
 async function loadStudentDataAndInitalizeNodes(fileName) {
+
   // Wait for D3 to resolve the promise
   let loadedData = await d3.csv(`../data/${fileName}`, d3.autoType);
   let studentData = structuredClone(loadedData.filter(studentDataFilter));
@@ -502,6 +489,7 @@ async function loadStudentDataAndInitalizeNodes(fileName) {
 // MAIN PROGRAM
 // Set up animation and then launch the algorithm!
 async function animateStudentData() {
+
   let cohortTermCode = document.getElementById("select-cohort");
   let cohortType = document.getElementById("select-student-type");
 
@@ -540,7 +528,7 @@ async function animateStudentData() {
 function resetAnimation() {
   globalThis.dataSetSwitched = true;
   resetStageCounts();
-  togglePlayPause()
+  togglePlayPauseForReset();
 }
 
 function resetStageCounts() {

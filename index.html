@@ -49,8 +49,11 @@
       <p>Select from the filters below and click 'Apply' to reload the animation at any time.</p>
     </h3>
     <div id="filter-container">
+      <!-- Row 1 -->
       <div class="filter-headers">Cohort</div>
+      <div class="grid-spacer"></div>
       <div class="filter-headers">Student Type</div>
+      <!-- Row 2 -->
       <select id="select-cohort" class="drop-down-menu">
         <option value="201150">Fall 2011</option>
         <option value="201250">Fall 2012</option>
@@ -61,26 +64,69 @@
         <option value="201750">Fall 2017</option>
         <option value="201850">Fall 2018</option>
       </select>
+      <div class="grid-spacer"></div>
       <select id="select-student-type" class="drop-down-menu">
         <option value="ftf">First-Time Freshman</option>
         <option value="trans">Transfer Students</option>
       </select>
-      <div class="filter-headers">Sex</div>
+      <!-- Row 3 -->
       <div class="filter-headers">Time Status</div>
-      <select id="select-sex" class="drop-down-menu">
-        <option value="All">All</option>
-        <option value="F">Female</option>
-        <option value="M">Male</option>
-      </select>
+      <div class="grid-spacer"></div>
+      <div class="filter-headers">Sex</div>
+      <!-- Row 4 -->
       <select id="select-time-status" class="drop-down-menu">
         <option value="All">All</option>
         <option value="UG Full-Time">Full-Time</option>
         <option value="UG Part-Time">Part-Time</option>
       </select>
+      <div class="grid-spacer"></div>
+      <select id="select-sex" class="drop-down-menu">
+        <option value="All">All</option>
+        <option value="F">Female</option>
+        <option value="M">Male</option>
+      </select>
+      <!-- Row 5 -->
+      <div class="filter-headers">Race/Ethnicity</div>
+      <div class="grid-spacer"></div>
+      <div class="filter-headers">First Generation Status</div>
+      <!-- Row 6 -->
+      <select id="select-race-ethnicity" class="drop-down-menu">
+        <option value="All">All</option>
+        <option value="African American">African American</option>
+        <option value="American Indian/Alaskan Native">American Indian/Alaskan Native</option>
+        <option value="Asian">Asian</option>
+        <option value="Hispanic">Hispanic</option>
+        <option value="International Student">International Student</option>
+        <option value="Missing/Unknown">Missing/Unknown</option>
+        <option value="Native Hawaiian/Pacific Islander">Native Hawaiian/Pacific Islander</option>
+        <option value="Two or More Races">Two or More Races</option>
+        <option value="White">White</option>
+      </select>
+      <div class="grid-spacer"></div>
+      <select id="select-first-gen-status" class="drop-down-menu">
+        <option value="All">All</option>
+        <option value="1GY">First Generation Student</option>
+        <option value="1GN">Not First Generation Student</option>
+        <option value="1GX">Unknown First Generation Status</option>
+      </select>
+      <!-- Row 7 -->
+      <div class="filter-headers">College of Major</div>
+      <div class="grid-spacer"></div>
       <div class="filter-headers"></div>
-      <div class="filter-headers"></div>
-      <div></div>
+      <!-- Row 8 -->
+      <select id="select-college-of-major" class="drop-down-menu">
+        <option value="All">All</option>
+        <option value="College of Business">College of Business</option>
+        <option value="College Health Applied Science">College of Health and Applied Science</option>
+        <option value="College Letters Arts Sciences">College of Letters, Arts, and Sciences</option>
+        <option value="School of Education">School of Education</option>
+        <option value="School of Hospitality">School of Hospitality</option>
+      </select>
+      <div class="grid-spacer"></div>
       <button id="apply-button" onclick="resetAnimation()">Apply</button>
+      <div class="grid-spacer"></div>
+      <button id="apply-button" onclick="resetDropdowns()">Reset</button>
+
     </div>
 
     <div id="source">

@@ -213,7 +213,7 @@ div.tooltip {
   display: grid;
   grid-template-columns: auto auto auto auto auto auto auto;
   column-gap: 5px;
-  row-gap: 10px;
+  row-gap: 5px;
   padding: 10px;
   justify-content: center;
 }
@@ -223,7 +223,7 @@ div.tooltip {
   font-family: 'Mohave', sans-serif;
   font-size: 16px;
   position: relative;
-  padding: 10px;
+  padding: 5px;
   border: none;
   border-right: 10px solid #fff;
   outline: none;
@@ -243,7 +243,7 @@ div.tooltip {
   background-color: #3aaca4;
   font-family: 'Mohave', sans-serif;
   font-size: 16px;
-  padding: 10px;
+  padding: 5px;
   border: none;
   outline: none;
   width: 95px;

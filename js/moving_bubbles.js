@@ -1,11 +1,16 @@
 // START OF SETUP
 
 // Simulation-specific variables
-let simulationRate = 8000;
+// Global flags for controller to listen to
+simulationRate = 8000;
+animStart = true;
+pauseSimulation = true;
+dataSetSwitched = true;
+debug = false;
+bubbleRadius = 4;
+
 d3.select("#transition-speed1 .spd").text(simulationRate / 1000);
 d3.select("#transition-speed2 .spd").text(simulationRate / 1000);
-let pauseSimulation = true;
-let DEBUG = false;
 
 // Regex for term codes to get term labels, and semester code -> semester label mapping
 const re = new RegExp("(20\\d{2})(30|40|50)"); // matches years in this millennium (20xx) followed by 30, 40, or 50
@@ -17,23 +22,14 @@ const width = 1200 - margin.left - margin.right;
 const height = 1100 - margin.top - margin.bottom;
 
 // Bubble stuff
-const bubbleRadius = 4; // Base radius of a bubble
 const bubblePadding = 1.4; // Collision detection uses this number times the radius of each bubble
 const bubbleRadiusVariance = 0.25 * bubbleRadius; // By how much the radius of a bubble can vary
-let predicateFunction = filterNone; // predicateFunction will always need to be defined
-
-// Global flags for controller to listen to
-let animStart = true;
-let datasetSwitched = false;
-// Drop-down menu and radio buttons
-let cohortTermCode = document.getElementById("select-cohort");
-let cohortType = document.getElementById("select-student-type");
 
 // Stage locations and properties
-const stages = {
+stages = {
   "Starting Cohort": {
     x: width * 0.5,
-    y: height * 0.15,
+    y: height * 0.2,
     color: "#843b97",
     count: 0,
     hovertext: "A 'Starting Cohort' is defined as a group of students in their first semester at MSU Denver.",
@@ -115,38 +111,17 @@ const SVG = d3
 // Dunno why this step is separate
 d3.select("#chart").style("width", width + margin.left + margin.right + "px");
 
-// let physics = d3
-//   .forceSimulation([])
-//   .force("cluster", forceCluster())
-//   .force("collide", d3.forceCollide((d) => bubblePadding * d.r))
-//   .alpha(0.06)
-//   .alphaDecay(0)
-//   .on("tick", updateBubblePositions);
-
 let physics = d3
   .forceSimulation([])
   .alphaTarget(0.005)
   .velocityDecay(0.04)
   .alphaDecay(0.3)
   .force("cluster", forceCluster())
-  // .force('charge', d3.forceManyBody().strength(-4))
-  // .force("x", d3.forceX().strength(0.01))
-  // .force("y", d3.forceY().strength(0.01))
   .force("collide", d3.forceCollide().radius(d => bubblePadding * d.r).strength(0.25))
   .on("tick", updateBubblePositions);
 
 // Buttons and sliders
-const termSlider = document.getElementById('termSlider');
-
-// Plays and pauses the animation, and also fades out starting instructional text on first click
-d3.select("button#toggleId")
-  .on("click", () => {
-    d3.select("#starting-note")
-      .transition()
-      .duration(500)
-      .style("opacity", 0)
-      .text(timeNotes['start'])
-  });
+let termSlider = document.getElementById('termSlider');
 
 d3.select('button#slower') // Transition speed slower
   .on('click', function () {
@@ -162,30 +137,30 @@ d3.select('button#faster') // Transition speed faster
 const div = d3.select("body").append("div").attr("class", "tooltip").style("opacity", 0);
 
 // Draw chart elements for the first time
-function initialDraws(studentNodes, cohortType, cohortName, timeNotes) {
+function initialDraws(studentNodes, cohortType, cohortName) {
   // A bubble for each student
   SVG.append("g")
     .selectAll("circle")
     .data(studentNodes)
     .join("circle")
-    .attr("fill", (d) => stages[d.stage].color) // Starting stage/color established in initializeNodes()
+    .attr("fill", (d) => globalThis.stages[d.stage].color) // Starting stage/color established in initializeNodes()
     .attr("cx", (d) => d.x)
     .attr("cy", (d) => d.y)
     .attr("r", (d) => d.r);
 
   // Stage labels
   SVG.selectAll()
-    .data(d3.keys(stages))
+    .data(d3.keys(globalThis.stages))
     .join("text")
     .attr("text-anchor", "middle")
-    .attr("x", (d) => stages[d].x)
-    .attr("y", (d) => stages[d].y + 100)
+    .attr("x", (d) => globalThis.stages[d].x)
+    .attr("y", (d) => globalThis.stages[d].y + 100)
     .text((d) => d)
     .on("mouseover", (d) => {
-      if (stages[d].hovertext) {
+      if (globalThis.stages[d].hovertext) {
         div.transition().duration(200).style("opacity", 0.9);
         div
-          .html(stages[d].hovertext)
+          .html(globalThis.stages[d].hovertext)
           .style("left", d3.event.pageX - 275 + "px")
           .style("top", d3.event.pageY - 28 + "px");
       }
@@ -197,15 +172,12 @@ function initialDraws(studentNodes, cohortType, cohortName, timeNotes) {
   // Initializes the group counts and percentages label locations
   // but does not actually draw the Ns and %s (see updateLabels function)
   SVG.selectAll(".groupPercentages")
-    .data(d3.keys(stages))
+    .data(d3.keys(globalThis.stages))
     .join("text")
     .attr("class", "groupPercentages")
     .attr("text-anchor", "middle")
-    .attr("x", (d) => stages[d].x)
-    .attr("y", (d) => stages[d].y + 125);
-
-  d3.select("#starting-note")
-    .text(timeNotes['start'])
+    .attr("x", (d) => globalThis.stages[d].x)
+    .attr("y", (d) => globalThis.stages[d].y + 125);
 
   // Fade in the number of students for this cohort
   d3.select("#num-students")
@@ -225,22 +197,11 @@ function initialDraws(studentNodes, cohortType, cohortName, timeNotes) {
     .text(cohortType.options[cohortType.selectedIndex].text);
 
   d3.select("#cohort-year")
-    // .style("opacity", 0)
-    // .transition()
-    // .duration(1000)
     .style("opacity", 1)
-    // .style("color", "#FF9B54")
     .text(cohortName);
 
   // Fade in the super sexy author
-  d3.select("#author")
-  // .style("opacity", 0)
-  // .transition()
-  // .duration(1500)
-  // .style("opacity", 1)
-  // .style("color", "#ffffff");
-
-  // Any other items you want to draw as part of first time chart setup
+  // d3.select("#author")
 }
 
 // Creates a physics environment
@@ -251,64 +212,13 @@ function makePhysicsEnvironment(studentNodes) {
 
 // Changes the play button into a pause button and back again
 function togglePlayPause() {
-  pauseSimulation = !pauseSimulation;
+  globalThis.pauseSimulation = !globalThis.pauseSimulation;
   let toggleElement = document.getElementById("toggleId");
-  if (pauseSimulation) {
+  if (globalThis.pauseSimulation) {
     toggleElement.innerHTML = "play_arrow";
   } else {
     toggleElement.innerHTML = "pause"
   }
-}
-
-// Updates the transition speed tooltip every time you click
-function updateTransitionSpeedHoverText(increment) {
-  simulationRate = Math.min(Math.max(2000, simulationRate + increment), 15000)
-  console.log(`Simulation speed: ${simulationRate}`)
-  d3.select("#transition-speed1 .spd").text(simulationRate / 1000); // One hovertext for the "slower" button
-  d3.select("#transition-speed2 .spd").text(simulationRate / 1000); // One hovertext for the "faster" button
-}
-
-// Various filter criteria here
-// Each function should take a student node as argument,
-// and return a boolean whether they match the criteria or not
-function filterMale(student) {
-  return student.sex === "M"
-}
-
-function filterFemale(student) {
-  return student.sex === "F"
-}
-
-// This is the only "filter" function which does not return a function
-// Underscore signifies that the argument (a student node) is unused
-// Returns false because no student matches this criteria
-function filterNone(_) {
-  return false;
-}
-
-// This'll go back up at the top with the other constants
-const filters = {
-  "male": filterMale,
-  "female": filterFemale,
-  // etc.
-}
-
-// Return a function which takes an arbitrary number of predicate
-// functions and evaluates the boolean AND across all of them
-// Note: fails fast (returns false at first failed criteria; don't bother checking rest)
-// E.g.: predicateFactory(filterMale, filterWhite) returns the function
-// (student) => filterMale(student) && filterWhite(student)
-function predicateFactory(...criteria) {
-  function predicate(student) {
-    for (const pred of criteria) {
-      if (!pred(student)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  return predicate
 }
 
 // Updaters that run on every simulation step
@@ -320,43 +230,16 @@ function updateBubblePositions() {
 }
 
 // Call this function to filter out bubbles based on the predicate passed in
-function updateBubbleColors(predicate = predicateFunction) {
+function updateBubbleColors() {
   d3.selectAll("circle")
     .transition()
-    .duration(simulationRate * 0.25) // How quickly the color transitions
-    .attr("fill", (d) => (predicate(d) ? "#354162" : stages[d.stage].color));  // If the predicate is true, fade the bubble out
-}
-
-// Updates the stage Ns and %s as well as the year label
-// Any other labels that should be updated on every step of the animation
-// should go here as well
-
-function updateTimeNotes(term) {
-  if (typeof timeNotes[term] === "undefined") {
-    return
-  }
-
-  if (timeNotes[term]) {
-    d3.select("#time-notes")
-      .style("opacity", 0)
-      .transition()
-      .duration(500)
-      .style("opacity", 1)
-      .style("color", "#ffffff")
-      .text("#current-note .note").text(`${timeNotes[term]}`);
-  } else {
-    d3.select("#time-notes")
-      .style("opacity", 1)
-      .transition()
-      .duration(500)
-      .style("opacity", 0)
-      .style("color", "#ffffff")
-  }
+    .duration(globalThis.simulationRate * 0.25) // How quickly the color transitions
+    .attr("fill", (d) => globalThis.stages[d.stage].color);  // If the predicate is true, fade the bubble out
 }
 
 function updateLabels(studentNodes, year) {
   SVG.selectAll(".groupPercentages").text((d) => {
-    let n = stages[d].count;
+    let n = globalThis.stages[d].count;
     let pct = Math.round((n / studentNodes.length) * 1000) / 10;
     return `n = ${n} (${pct}%)`;
   });
@@ -393,9 +276,9 @@ function initializeNodes(stage, x, y, student) {
 // The actual code which, given a term code, updates each node's position and color
 function updateNodes(studentNodes, term) {
   studentNodes.forEach(function updateSingleNode(node) {
-    stages[node.stage].count -= 1;
+    globalThis.stages[node.stage].count -= 1;
     node.stage = node[term];
-    stages[node.stage].count += 1;
+    globalThis.stages[node.stage].count += 1;
   });
 }
 
@@ -422,124 +305,24 @@ function forceCluster() {
   return force;
 }
 
-// Slider functions
-function createSlider(termCodes) {
-  let tooltipCallback = (value) => termLabelFromTermCode(termCodes[Math.round(value)]);
-  let pipFormatCallback = (value) => `Year ${Math.floor(value / 3) + 1}`
-
-  noUiSlider.create(termSlider, {
-    start: [0, 0, termCodes.length - 1],
-    // snap: true,
-    connect: [false, true, true, false],
-    step: 1,
-    range: {
-      'min': 0,
-      'max': termCodes.length - 1
-    },
-    tooltips: {
-      from: tooltipCallback,
-      to: tooltipCallback
-    },
-    pips: {
-      mode: 'steps',
-      filter: filterPipsClosure(termCodes),
-      format: {
-        to: pipFormatCallback,
-        from: pipFormatCallback
-      }
-    }
-  });
-
-  termSlider.noUiSlider.on("change", sliderHandleWasMoved)
-
-  d3.select('button#reset')
-    .on('click', () => {
-      termSlider.noUiSlider.reset();
-      animStart = true;
-    })
-};
-
-function sliderHandleWasMoved(_, handle, _, _, _, _) {
-  // console.log("a slider handle was moved!")
-  if (handle === 1) {
-    // console.log("the current term handle was moved!")
-    animStart = true;
-    // Fade out the current timenote because it may not be 
-    d3.select("#time-notes")
-      .style("opacity", 1)
-      .transition()
-      .duration(1000)
-      .style("opacity", 0)
-      .style("color", "#ffffff")
-  } else {
-    // console.log("a bookmark handle was moved!")
-  }
-}
-
-function filterPipsClosure(termCodes) {
-  function filterPips(value, _) {
-    let pointsInTime = [termCodes[2] ?? false, termCodes[11] ?? false, termCodes[17] ?? false, termCodes[29] ?? false]
-    return pointsInTime.includes(termCodes[value]) ? 2 : -1
-  }
-  return filterPips
-}
-
-function incrementSlider() {
-  let [min, i, max] = termSlider.noUiSlider.get(true).map(Math.round);
-  let next = Math.max(min, (i + 1) % (max + 1));
-  console.log(`i: ${i}, min: ${min}, max: ${max}, next: ${next}`);
-  termSlider.noUiSlider.setHandle(1, next);
-}
-
-function getSliderValue() {
-  return Math.round(termSlider.noUiSlider.get(true)[1]);
-}
-
-function getTermAndYear(termCodes) {
-  let i = getSliderValue()
-  let term = termCodes[i]
-  let year = Math.floor(i / 3) + 1
-  return [term, year]
-}
-
-function getTimeNotes(fileName, allTimeNotes) {
-  timeNotes = (allTimeNotes[fileName.slice(0, -4)]);
-  return timeNotes;
-}
-
-function changeDataSource() {
-  // togglePlayPause();
-  pauseSimulation = true
-  document.getElementById("toggleId").innerHTML = "play_arrow"
-  d3.select("#time-notes")
-    .style("opacity", 1)
-    .transition()
-    .duration(500)
-    .style("opacity", 0)
-    .style("color", "#ffffff");
-  datasetSwitched = true;
-}
-
 // Return a controller which encapsulates everything that  needs to happen for a single animation frame
 function animatorControllerFactory(studentNodes, termCodes, studentX) {
   // THIS IS THE MAIN LOGIC FOR THE ANIMATION ITSELF;
   // EVERYTHING ELSE IN THIS FILE IS A HELPER FUNCTION, A VARIABLE, OR SETUP CODE
   function controller() {
     // Dataset switcher listener goes here
-    if (datasetSwitched) {
-      datasetSwitched = false;
-      termSlider.noUiSlider.destroy();
-      setTimeout(animateStudentData, 10, `${cohortTermCode.value}_${cohortType.value}.csv`)
-    } else if (pauseSimulation) {
-      setTimeout(controller, 100);
+    if (globalThis.dataSetSwitched) {
+      globalThis.dataSetSwitched = false;
+      setTimeout(animateStudentData, 10);
+    } else if (globalThis.pauseSimulation) {
+      setTimeout(controller, 10);
     } else {
-      // Filter criteria listener goes here
-
 
       // If the animStart global flag is false, increment the slider
       // animStart will be true when an animation is first started
       // AND whenever the reset button is clicked
-      if (!animStart) {
+
+      if (!globalThis.animStart) {
         incrementSlider();
       }
 
@@ -548,19 +331,16 @@ function animatorControllerFactory(studentNodes, termCodes, studentX) {
 
       updateNodes(studentNodes, term);
       updateLabels(studentNodes, year);
-      updateTimeNotes(term);
 
-      // Suppose the user wants to filter on sex == female
-      // predicateFunction = filterSex("M")
       updateBubbleColors();
 
-      if (DEBUG) {
+      if (globalThis.debug) {
         debugStatements(studentNodes, studentX, term);
       }
 
       // Finally, move the slider
-      animStart = false;
-      setTimeout(controller, simulationRate);
+      globalThis.animStart = false;
+      setTimeout(controller, globalThis.simulationRate);
     }
   }
 
@@ -568,33 +348,62 @@ function animatorControllerFactory(studentNodes, termCodes, studentX) {
 }
 
 // Load data, generate term codes, and initialize student nodes
-async function loadStudentData(fileName) {
+async function loadStudentDataAndInitalizeNodes(fileName) {
+
   // Wait for D3 to resolve the promise
-  let studentData = await d3.csv(`../data/${fileName}`, d3.autoType);
+  let loadedData = await d3.csv(`../data/${fileName}`, d3.autoType);
+  let studentData = structuredClone(loadedData.filter(studentDataFilter));
+  if (studentData.length < 5) {
+    studentData = loadedData;
+    resetDropdowns();
+    alert("Insufficient results to display. Cohort must be at least five students.");
+  }
+  // Sets the simulation rate and bubble size based on the size of the data set
+  if (studentData.length > 2000) {
+    simulationRate = 8000;
+    bubbleRadius = 4;
+  } else if (studentData.length > 1500) {
+    simulationRate = 7000;
+    bubbleRadius = 4.5;
+  } else if (studentData.length > 1000) {
+    simulationRate = 6000;
+    bubbleRadius = 5;
+  } else if (studentData.length > 400) {
+    simulationRate = 5000;
+    bubbleRadius = 6;
+  } else {
+    simulationRate = 4000;
+    bubbleRadius = 8;
+  }
+  updateTransitionSpeedHoverText(0);
 
   // Get term codes from dataset
   const termCodes = Object.keys(studentData[0]).filter((k) => re.test(k));
 
   // Initialize student nodes
   let stage = "Starting Cohort";
-  let x = stages[stage].x;
-  let y = stages[stage].y;
+  let x = globalThis.stages[stage].x;
+  let y = globalThis.stages[stage].y;
   let studentNodes = studentData.map((student) => initializeNodes(stage, x, y, student)); //.slice(0, 1000);
-  Object.keys(stages).forEach((key) => stages[key].count = 0)
-  stages[stage].count = studentNodes.length;
+
+  globalThis.stages[stage].count = studentNodes.length;
 
   return [studentNodes, termCodes];
 }
+
 // END OF SETUP
 
 // MAIN PROGRAM
 // Set up animation and then launch the algorithm!
-async function animateStudentData(fileName) {
+async function animateStudentData() {
+
+  let cohortTermCode = document.getElementById("select-cohort");
+  let cohortType = document.getElementById("select-student-type");
+  let fileName = `${cohortTermCode.value}_${cohortType.value}.csv`
 
   // Load data and initialize nodes with their starting locations
   console.log(`Loading file ${fileName}`)
-  let [studentNodes, termCodes] = await loadStudentData(fileName);
-  getTimeNotes(fileName, allTimeNotes)
+  let [studentNodes, termCodes] = await loadStudentDataAndInitalizeNodes(fileName);
 
   // Clear the chart
   SVG.selectAll("*").remove();
@@ -603,7 +412,7 @@ async function animateStudentData(fileName) {
   createSlider(termCodes);
 
   // Draw chart elements first time
-  initialDraws(studentNodes, cohortType, termLabelFromTermCode(termCodes[0]), timeNotes);
+  initialDraws(studentNodes, cohortType, termLabelFromTermCode(termCodes[0]));
 
   // Give the labels their Ns and %s
   updateLabels(studentNodes, 1);
@@ -616,13 +425,25 @@ async function animateStudentData(fileName) {
 
   // Finally ready to start the animation...
   // Launch the algorithm!
-  animStart = true;
+  globalThis.animStart = true;
   let controller = animatorControllerFactory(studentNodes, termCodes, studentX);
 
   console.log("Setup complete, activating controller")
   controller();
 }
+
+function resetAnimation() {
+  globalThis.dataSetSwitched = true;
+  resetStageCounts();
+  togglePlayPauseForReset();
+}
+
+function resetStageCounts() {
+  Object.keys(globalThis.stages).forEach((k) => globalThis.stages[k].count = 0);
+}
+
+
 // END OF MAIN PROGRAM
 
-// Finally, actually call the main program with whatever dataset you want to start with (just the filename)
-animateStudentData("201150_ftf.csv");
+// Finally, actually call the main program
+animateStudentData().then(() => { });

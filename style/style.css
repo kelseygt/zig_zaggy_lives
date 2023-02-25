@@ -1,8 +1,9 @@
+/* START: General page containers */
+
 body {
   font-family: 'Mohave', sans-serif;
   background: #222a3f;
 }
-
 #main-wrapper {
   margin: auto;
   margin-top: 1%;
@@ -23,24 +24,11 @@ body {
   display: inline-block;
   width: 1200px;
 }
-#time-notes {
-  position: relative;
-  color: #fff; 
-  padding-left: 20px; 
-  padding-right: 20px;
-  font-style: italic;
-  font-weight: 400; 
-  font-size: 1.15em; 
-  line-height: 1.4em;
-  padding-top: 0px;
-  padding-bottom: 0px;
-  height: 110px;
-}
 #source {
   position: absolute;
   border-top: 1px solid #ccc;
   padding-top: 20px;
-  top: 1100px;
+  top: 1130px;
   font-size: 15px;
   line-height: 1.4em;
   width: 500px;
@@ -48,16 +36,6 @@ body {
 }
 #chart {
   margin: 0px auto;
-}
-#starting-note {
-  font-weight: bold;
-  font-size: 1.15em;
-	padding: 3px 0px;
-	font-weight: normal;
-  text-align: left;
-  margin-top: -40px;
-  margin-bottom: 0px;
-  color: #fff;
 }
 #left-button-container{
   margin-top: 20px;
@@ -71,59 +49,15 @@ body {
   text-align: left;
   padding-left: 2.5px;
 }
-#toggleId, #slower, #reset, #faster{
-  border-radius: 5px;
-  /* padding: 1px 15px; */
-  background-image: linear-gradient(to bottom right, #43AA8B, #277DA1);
-  border: #277DA1;
-}
-#toggleId:hover, #slower:hover, #play:hover, #pause:hover, #reset:hover, #faster:hover{
-  background-color: #ca7878;
-  cursor: pointer;
-  background-image: linear-gradient(to bottom right, #CE4257, #FF9B54);
-}
-#toggleId:active, #slower:active, #reset:active, #faster:active {
-  transform: translateY(5px);
-}
 .inline-div {
   display: flex;
   text-align: center;
   margin-bottom: 0px;
 }
+/* END: General page containers */
 
-#num-students {
-  background: linear-gradient(to right, #ff8a00 0%, #dd4c4f 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  display: inline-block;
-  /* font-weight: bold; */
-}
+/* START: General text formatting */
 
-#cohort-year {
-  /* background: linear-gradient(to bottom right, #43AA8B, #277DA1); */
-  background: linear-gradient(to right, #ff8a00 0%, #dd4c4f 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  display: inline-block;
-  font-weight: bold;
-}
-
-/* Tooltip hover formatting */
-div.tooltip {
-  color: white;
-  position: absolute;
-  text-align: left;
-  width: 200px;
-  padding: 5px;
-  font-size: 16px; 
-  font-family: 'Mohave', sans-serif;;
-  background: #267e79;
-  border: 1px solid #5a6164;
-  pointer-events: none;
-  border-radius: 5px;
-}
-
-/* General text formatting */
 text {
   font-size: 1.3em;
   fill: #fff;
@@ -136,7 +70,6 @@ h1 {
   margin-top: 0px;
   margin-bottom: 0px;
   color: #fff;
-  /* border-bottom: 1px solid #ccc; */
 }
 h2 {
 	font-size: 2.2em;
@@ -181,7 +114,39 @@ text {
   font-size: 1.3em;
   fill: #fff;
 }
+/* Tooltip hover formatting */
+div.tooltip {
+  color: white;
+  position: absolute;
+  text-align: left;
+  width: 200px;
+  padding: 5px;
+  font-size: 16px; 
+  font-family: 'Mohave', sans-serif;;
+  background: #267e79;
+  border: 1px solid #5a6164;
+  pointer-events: none;
+  border-radius: 5px;
+}
+#cohort-year {
+  background: linear-gradient(to right, #ff8a00 0%, #dd4c4f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  font-weight: bold;
+}
+#num-students {
+  background: linear-gradient(to right, #ff8a00 0%, #dd4c4f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
 
+/* END: General text formatting */
+
+/* START: Everything slider related */
 .slidecontainer {
   width: 50%;
   text-align: center;
@@ -227,31 +192,68 @@ text {
   opacity: 1;
 }
 
+#toggleId, #slower, #reset, #faster{
+  border-radius: 5px;
+  background-image: linear-gradient(to bottom right, #43AA8B, #277DA1);
+  border: #277DA1;
+}
+#toggleId:hover, #slower:hover, #play:hover, #pause:hover, #reset:hover, #faster:hover, .filter-button:hover{
+  background-color: #ca7878;
+  cursor: pointer;
+  background-image: linear-gradient(to bottom right, #CE4257, #FF9B54);
+}
+#toggleId:active, #slower:active, #reset:active, #faster:active, .filter-button:active {
+  transform: translateY(5px);
+}
+
+/* END: Everything slider related */
+
+/* START: Everything filter area related */
+#filter-container {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto auto auto;
+  column-gap: 5px;
+  row-gap: 5px;
+  padding: 10px;
+  justify-content: center;
+}
+
 /* Drop-down menu */
-.select-cohort {
+.drop-down-menu {
   font-family: 'Mohave', sans-serif;
   font-size: 16px;
   position: relative;
-  padding: 10px;
+  padding: 5px;
   border: none;
   border-right: 10px solid #fff;
   outline: none;
   width: 200px;
   border-radius: 4px;
-  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
+  grid-column: span 3;
+  text-overflow: ellipsis;
 }
 
-#drop-down-menu-container{
-  margin-left: 50px; /* [Sidebar width - 2 x drop-down width] / 2) */
+.filter-headers {
+  color: #fff;
+  text-align: flex-start;
+  grid-column: span 3;
 }
 
-/* Whitespace for timeNotes so the drop-downs won't shift */
-pre {
+.filter-button {
+  background-color: #3aaca4;
   font-family: 'Mohave', sans-serif;
-  width: 500px;
-  white-space: pre-wrap;       /* Since CSS 2.1 */
-  white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-  white-space: -pre-wrap;      /* Opera 4-6 */
-  white-space: -o-pre-wrap;    /* Opera 7 */
-  word-wrap: break-word;       /* Internet Explorer 5.5+ */
+  font-size: 16px;
+  padding: 5px;
+  border: none;
+  outline: none;
+  width: 95px;
+  border-radius: 4px;
+  cursor: pointer;
+  grid-column: span 1;
 }
+
+.grid-spacer {
+  grid-column: span 1;
+}
+
+/* END: Everything filter area related */

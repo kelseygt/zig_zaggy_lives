@@ -362,6 +362,12 @@ async function loadStudentDataAndInitalizeNodes(fileName) {
   if (studentData.length > 2000) {
     simulationRate = 8000;
     bubbleRadius = 4;
+  } else if (studentData.length > 1500) {
+    simulationRate = 7000;
+    bubbleRadius = 4.5;
+  } else if (studentData.length > 1000) {
+    simulationRate = 6000;
+    bubbleRadius = 5;
   } else if (studentData.length > 400) {
     simulationRate = 5000;
     bubbleRadius = 6;

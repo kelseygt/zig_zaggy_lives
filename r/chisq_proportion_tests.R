@@ -9,14 +9,6 @@ cohorts <- read.csv(file = "E:/Portfolio/zig_zaggy_lives/tableau_files/all_cohor
 enr_data <- read.csv(file = "E:/Portfolio/zig_zaggy_lives/data/base_working_files/ftf_and_trans_201150_thru_202150.csv", header = T, check.names = F)
 joined <- left_join(cohorts, enr_data, by = c("pid" = "PIDM"))
 
-# customize this section
-cohort <- "201150"
-pit <- "202140"
-styp <- "First-Time Freshman"
-metric <- "RACE_ETHNICITY"
-population <- "Dropped Out"
-# end
-
 # building the function
 chi_sq_test <- function(cohort, styp, metric, pit, population) {
   expected_prop <- joined %>%
@@ -41,5 +33,13 @@ chi_sq_test <- function(cohort, styp, metric, pit, population) {
   chisq.test(x = expected_prop$n2, p = expected_prop$n/sum(expected_prop$n))
 }
 #end
+
+# customize this section
+cohort <- "201150"
+pit <- "201240"
+styp <- "First-Time Freshman"
+metric <- "SEX_DESC" # RACE_ETHNICITY, FG_DESC, SEX_DESC
+population <- "Dropped Out"
+# end
 
 chi_sq_test(cohort, styp, metric, pit, population)

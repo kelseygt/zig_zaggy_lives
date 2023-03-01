@@ -21,8 +21,7 @@ for (student_id in all_cohorts$pid) {
   
   i = 1
   # filters overall data set to an individual student
-  # because the data is staggered, depending on the cohort, any columns with NAs
-  # are removed.
+  # because the data is staggered, depending on the cohort, any columns with NAs are removed.
   trajectory <- all_cohorts[all_cohorts$pid == student_id, ] %>%
     select_if(~ !any(is.na(.)))
   # creates empty data frame for each student to store all their hiatus

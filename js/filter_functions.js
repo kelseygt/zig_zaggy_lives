@@ -30,15 +30,10 @@ function studentDataFilter(student) {
         }
     }
 
-    // Need to eventually update the R script to deal with the college issue here
-    // In the meantime, this filter always needs to occur last
+    // Need to eventually update the R script to deal with recoding the colleges
     let collegeMajor = document.getElementById("select-college-of-major").value
     if (collegeMajor !== "All") {
-        if (collegeMajor == "College Health Applied Science"
-            && student.college_of_major == "College Professional Studies") {
-            return true
-        }
-        else if (student.college_of_major != collegeMajor) {
+        if (student.college_of_major != collegeMajor) {
             return false
         }
     }

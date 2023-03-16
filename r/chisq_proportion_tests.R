@@ -35,11 +35,11 @@ chi_sq_test <- function(cohort, styp, metric, pit, population) {
 #end
 
 # customize this section
-cohort <- "201150"
-pit <- "201240"
+cohort <- "201450"
+pit <- "201840"
 styp <- "First-Time Freshman"
-metric <- "SEX_DESC" # RACE_ETHNICITY, FG_DESC, SEX_DESC
-population <- "Dropped Out"
+metric <- "RACE_ETHNICITY" # RACE_ETHNICITY, FG_DESC, SEX_DESC
+population <- "Transferred Out"
 # end
 
 chi_sq_test(cohort, styp, metric, pit, population)

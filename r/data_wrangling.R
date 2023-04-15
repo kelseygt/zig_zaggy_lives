@@ -10,7 +10,7 @@ library(tibble)
 library(rstudioapi)
 
 # loading in data (all but the credit hour files -- see first function in next section)
-setwd("C:/Users/Laserbeams/Desktop/working_files")
+setwd("C:/Users/Laserbeams/Desktop/redo")
 cohort_data <- read.csv("ftf_and_trans_201150_thru_202150.csv", header = T, check.names = F)
 grad_data <- as.data.frame(read_excel("graduate_data.xlsx", sheet = "for_import"))
 trans_data <- as.data.frame(read_excel("transfer_outs.xlsx", sheet = "for_import"))
@@ -295,7 +295,7 @@ zig_zag <- function(cohort_data, grad_data, trans_data, max_term_data, drop_data
       (is.na(zz_t[[pidm]]) & is.na(before)) 
       | (is.na(zz_t[[pidm]]) & is.na(after)) 
       | (is.na(zz_t[[pidm]]) & substr(terms, 5, 6) != "40"), 
-      "hiatus", zz_t[[pidm]])
+      "Hiatus", zz_t[[pidm]])
   }
   zz_sabb <- as.data.frame(sapply(colnames(zz_t), FUN = function(pidm) sabb(pidm)))
   
@@ -308,11 +308,72 @@ zig_zag <- function(cohort_data, grad_data, trans_data, max_term_data, drop_data
   # adding column for start position
   colnames(zz_sabb)[which(names(zz_sabb) == "PIDM")] <- "pid"
   zz <- add_column(zz_sabb, start = rep("Starting Cohort", times = nrow(zz_sabb)), .after = "pid")
-  zz_piv <- pivot_longer(!pid, data = zz, names_to = "term", values_to = "grp")
-  zz_piv <- add_column(zz_piv, duration = rep(1, times = nrow(zz_piv)), .after = "grp")
+  # zz_piv <- pivot_longer(!pid, data = zz, names_to = "term", values_to = "grp")
+  # zz_piv <- add_column(zz_piv, duration = rep(1, times = nrow(zz_piv)), .after = "grp")
+  
+  # appending on a couple final features to be used in filtering
+  zz$pid <- as.integer(zz$pid)
+  to_append <- cohort_data %>%
+    select(PIDM,
+           COLL_DESC, 
+           DEPT_DESC,
+           MAJR_CODE,
+           MAJR_DESC, 
+           TIME_STATUS, 
+           SEX_CODE, 
+           FG_CODE, 
+           RACE_ETHNICITY)
+  final <- left_join(zz, to_append, by = c("pid" = "PIDM"))
+  final <- final %>% relocate(COLL_DESC, 
+                              DEPT_DESC,
+                              MAJR_CODE,
+                              MAJR_DESC, 
+                              TIME_STATUS, 
+                              SEX_CODE, 
+                              FG_CODE, 
+                              RACE_ETHNICITY, 
+                              .after = pid)
+  final <- final %>% 
+    rename("college_of_major" = "COLL_DESC",
+           "dept_of_major" = "DEPT_DESC",
+           "major_code" = "MAJR_CODE",
+           "major" = "MAJR_DESC",
+           "time_status" = "TIME_STATUS",
+           "sex" = "SEX_CODE",
+           "first_gen_status" = "FG_CODE",
+           "race_ethnicity" = "RACE_ETHNICITY")
+  
+  # recoding college of major to match current structure of university
+  ed_majors <- c("EDPB",
+                 "EDU",
+                 "ELCE",
+                 "LECE",
+                 "LEDS",
+                 "LEED",
+                 "LK12",
+                 "LSPL",
+                 "LTIR",
+                 "PCIP",
+                 "PETE",
+                 "PTED",
+                 "SED",
+                 "TEDM",
+                 "TLC",
+                 "TLE",
+                 "TLK",
+                 "TLS",
+                 "UNED"
+  )
+
+  final$college_of_major <-
+    ifelse(final$major == "Computer Science", "College Health Applied Science",
+           ifelse(final$major == "Journalism", "College Letters Arts Sciences",
+                  ifelse(final$major_code %in% ed_majors, "School of Education",
+                         ifelse(final$college_of_major == "College Professional Studies", "College Health Applied Science",
+                                final$college_of_major))))
   
   # export final data set
-  write.csv(zz, paste0(cohort, "_", student_type, ".csv"), row.names = F)
+  write.csv(final, paste0(cohort, "_", student_type, ".csv"), row.names = F)
   
 }
 

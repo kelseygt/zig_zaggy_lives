@@ -46,8 +46,9 @@
         as
         insufficient time has elapsed to know whether students are potentially just on hiatus, or have transferred out.
       </p>
-      <p>Select from the filters below and click 'Apply' to reload the animation at any time.</p>
-    </h3><br><br>
+      <p>Select from the filters below and click 'Apply' to reload the animation at any time. Animation will only
+        populate with a minimum of 5 individuals.</p>
+    </h3>
     <div id="filter-container">
       <!-- Row 1 -->
       <div class="filter-headers">Cohort</div>
@@ -110,31 +111,165 @@
         <option value="1GX">Unknown First Generation Status</option>
       </select>
       <!-- Row 7 -->
-      <div class="filter-headers">College of Starting Major</div>
+      <div class="filter-headers">Term GPA</div>
       <div class="grid-spacer"></div>
-      <div class="filter-headers"></div>
+      <div class="filter-headers">EFC</div>
       <!-- Row 8 -->
+      <select id="select-term-gpa" class="drop-down-menu">
+        <option value="All">All</option>
+        <option value="0.0 - 2.0">0.0 - 2.0</option>
+        <option value="2.0+">2.0+</option>
+      </select>
+      <div class="grid-spacer"></div>
+      <select id="select-efc" class="drop-down-menu">
+        <option value="All">All</option>
+        <option value="$0 - $3600">$0 - $3600</option>
+        <option value="$3600+">$3600+</option>
+        <option value="Unknown EFC">Unknown EFC</option>
+      </select>
+      <!-- Row 9 -->
+      <div class="filter-headers">Pell Eligibility</div>
+      <div class="grid-spacer"></div>
+      <div class="filter-headers">College of Starting Major</div>
+      <!-- Row 10 -->
+      <select id="select-pell-eligibility" class="drop-down-menu">
+        <option value="All">All</option>
+        <option value="Pell Eligible">Pell Eligible</option>
+        <option value="Not Pell Eligible">Not Pell Eligible</option>
+      </select>
+      <div class="grid-spacer"></div>
       <select id="select-college-of-major" class="drop-down-menu">
         <option value="All">All</option>
         <option value="College of Business">College of Business</option>
-        <option value="College of Health and Applied Science">College of Health and Applied Science</option>
-        <option value="College of Letters, Arts, and Sciences">College of Letters, Arts, and Sciences</option>
+        <option value="College Health Applied Science">College of Health and Applied Science</option>
+        <option value="College Letters Arts Sciences">College of Letters, Arts, and Sciences</option>
         <option value="School of Education">School of Education</option>
         <option value="School of Hospitality">School of Hospitality</option>
+      </select>
+      <!-- Row 11 -->
+      <div class="filter-headers">Department of Starting Major</div>
+      <div class="grid-spacer"></div>
+      <div class="filter-headers">College of Ending Major</div>
+      <!-- Row 12 -->
+      <select id="select-department-of-major" class="drop-down-menu">
+        <option value="All">All</option>
+        <option value="Accounting">Accounting</option>
+        <option value="Advanced Manufacturing/Industrial Design">Advanced Manufacturing/Industrial Design</option>
+        <option value="Africana Studies">Africana Studies</option>
+        <option value="Art">Art</option>
+        <option value="Aviation & Aerospace Science">Aviation & Aerospace Science</option>
+        <option value="Biology">Biology</option>
+        <option value="Chemistry">Chemistry</option>
+        <option value="Chicana/o Studies">Chicana/o Studies</option>
+        <option value="College of Business">College of Business</option>
+        <option value="Communication Studies">Communication Studies</option>
+        <option value="Computer Information Systems">Computer Information Systems</option>
+        <option value="Computer Sciences">Computer Sciences</option>
+        <option value="Criminal Justice & Criminology">Criminal Justice & Criminology</option>
+        <option value="Earth and Atmospheric Sciences">Earth and Atmospheric Sciences</option>
+        <option value="Economics">Economics</option>
+        <option value="Engineering and Engineering Technology">Engineering and Engineering Technology</option>
+        <option value="English">English</option>
+        <option value="Finance">Finance</option>
+        <option value="Gender Institute for Teaching and Advocacy">Gender Institute for Teaching and Advocacy</option>
+        <option value="Health Professions">Health Professions</option>
+        <option value="History">History</option>
+        <option value="Hospitality, Tourism, & Events">Hospitality, Tourism, & Events</option>
+        <option value="Human Performance and Sport">Human Performance and Sport</option>
+        <option value="Human Services Professions">Human Services Professions</option>
+        <option value="Individualized Degree Program">Individualized Degree Program</option>
+        <option value="Journalism and Tech Com">Journalism and Tech Com</option>
+        <option value="Management">Management</option>
+        <option value="Marketing">Marketing</option>
+        <option value="Mathematics & Statistics">Mathematics & Statistics</option>
+        <option value="Modern Languages">Modern Languages</option>
+        <option value="Music">Music</option>
+        <option value="Nursing">Nursing</option>
+        <option value="Nutrition">Nutrition</option>
+        <option value="Philsophy">Philsophy</option>
+        <option value="Physics">Physics</option>
+        <option value="Political Science">Political Science</option>
+        <option value="Psychology">Psychology</option>
+        <option value="School of Education">School of Education</option>
+        <option value="Social Work">Social Work</option>
+        <option value="Sociology and Anthropology">Sociology and Anthropology</option>
+        <option value="Speech, Language, Hearing Sci">Speech, Language, and Hearing Sciences</option>
+        <option value="Theatre and Dance">Theatre and Dance</option>
+        <option value="Undeclared">Undeclared</option>
+      </select>
+      <div class="grid-spacer"></div>
+      <select id="select-college-of-ending-major" class="drop-down-menu">
+        <option value="All">All</option>
+        <option value="College of Business">College of Business</option>
+        <option value="College Health Applied Science">College of Health and Applied Science</option>
+        <option value="College Letters Arts Sciences">College of Letters, Arts, and Sciences</option>
+        <option value="School of Education">School of Education</option>
+        <option value="School of Hospitality">School of Hospitality</option>
+      </select>
+
+      <!-- Row 13 -->
+      <div class="filter-headers">Department of Ending Major</div>
+      <div class="grid-spacer"></div>
+      <div class="filter-headers"></div>
+
+      <!-- Row 14 -->
+      <select id="select-department-of-ending-major" class="drop-down-menu">
+        <option value="All">All</option>
+        <option value="Accounting">Accounting</option>
+        <option value="Advanced Manufacturing/Industrial Design">Advanced Manufacturing/Industrial Design</option>
+        <option value="Africana Studies">Africana Studies</option>
+        <option value="Art">Art</option>
+        <option value="Aviation & Aerospace Science">Aviation & Aerospace Science</option>
+        <option value="Biology">Biology</option>
+        <option value="Chemistry">Chemistry</option>
+        <option value="Chicana/o Studies">Chicana/o Studies</option>
+        <option value="College of Business">College of Business</option>
+        <option value="Communication Studies">Communication Studies</option>
+        <option value="Computer Information Systems">Computer Information Systems</option>
+        <option value="Computer Sciences">Computer Sciences</option>
+        <option value="Criminal Justice & Criminology">Criminal Justice & Criminology</option>
+        <option value="Earth and Atmospheric Sciences">Earth and Atmospheric Sciences</option>
+        <option value="Economics">Economics</option>
+        <option value="Engineering and Engineering Technology">Engineering and Engineering Technology</option>
+        <option value="English">English</option>
+        <option value="Finance">Finance</option>
+        <option value="Gender Institute for Teaching and Advocacy">Gender Institute for Teaching and Advocacy</option>
+        <option value="Health Professions">Health Professions</option>
+        <option value="History">History</option>
+        <option value="Hospitality, Tourism, & Events">Hospitality, Tourism, & Events</option>
+        <option value="Human Performance and Sport">Human Performance and Sport</option>
+        <option value="Human Services Professions">Human Services Professions</option>
+        <option value="Individualized Degree Program">Individualized Degree Program</option>
+        <option value="Journalism and Tech Com">Journalism and Tech Com</option>
+        <option value="Management">Management</option>
+        <option value="Marketing">Marketing</option>
+        <option value="Mathematics & Statistics">Mathematics & Statistics</option>
+        <option value="Modern Languages">Modern Languages</option>
+        <option value="Music">Music</option>
+        <option value="Nursing">Nursing</option>
+        <option value="Nutrition">Nutrition</option>
+        <option value="Philsophy">Philsophy</option>
+        <option value="Physics">Physics</option>
+        <option value="Political Science">Political Science</option>
+        <option value="Psychology">Psychology</option>
+        <option value="School of Education">School of Education</option>
+        <option value="Social Work">Social Work</option>
+        <option value="Sociology and Anthropology">Sociology and Anthropology</option>
+        <option value="Speech, Language, Hearing Sci">Speech, Language, and Hearing Sciences</option>
+        <option value="Theatre and Dance">Theatre and Dance</option>
+        <option value="Undeclared">Undeclared</option>
       </select>
       <div class="grid-spacer"></div>
       <button class="filter-button" onclick="resetAnimation()">Apply</button>
       <div class="grid-spacer"></div>
       <button class="filter-button" onclick="resetDropdowns()">Reset</button>
     </div>
-    <div class="filter-headers">
-      <p style="color: white; font-size: 14px; width: 210px; margin-left: 250px;">You may
-        need
-        to
-        wait a moment
-        for any changes to take
-        effect after clicking "Apply" or "Reset".</p>
 
+
+
+    <div class="filter-headers">
+      <p style="color: white; font-size: 14px; width: 400px; margin-left: 50px;">You may
+        need to wait a moment for any changes to take effect after clicking "Apply" or "Reset".</p>
     </div>
 
     <div id="source">
@@ -185,5 +320,4 @@
 <script src="./js/d3.v5.min.js" type="text/javascript"></script>
 <script src="./js/filter_functions.js" type="text/javascript"></script>
 <script src="./js/slider_functions.js" type="text/javascript"></script>
-<script src="./js/cohort_time_notes.js" type="text/javascript"></script>
 <script src="./js/moving_bubbles.js" type="text/javascript"></script>

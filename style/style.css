@@ -62,6 +62,9 @@ text {
   font-size: 1.3em;
   fill: #fff;
 }
+p {
+  font-size: 0.95em;
+}
 h1 {
 	font-size: 2.5em;
 	padding: 3px 0px;
@@ -221,9 +224,9 @@ div.tooltip {
 /* Drop-down menu */
 .drop-down-menu {
   font-family: 'Mohave', sans-serif;
-  font-size: 16px;
+  font-size: 15px;
   position: relative;
-  padding: 5px;
+  padding: 2px;
   border: none;
   border-right: 10px solid #fff;
   outline: none;
@@ -242,8 +245,8 @@ div.tooltip {
 .filter-button {
   background-color: #3aaca4;
   font-family: 'Mohave', sans-serif;
-  font-size: 16px;
-  padding: 5px;
+  font-size: 15px;
+  padding: 2px;
   border: none;
   outline: none;
   width: 95px;

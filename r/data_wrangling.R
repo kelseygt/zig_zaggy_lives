@@ -16,6 +16,7 @@ grad_data <- as.data.frame(read_excel("graduate_data.xlsx", sheet = "for_import"
 trans_data <- as.data.frame(read_excel("transfer_outs.xlsx", sheet = "for_import"))
 max_term_data <- as.data.frame(read_excel("max_term.xlsx", sheet = "for_import_1"))
 drop_data <- as.data.frame(read_excel("max_term.xlsx", sheet = "for_import_2"))
+ending_major <- read.csv("ending_major.csv", header = T)
 
 # building data trimming functions (order matters here)
 read_cred_hr_data <- function(cohort) {
@@ -91,9 +92,189 @@ trim_drop_data <- function(drop_data, student_type, cohort, credit_hrs) {
   drop_trimmed <- drop_trimmed[, match(colnames(credit_hrs), names(drop_trimmed))]
   return(drop_trimmed)
 }
+append_data <- function(zz, cohort_trimmed, student_type, ending_major) {
+  # appending on a couple final features to be used in filtering
+  zz$pid <- as.integer(zz$pid)
+  zz$student_type <- ifelse(student_type == 'ftf', 'ftf', 'trans')
+  zz <- zz %>% relocate(student_type, .after = pid)
+  to_append <- cohort_data %>%
+    select(PIDM,
+           TERM_CODE,
+           TIME_STATUS,
+           COLL_DESC,
+           DEPT_CODE,
+           DEPT_DESC,
+           MAJR_CODE,
+           MAJR_DESC, 
+           SEX_CODE, 
+           FG_CODE, 
+           RACE_ETHNICITY,
+           TERM_GPA,
+           PELL_ELIGIBLE_TERM,
+           EFC)
+  
+  # bucketing of EFC and GPA
+  to_append$gpa_bucketed <- ifelse(is.na(to_append$TERM_GPA) | to_append$TERM_GPA < 2, "0.0 - 2.0", "2.0+")
+  to_append$efc_bucketed <- ifelse(is.na(to_append$EFC), "Unknown EFC",
+                                   ifelse(to_append$EFC <= 3600, "$0 - $3600",
+                                          ifelse(to_append$EFC > 3600, "$3600+", "ERROR")))
+  
+  appended <- left_join(zz, to_append, by = c("pid" = "PIDM"))
+  appended <- appended %>% relocate(TERM_CODE,
+                              TIME_STATUS,
+                              COLL_DESC,
+                              DEPT_CODE,
+                              DEPT_DESC,
+                              MAJR_CODE,
+                              MAJR_DESC, 
+                              SEX_CODE, 
+                              FG_CODE, 
+                              RACE_ETHNICITY,
+                              TERM_GPA,
+                              gpa_bucketed,
+                              PELL_ELIGIBLE_TERM,
+                              EFC,
+                              efc_bucketed,
+                              .after = student_type)
+  
+  # adding ending college/dept/major
+  appended <- left_join(appended, ending_major, by = "pid")
+  appended <- appended %>% relocate(ending_coll_code,
+                                    ending_coll_desc,
+                                    ending_dept_code,
+                                    ending_dept_desc,
+                                    ending_major_code,
+                                    ending_major_desc,
+                                    .after = MAJR_DESC)
+  
+  # renaming columns 
+  appended <- appended %>% 
+    rename("cohort" = "TERM_CODE",
+           "time_status" = "TIME_STATUS",
+           "college_of_major" = "COLL_DESC",
+           "dept_code" = "DEPT_CODE",
+           "dept_of_major" = "DEPT_DESC",
+           "major_code" = "MAJR_CODE",
+           "major" = "MAJR_DESC",
+           "time_status" = "TIME_STATUS",
+           "sex" = "SEX_CODE",
+           "first_gen_status" = "FG_CODE",
+           "race_ethnicity" = "RACE_ETHNICITY",
+           "term_gpa" = "TERM_GPA",
+           "pell_term" = "PELL_ELIGIBLE_TERM",
+           "efc" = "EFC")
+  
+  return(appended)
+}
+recode_colleges <- function(appended) {
+  # recoding college of major to match current structure of university
+  ed_majors <- c("EDPB",
+                 "EDU",
+                 "ELCE",
+                 "LECE",
+                 "LEDS",
+                 "LEED",
+                 "LK12",
+                 "LSPL",
+                 "LTIR",
+                 "PCIP",
+                 "PETE",
+                 "PTED",
+                 "SED",
+                 "TEDM",
+                 "TLC",
+                 "TLE",
+                 "TLK",
+                 "TLS",
+                 "UNED"
+  )
+  
+  hosp_majors <- c("BRWO",
+                   "CEVT",
+                   "EVTM", 
+                   "HLDR",
+                   "HTL",
+                   "PCEV",
+                   "TTM",
+                   "HTE"
+  )
+  
+  # starting college recoded
+  appended$college_recoded <-
+    ifelse(appended$major == "Computer Science", "College Health Applied Science",
+           ifelse(appended$major == "Journalism", "College Letters Arts Sciences",
+                  ifelse(appended$major_code %in% ed_majors, "School of Education",
+                         ifelse(appended$major_code %in% hosp_majors, "School of Hospitality",
+                                ifelse(appended$college_of_major == "College Professional Studies", "College Health Applied Science",
+                                       appended$college_of_major))))) # consider whether you want to build in logic for ccd/academic affairs/no college designated
+  
+  # ending college recoded
+  appended$ending_college_recoded <-
+    ifelse(appended$ending_major_desc == "Computer Science", "College Health Applied Science",
+           ifelse(appended$ending_major_desc == "Journalism", "College Letters Arts Sciences",
+                  ifelse(appended$ending_major_desc %in% ed_majors, "School of Education",
+                         ifelse(appended$ending_major_code %in% hosp_majors, "School of Hospitality",
+                                ifelse(appended$ending_coll_desc == "College Professional Studies", "College Health Applied Science",
+                                       appended$ending_coll_desc))))) # consider whether you want to build in logic for ccd/academic affairs/no college designated
+  
+  appended <- appended %>% relocate(college_recoded, .after = college_of_major)
+  appended <- appended %>% relocate(ending_college_recoded, .after = ending_coll_desc)
+  return(appended)
+}
+recode_departments <- function(appended) {
+  # starting department recoded
+  appended$dept_recoded <-
+    ifelse(appended$dept_code %in% c("JMC", "JMP", "JRN", "JTC", "TCM"), "Journalism and Tech Com",
+           ifelse(appended$dept_code %in% c("SABS", "SOAN"), "Sociology and Anthropology",
+                  ifelse(appended$dept_code %in% c("TED1", "TED2", "TED3", "TEDA", "TEDB", "EDUC"), "School of Education", 
+                         ifelse(appended$dept_code %in% c("WMS", "GWS"), "Gender Institute for Teaching and Advocacy",
+                                ifelse(appended$dept_code %in% c("HTE", "HTL", "BRWO", "CEVT", "EVTM", "HLDR", "PCEV", "TTM"), "Hospitality, Tourism, & Events", 
+                                       ifelse(appended$dept_code %in% c("AAS", "AFS"), "Africana Studies",
+                                              ifelse(appended$dept_code %in% c("AMSI", "IND"), "Advanced Manufacturing/Industrial Design",
+                                                     ifelse(appended$dept_code %in% c("EAET", "ETS"), "Engineering and Engineering Technology",
+                                                            ifelse(appended$dept_code %in% c("PSY", "PSYC"), "Psychology",
+                                                                   ifelse(appended$dept_code %in% c("THAD", "THE"), "Theatre and Dance",
+                                                                          ifelse(appended$major_code %in% c("CS", "CSI"), "Computer Sciences",
+                                                                                 ifelse(appended$major_code %in% c("MTH", "STA"), "Mathematics & Statistics",
+                                                                                        ifelse(appended$dept_code %in% c("HSC", "HSP"), "Human Services Professions",
+                                                                                               ifelse(appended$dept_code %in% c("IDP", "IDPB", "IDPE", "IDPL", "IDPP", "IDPA", "IDPH"), "Individualized Degree Program",
+                                                                                                      ifelse(appended$dept_code %in% c("CIS", "CMS"), "Computer Information Systems",
+                                                                                                             ifelse(appended$major_code == "UNN", "Nursing", 
+                                                                                                                    ifelse(appended$major_code %in% c("ATV", "AMG", "ASC", "AAM", "PCAM", "PCSC"), "Aviation & Aerospace Science",
+                                                                                                                           ifelse(appended$major_code %in% c("CHE", "CHEM"), "Chemistry and Biochemistry",
+                                                                                                                                  ifelse(appended$dept_code == "Communication Arts & Sciences", "Communication Studies",
+                                                                                                                                         appended$dept_of_major)))))))))))))))))))
+  
+  # ending department recoded
+  appended$ending_dept_recoded <-
+    ifelse(appended$ending_dept_code %in% c("JMC", "JMP", "JRN", "JTC", "TCM"), "Journalism and Tech Com",
+           ifelse(appended$ending_dept_code %in% c("SABS", "SOAN"), "Sociology and Anthropology",
+                  ifelse(appended$ending_dept_code %in% c("TED1", "TED2", "TED3", "TEDA", "TEDB", "EDUC"), "School of Education",
+                         ifelse(appended$ending_dept_code %in% c("WMS", "GWS"), "Gender Institute for Teaching and Advocacy",
+                                ifelse(appended$ending_dept_code %in% c("HTE", "HTL", "BRWO", "CEVT", "EVTM", "HLDR", "PCEV", "TTM"), "Hospitality, Tourism, & Events",
+                                       ifelse(appended$ending_dept_code %in% c("AAS", "AFS"), "Africana Studies",
+                                              ifelse(appended$ending_dept_code %in% c("AMSI", "IND"), "Advanced Manufacturing/Industrial Design",
+                                                     ifelse(appended$ending_dept_code %in% c("EAET", "ETS"), "Engineering and Engineering Technology",
+                                                            ifelse(appended$ending_dept_code %in% c("PSY", "PSYC"), "Psychology",
+                                                                   ifelse(appended$ending_dept_code %in% c("THAD", "THE"), "Theatre and Dance",
+                                                                          ifelse(appended$ending_major_code %in% c("CS", "CSI"), "Computer Sciences",
+                                                                                 ifelse(appended$ending_major_code %in% c("MTH", "STA"), "Mathematics & Statistics",
+                                                                                        ifelse(appended$ending_dept_code %in% c("HSC", "HSP"), "Human Services Professions",
+                                                                                               ifelse(appended$ending_dept_code %in% c("IDP", "IDPB", "IDPE", "IDPL", "IDPP", "IDPA", "IDPH"), "Individualized Degree Program",
+                                                                                                      ifelse(appended$ending_dept_code %in% c("CIS", "CMS"), "Computer Information Systems",
+                                                                                                             ifelse(appended$ending_major_code == "UNN", "Nursing", 
+                                                                                                                    ifelse(appended$ending_major_code %in% c("ATV", "AMG", "ASC", "AAM", "PCAM", "PCSC"), "Aviation & Aerospace Science",
+                                                                                                                           ifelse(appended$ending_major_code %in% c("CHE", "CHEM"), "Chemistry and Biochemistry",
+                                                                                                                                  ifelse(appended$ending_dept_desc == "Communication Arts & Sciences", "Communication Studies",
+                                                                                                                                         appended$ending_dept_desc)))))))))))))))))))
+  
+  appended <- appended %>% relocate(dept_recoded, .after = dept_of_major)
+  appended <- appended %>% relocate(ending_dept_recoded, .after = ending_dept_desc)
+  return(appended)
+}
 
 # building main function
-zig_zag <- function(cohort_data, grad_data, trans_data, max_term_data, drop_data) {
+zig_zag <- function(cohort_data, grad_data, trans_data, max_term_data, drop_data, ending_major) {
   
   # trimming data sets to apply to the cohort in question
   cohort <- showPrompt(title = "Cohort Selection", message = "Which cohort are you interested in?")
@@ -288,7 +469,7 @@ zig_zag <- function(cohort_data, grad_data, trans_data, max_term_data, drop_data
   zz_t <- zz_t[-1 ,]
   
   terms <- rownames(zz_t)
-  sabb <- function(pidm) {
+  hiatus <- function(pidm) {
     before <- c(NA, head(zz_t[[pidm]], -1))
     after <- c(tail(zz_t[[pidm]], -1), NA)
     ifelse(
@@ -297,80 +478,23 @@ zig_zag <- function(cohort_data, grad_data, trans_data, max_term_data, drop_data
       | (is.na(zz_t[[pidm]]) & substr(terms, 5, 6) != "40"), 
       "Hiatus", zz_t[[pidm]])
   }
-  zz_sabb <- as.data.frame(sapply(colnames(zz_t), FUN = function(pidm) sabb(pidm)))
+  zz_hiatus <- as.data.frame(sapply(colnames(zz_t), FUN = function(pidm) hiatus(pidm)))
   
   # filling in the remaining NAs
-  zz_sabb <- zz_sabb %>% fill(everything())
-  rownames(zz_sabb) <- rownames(zz_t)
-  zz_sabb <- as.data.frame(t(zz_sabb))
-  zz_sabb <- rownames_to_column(zz_sabb, "PIDM")
+  zz_hiatus <- zz_hiatus %>% fill(everything())
+  rownames(zz_hiatus) <- rownames(zz_t)
+  zz_hiatus <- as.data.frame(t(zz_hiatus))
+  zz_hiatus <- rownames_to_column(zz_hiatus, "PIDM")
   
   # adding column for start position
-  colnames(zz_sabb)[which(names(zz_sabb) == "PIDM")] <- "pid"
-  zz <- add_column(zz_sabb, start = rep("Starting Cohort", times = nrow(zz_sabb)), .after = "pid")
+  colnames(zz_hiatus)[which(names(zz_hiatus) == "PIDM")] <- "pid"
+  zz <- add_column(zz_hiatus, start = rep("Starting Cohort", times = nrow(zz_hiatus)), .after = "pid")
   # zz_piv <- pivot_longer(!pid, data = zz, names_to = "term", values_to = "grp")
   # zz_piv <- add_column(zz_piv, duration = rep(1, times = nrow(zz_piv)), .after = "grp")
   
-  # appending on a couple final features to be used in filtering
-  zz$pid <- as.integer(zz$pid)
-  to_append <- cohort_data %>%
-    select(PIDM,
-           COLL_DESC, 
-           DEPT_DESC,
-           MAJR_CODE,
-           MAJR_DESC, 
-           TIME_STATUS, 
-           SEX_CODE, 
-           FG_CODE, 
-           RACE_ETHNICITY)
-  final <- left_join(zz, to_append, by = c("pid" = "PIDM"))
-  final <- final %>% relocate(COLL_DESC, 
-                              DEPT_DESC,
-                              MAJR_CODE,
-                              MAJR_DESC, 
-                              TIME_STATUS, 
-                              SEX_CODE, 
-                              FG_CODE, 
-                              RACE_ETHNICITY, 
-                              .after = pid)
-  final <- final %>% 
-    rename("college_of_major" = "COLL_DESC",
-           "dept_of_major" = "DEPT_DESC",
-           "major_code" = "MAJR_CODE",
-           "major" = "MAJR_DESC",
-           "time_status" = "TIME_STATUS",
-           "sex" = "SEX_CODE",
-           "first_gen_status" = "FG_CODE",
-           "race_ethnicity" = "RACE_ETHNICITY")
-  
-  # recoding college of major to match current structure of university
-  ed_majors <- c("EDPB",
-                 "EDU",
-                 "ELCE",
-                 "LECE",
-                 "LEDS",
-                 "LEED",
-                 "LK12",
-                 "LSPL",
-                 "LTIR",
-                 "PCIP",
-                 "PETE",
-                 "PTED",
-                 "SED",
-                 "TEDM",
-                 "TLC",
-                 "TLE",
-                 "TLK",
-                 "TLS",
-                 "UNED"
-  )
-
-  final$college_of_major <-
-    ifelse(final$major == "Computer Science", "College Health Applied Science",
-           ifelse(final$major == "Journalism", "College Letters Arts Sciences",
-                  ifelse(final$major_code %in% ed_majors, "School of Education",
-                         ifelse(final$college_of_major == "College Professional Studies", "College Health Applied Science",
-                                final$college_of_major))))
+  appended <- append_data(zz, cohort_trimmed, student_type, ending_major)
+  final <- recode_colleges(appended)
+  final <- recode_departments(final)
   
   # export final data set
   write.csv(final, paste0(cohort, "_", student_type, ".csv"), row.names = F)
@@ -378,4 +502,4 @@ zig_zag <- function(cohort_data, grad_data, trans_data, max_term_data, drop_data
 }
 
 # running final function
-zig_zag(cohort_data, grad_data, trans_data, max_term_data, drop_data)
+zig_zag(cohort_data, grad_data, trans_data, max_term_data, drop_data, ending_major)
